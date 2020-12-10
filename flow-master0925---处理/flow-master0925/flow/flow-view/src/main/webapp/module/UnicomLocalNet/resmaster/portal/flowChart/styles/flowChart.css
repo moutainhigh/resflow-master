@@ -1,0 +1,366 @@
+.inline-block {
+  display: inline-block
+}
+
+.track-list {
+  margin: 20px;
+  padding-left: 5px;
+  position: relative;
+}
+
+.track-list li {
+  position: relative;
+  padding: 9px 0 0 25px;
+  line-height: 18px;
+  border-left: 1px solid #d9d9d9;
+  color: #999;
+  display: inherit;
+}
+
+.track-list li.first {
+  color: #ED7848;
+  padding-top: 0;
+  border-left-color: #fff;
+}
+
+.track-list li .node-icon {
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  background: url(../images/order-icons.png) -21px -72px no-repeat;
+}
+
+.track-list li.first .node-icon {
+  background-position: 0 -72px;
+}
+
+.track-list li .txt {
+  max-width: 600px;
+  position: relative;
+  top: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.track-list li .txt span {
+  margin-right: 10px;
+}
+
+.track-list li .time {
+  margin-right: 20px;
+  position: relative;
+  top: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.fish-flowBox {
+  width: 100%;
+  height: auto;
+}
+
+.panel {
+  margin: 0 5px;
+}
+
+.flow-chart-box {
+  width: 100%;
+  height: auto;
+  position: relative;
+  padding: 50px 0 10px 0;
+}
+
+.fish-prompt {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.fish-prompt .fish-prompt-1,
+.fish-prompt .fish-prompt-2,
+.fish-prompt .fish-prompt-3 {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  line-height: 25px;
+  position: relative;
+}
+
+.fish-prompt .fish-prompt-1 {
+  color: #4ECB73
+}
+
+.fish-prompt .fish-prompt-2 {
+  color: #ED7848
+}
+
+.fish-prompt .fish-prompt-1:before,
+.fish-prompt .fish-prompt-2:before,
+.fish-prompt .fish-prompt-3:before {
+  display: inline-block;
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 6px;
+  left: -15px;
+  border-radius: 50%;
+}
+
+.fish-prompt .fish-prompt-1:before {
+  background-color: #4ECB73;
+}
+
+.fish-prompt .fish-prompt-2:before {
+  background-color: #ED7848;
+}
+
+.fish-prompt .fish-prompt-3:before {
+  background-color: #999;
+}
+
+/*fish-flowUl s*/
+.relative {
+  position: relative;
+}
+
+.mgt-50 {
+  margin-top: 50px;
+}
+
+.fish-flowUl {
+  margin: 0 auto;
+  display: table;
+  padding-left: 0 !important;
+}
+
+.fish-flowUl li {
+  display: table-cell;
+  float: left;
+  margin: 55px 15px;
+  text-align: center;
+  position: relative;
+  vertical-align: middle;
+}
+
+.fish-flowUl li .fish-flowIcon {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  line-height: 34px;
+  background: rgba(195, 205, 214, 1);
+  border-radius: 50%;
+}
+
+.fish-flowUl li .fish-flowIcon img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.fish-flowUl li .fish-flowName {
+  font-size: 12px;
+  color: #C3CDD6;
+  margin-top: 3px;
+}
+
+.fish-flowUl .fish-Line-s1,
+.fish-flowUl .fish-Line-s2 {
+  width: 1px;
+  height: 106px;
+  background-color: #C3CDD6;
+  margin: 22px 10px 0 10px !important;
+}
+
+.fish-flowUl .fish-Line-s3 {
+  width: 1px;
+  height: 418px;
+  background-color: #C3CDD6;
+  margin: 22px 10px 0 10px !important;
+}
+
+.fish-flowUl .fish-Line-s3s {
+  height: 522px;
+}
+
+.fish-flowUl .fish-flow1 {
+  height: 129px;
+}
+
+.fish-flowUl .fish-flow1,
+.fish-flowUl .fish-flow2 {
+  margin-top: 0 !important;
+}
+
+.fish-flowUl .fish-Line-s1 label,
+.fish-flowUl .fish-Line-s2 label,
+.fish-flowUl .fish-Line-s3 label {
+  width: 16px;
+  max-width: 16px;
+  height: 1px;
+  background-color: #C3CDD6;
+  position: absolute;
+  left: -15px;
+}
+
+.fish-line-h {
+  width: 124px;
+  height: 1px;
+  position: absolute;
+  bottom: 0;
+  left: -26px;
+  background-color: #C3CDD6;
+}
+
+.fish-line-he {
+  width: 100px;
+  height: 1px;
+  position: absolute;
+  bottom: 0;
+  left: -26px;
+  background-color: #C3CDD6;
+}
+
+.fish-flowUl li .fish-arrows {
+  display: inline-block;
+  width: 20px;
+  height: 15px;
+  background: url(../images/arrows.png) right 0 no-repeat;
+  position: absolute;
+  left: -25px;
+  top: 15px;
+}
+
+.fish-flow-dl,
+.fish-flow-dl dd {
+  margin: 0;
+  padding: 0;
+}
+
+.fish-flow-dl dd {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.fish-flow-dl dd:first-child {
+  margin-top: 0 !important;
+}
+
+.fish-flow-dl dd>div {
+  /* float: left; */
+  margin-right: 30px;
+  flex-grow: 1;
+  -ms-flex-grow: 1;
+}
+
+.fish-flow-dl dd>div:last-child {
+  margin-right: 0 !important;
+}
+
+/*完成*/
+.fish-flowUl .fish-finish .fish-flowIcon,
+.fish-flowUl .fish-finish.fish-Line-s1,
+.fish-flowUl .fish-finish.fish-Line-s2,
+.fish-flowUl .fish-finish.fish-Line-s3,
+.fish-flowUl .fish-finish label,
+.fish-flowUl .fish-line-h.fish-finish {
+  background-color: #4ECB73 !important
+}
+
+.fish-flowUl .fish-finish .fish-flowName {
+  color: #4ECB73
+}
+
+.fish-flowUl .fish-finish .fish-arrows {
+  background: url(../images/arrows2.png) right 0 no-repeat;
+}
+
+/*处理中*/
+.fish-flowUl .fish-dispose .fish-flowIcon,
+.fish-flowUl .fish-dispose.fish-Line-s1,
+.fish-flowUl .fish-dispose.fish-Line-s2,
+.fish-flowUl .fish-dispose.fish-Line-s3,
+.fish-flowUl .fish-dispose label,
+.fish-flowUl .fish-line-h.fish-dispose {
+  background-color: #ED7848 !important
+}
+
+.fish-flowUl .fish-dispose .fish-flowName {
+  color: #ED7848
+}
+
+.fish-flowUl .fish-dispose .fish-arrows {
+  background: url(../images/arrows1.png) right 0 no-repeat;
+}
+
+/*fish-flowUl d*/
+
+/* 核查调度 */
+.fish-verification li {
+  margin: 210px 15px 0 15px !important;
+}
+
+.fish-verification .fish-Line-s1,
+.fish-verification .fish-Line-s2 {
+  width: 1px;
+  height: 106px;
+  background-color: #C3CDD6;
+  margin: 180px 10px 0 10px !important;
+}
+
+.fish-verification .fish-flow1 {
+  height: 128px;
+  margin-top: 158px !important;
+}
+
+p{
+  white-space: nowrap;
+}
+
+/*跨域电路拆机，变更*/
+.fish-ver li {
+  margin: 106px 15px 0 15px !important;
+}
+
+.fish-ver .fish-flow1 {
+  height: 128px;
+  margin-top: 53px !important;
+}
+.fish-ver .fish-Line-s1 {
+  width: 1px;
+  height: 106px;
+  background-color: #C3CDD6;
+  margin: 75px 10px 0 10px !important;
+}
+
+.fish-ver .fish-Line-s4 {
+  width: 1px;
+  height: 210px;
+  background-color: #C3CDD6;
+  margin: 22px 10px 0 10px !important;
+}
+
+.fish-ver .fish-Line-s4 label{
+  width: 16px;
+  max-width: 16px;
+  height: 1px;
+  background-color: #C3CDD6;
+  position: absolute;
+  left: -15px;
+}
+
+.fish-ver .fish-line-hh{
+  width: 100px;
+  height: 1px;
+  position: absolute;
+  bottom: 0;
+  left: -26px;
+  background-color: #C3CDD6;
+}
+
+.resetBox {
+  padding: 20px 0 10px 0;
+}

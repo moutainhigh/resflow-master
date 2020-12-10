@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <h4 class="modal-title">选择派发对象</h4>
+</div>
+<div class="modal-body">
+    <div class="col-md-12" id="selectJobView">
+        <div class="row">
+            <form class="form-horizontal" id="orderOperTree-form">
+
+                <div class="row" id="selectType" style="margin-left: 5px;">
+                    <label class="radio-inline">
+                        <input type="radio" name="selectTypeRadio" id="treeData" value="tree">组织树</label>
+                    <label class="radio-inline">
+                        <input type="radio" name="selectTypeRadio" id="findData" value="find" checked="true">搜索</label>
+                </div>
+
+                <div class="row" id="treeDiv" style="height:338px;overflow-y:auto" hidden>
+                    <div id="tree" class="col-md-12" >
+                        <div id="treeDemo"></div>
+                    </div>
+                </div>
+
+                <div class="row" id="findButton" style="margin-left: 5px;" >
+                    <div id="searchTypeDiv" class="col-md-4" >
+                        <input type="text" id="searchType" name="searchType" class="form-control" disabled />
+                    </div>
+                    <div id="searchDataDiv" class="col-md-6">
+                        <input type="text" id="searchData" name="searchData" class="form-control" />
+                    </div>
+                    <div id="searchDiv" class="col-md-2">
+                        <button type="button" id="searchBtn" class="btn" style="background-color: #EB4A4B;height: 25px;">查询</button>
+                    </div>
+                </div>
+                <div class="row" id="findDiv" style="margin-left: 5px;">
+                    <div style="padding: 10px;" id="searchDataGridDiv">
+                        <div id="searchDataGrid"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div id="subBtnDiv" class="col-md-12" >
+                        <div style="text-align: right;padding-top:10px;padding-right:20px;" >
+                            <button type="button" id="submitBtn" class="btn" style="background-color: #EB4A4B">确定</button>
+                            <button type="button" class="btn" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

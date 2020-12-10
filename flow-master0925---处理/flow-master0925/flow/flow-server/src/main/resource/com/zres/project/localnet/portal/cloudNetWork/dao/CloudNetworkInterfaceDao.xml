@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetWork.dao.CloudNetworkInterfaceDao">
+
+    <select id="queryCloudNetworkInfo"  resultType="map">
+        SELECT CST.SUBSCRIBE_ID,
+                SO.TRADE_ID,
+                SO.FLOW_ID,
+                /** SRV_CODE 待确认这个字段要存哪*/
+                SO.PARALLEL_FLAG,
+                SO.SERIAL_NUMBER
+            FROM GOM_BDW_SRV_ORD_INFO SO
+            LEFT JOIN GOM_BDW_CST_ORD CST ON CST.CST_ORD_ID = SO.CST_ORD_ID
+            WHERE SO.SRV_ORD_ID = #{srvOrdId}
+
+
+    </select>
+
+    <select id="queryUrlInfo" parameterType="string" resultType="string">
+        SELECT CODE_VALUE FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE =#{codeType}
+    </select>
+</mapper>

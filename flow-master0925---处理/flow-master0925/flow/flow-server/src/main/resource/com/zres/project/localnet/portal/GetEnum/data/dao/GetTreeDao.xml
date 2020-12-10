@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.GetTreeDao">
+
+    <select id="getProvenceInfoList" resultType="map">
+      select id as "id",NAME as "name",PARENT_ID as "pId" from gom_area_s where id = #{areaId} and REC_STATE='170000001'
+   </select>
+    <select id="getCityInfoList" resultType="map">
+      select id as "id",NAME as "name",PARENT_ID as "pId" from gom_area_s where parent_id = #{areaId} and REC_STATE='170000001'
+      UNION ALL
+      select id as "id",NAME as "name",PARENT_ID as "pId" from gom_area_s where id = #{areaId} and REC_STATE='170000001'
+    </select>
+    <!--
+        UNION ALL
+      select id as "id",NAME as "name",PARENT_ID as "pId" from gom_area_s
+      where parent_id in ( select ID  from gom_area_s where parent_id = 350002000000000042766429 and REC_STATE='170000001')
+      and REC_STATE='170000001'-->
+
+    <select id="getCountyInfoList" resultType="map">
+        select id as "id",NAME as "name",PARENT_ID as "pId"  from gom_area_s where   REC_STATE='170000001'
+    </select>
+    <select id="getProviceArea" resultType="map">
+        SELECT ID,NAME,PARENT_ID FROM gom_area_s a where a.PARENT_ID = 350002000000000042766427
+        START WITH  a.ID=#{0}  CONNECT BY prior a.PARENT_ID=a.ID
+    </select>
+
+    <select id="getAreaIdByName" resultType="map">
+        select * from gom_area_s where  name = #{0} and ROWNUM  = 1
+    </select>
+
+    <select id="getParentDepInfo" resultType="map">
+        SELECT a.ORG_ID,a.ORG_NAME FROM gom_org_s a where a.PARENT_ORG_ID in ( SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+        START WITH  a.ORG_ID= (select ORG_ID from gom_user_s where user_id = #{0} )
+        CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+
+    </select>
+</mapper>

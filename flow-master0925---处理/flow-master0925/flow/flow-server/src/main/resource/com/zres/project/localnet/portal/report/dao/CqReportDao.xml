@@ -1,0 +1,1694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.report.dao.CqReportDao">
+
+    <!--资源分配未入库-->
+    <sql id="queryResAllocateUnStorage">
+        select
+        /**单据来源*/
+        bdw_get_order_type(so.srv_ord_id) RESOURCES_NAME,
+        /**发起单位（分公司）-只能用受理部门替代*/
+        c.HANDLE_DEP,
+        /**申请单号*/
+        c.APPLY_ORD_ID,
+        /**申请单创建时间*/
+        c.CREATE_DATE,
+        /**申请单标题*/
+        c.APPLY_ORD_NAME,
+        /**客户名称*/
+        c.CUST_NAME_CHINESE,
+        /**产品名称（产品类型）*/
+        pc.code_content product_name,
+        /**产品类型（编码）*/
+        pc.code_value product_value,
+        /**动作类型*/
+        PT.code_content operate_name,
+        /**动作类型*/
+        PT.code_value operate_value,
+        /**业务号码*/
+        SO.SERIAL_NUMBER,
+        /**电路编号*/
+        attr.attr_value,
+        /**调度单号*/
+        d.DISPATCH_ORDER_NO,
+        /**客户订单号*/
+        c.SUBSCRIBE_ID,
+        /**业务订单号*/
+        SO.TRADE_ID,
+        /**是否报竣 0 是，1否*/
+        CASE WHEN O.ORDER_STATE = '200000004' THEN '是' ELSE '否' END IS_FINISH, /*未入库专业*/
+        fp.un_save_specialty,
+        /*资源分配人员所属分公司*/
+        fp_org,
+        /*资源分配处理人员/角色*/
+        fp_staff
+        /**客户订单*/
+        from gom_bdw_cst_ord c
+        /**业务订单*/
+        join gom_bdw_srv_ord_info SO
+        on c.cst_ord_id = SO.cst_ord_id
+        /** 流程定单*/
+        join gom_order o on o.order_id = so.order_id
+        /**流程工单(执行中)*/
+        left join gom_wo w on o.order_id = w.order_id  and w.wo_state = '290000002'
+        /**流程环节*/
+        /*left join gom_ps_2_wo_s s
+        on w.ps_id = s.id
+        left join uos_tache t
+        on s.tache_id = t.id*/
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'product_code') PC
+        ON SO.SERVICE_ID = PC.CODE_VALUE
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'operate_type') PT
+        ON SO.ACTIVE_TYPE = PT.CODE_VALUE
+        /* 电路编号*/
+        left join (select srv_ord_id, attr_value
+        from GOM_BDW_SRV_ORD_ATTR_INFO
+        where attr_value_name = 'circuitCode') attr
+        on attr.srv_ord_id = so.srv_ord_id
+        left join GOM_BDW_DISPATCH_ORDER d
+        on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+        /*资源分配*/
+        left join (SELECT O.PARENT_ORDER_ID ORDER_ID,
+       /* LISTAGG(PDS.PUB_DATE_NAME, ',') WITHIN GROUP(ORDER BY PDS.PUB_DATE_NAME) UN_SAVE_SPECIALTY,
+        LISTAGG(FP.FP_ORG, ',') WITHIN GROUP(ORDER BY FP.FP_ORG) FP_ORG,
+        LISTAGG(FP.FP_STAFF, ',') WITHIN GROUP(ORDER BY FP.FP_STAFF) FP_STAFF*/
+                        PDS.PUB_DATE_NAME  UN_SAVE_SPECIALTY,
+                        FP.FP_ORG FP_ORG,
+                        FP.FP_STAFF FP_STAFF
+        FROM GOM_ORDER O /*专业名称*/
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE' /*资源信息返回接口返回的子流程id*/
+        LEFT JOIN (SELECT ATTR_VALUE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO
+        WHERE ATTR_CODE = 'orderId') K ON K.ATTR_VALUE = O.ORDER_ID /*资源分配环节*/
+        LEFT JOIN (SELECT W.ORDER_ID,
+        W.STATE_DATE,
+        CASE WHEN W.wo_state = '290000002'
+        THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+        THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000001'
+        THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000003'
+        THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+        ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+        END AS FP_STAFF,
+        dept.dept_name AS FP_ORG,
+        RANK() OVER(PARTITION BY W.ORDER_ID ORDER BY W.WO_ID DESC) RAN
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+        LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+        LEFT JOIN department dept ON dept.dept_id = info.region_id
+        WHERE T.TACHE_CODE IN ('RES_ALLOCATE', 'FIBER_RES_ALLOCATE')) FP
+        ON FP.ORDER_ID = O.ORDER_ID /*未入库*/
+        WHERE K.ATTR_VALUE IS NULL
+        AND FP.RAN = 1
+        <if test="beginDate !='' and beginDate !=null ">
+            /**开始时间*/
+            <![CDATA[   and fp.state_date > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and fp.state_date < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+       /* GROUP BY O.PARENT_ORDER_ID*/
+        ) fp
+        on fp.order_id = o.order_id
+        /**鉴权*/
+        INNER JOIN (SELECT ORG_ID
+        FROM GOM_ORG_S
+        START WITH ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = #{userId})
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID) B
+        ON C.HANDLE_DEP_ID = B.ORG_ID
+        where so.system_resource = 'flow-schedule-lt' /*排除停、复、拆、核查,只查询新开变更移机*/
+        AND O.PS_ID IN ('1000212', '1000207', '1000209')
+        and pt.CODE_VALUE not in (104, 105, 102)
+        and fp.un_save_specialty is not null
+        <if test="resources.size()>0">
+            /**单据来源*/
+            and bdw_get_order_type(so.srv_ord_id) in
+            <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                #{resource}
+            </foreach>
+        </if>
+        <if test="fpStaffOrg.size()>0 ">
+            /**分配环节处理人员/角色所属分公司*/
+            and
+            <foreach collection="fpStaffOrg" item="fpOrg" open="(" separator=" or " close=")">
+                instr( fp_org,#{fpOrg} )>0
+            </foreach>
+        </if>
+        <if test="specialtyType.size()>0 ">
+            /**分配环节专业*/
+            and
+            <foreach collection="specialtyType" item="specialty" open="(" separator=" or " close=")">
+                instr( fp.un_save_specialty, #{specialty} )>0
+            </foreach>
+        </if>
+        <if test="applyBeginDate !='' and applyBeginDate !=null ">
+            /**开始时间*/
+            <![CDATA[   and c.CREATE_DATE > = to_date(#{applyBeginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="applyEndDate !='' and applyEndDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and c.CREATE_DATE < = to_date(#{applyEndDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+
+    </sql>
+
+    <!-- 超时未报竣电路 -->
+    <sql id="queryOvertimeUnfinished">
+        select
+                /**单据来源*/
+                RESOURCES_NAME,
+                /**发起单位（分公司）-只能用受理部门替代*/
+                 HANDLE_DEP,
+                /**申请单号*/
+                 APPLY_ORD_ID,
+                /**申请单创建时间*/
+                 CREATE_DATE,
+                /**申请单标题*/
+                 APPLY_ORD_NAME,
+                /**客户名称*/
+                 CUST_NAME_CHINESE,
+                /**产品名称（产品类型）*/
+                product_name,
+                /**产品类型（编码）*/
+                 product_value,
+                /**动作类型*/
+                 operate_name,
+                /**动作类型*/
+                 operate_value,
+                /**业务号码*/
+                 SERIAL_NUMBER,
+                /**电路编号*/
+                 attr_value,
+                /**要求完成时间*/
+                 REQ_FIN_DATE,
+                /**超时天数*/
+                 OVER_TIME,
+                /**电路调度环节处理人员/角色*/
+                cd_staff,
+                /**电路调度环节处理人员/角色所属分公司*/
+                 cd_org,
+                /**调度单号*/
+                 DISPATCH_ORDER_NO,
+                /**客户订单号*/
+                 SUBSCRIBE_ID,
+                /**业务订单号*/
+                 TRADE_ID
+        from (select
+            /**单据来源*/
+            bdw_get_order_type(so.srv_ord_id) RESOURCES_NAME,
+            /**发起单位（分公司）-只能用受理部门替代*/
+            c.HANDLE_DEP,
+            /**申请单号*/
+            c.APPLY_ORD_ID,
+            /**申请单创建时间*/
+            c.CREATE_DATE,
+            /**申请单标题*/
+            c.APPLY_ORD_NAME,
+            /**客户名称*/
+            c.CUST_NAME_CHINESE,
+            /**产品名称（产品类型）*/
+            pc.code_content product_name,
+            /**产品类型（编码）*/
+            pc.code_value product_value,
+            /**动作类型*/
+            PT.code_content operate_name,
+            /**动作类型*/
+            PT.code_value operate_value,
+            /**业务号码*/
+            SO.SERIAL_NUMBER,
+            /**电路编号*/
+            attr.attr_value,
+            /**要求完成时间*/
+            o.REQ_FIN_DATE,
+
+            /**超时天数*/
+            SF_FLOW_GET_WORKING_DATE(to_char(o.REQ_FIN_DATE,
+            'yyyy-mm-dd hh24:mi:ss'),
+            to_char(sysdate,
+            'yyyy-mm-dd hh24:mi:ss'),
+            #{areaId}
+            ) OVER_TIME,
+
+            /**电路调度环节处理人员/角色*/
+            cd.cd_staff,
+            /**电路调度环节处理人员/角色所属分公司*/
+            cd.cd_org,
+            /**调度单号*/
+            d.DISPATCH_ORDER_NO,
+            /**客户订单号*/
+            c.SUBSCRIBE_ID,
+            /**业务订单号*/
+            SO.TRADE_ID
+            /** , CASE WHEN O.ORDER_STATE = '200000004' THEN 0 ELSE 1 END AS IS_FINISHED*/
+        from gom_bdw_cst_ord c
+        join gom_bdw_srv_ord_info so
+        on c.cst_ord_id = SO.cst_ord_id
+        join gom_order o
+        on o.order_id = so.order_id
+        join gom_wo w
+        on o.order_id = w.order_id
+        and w.wo_state = '290000002'
+/*        left join gom_ps_2_wo_s wp on wp.id = w.ps_id
+        left join uos_tache t on wp.tache_id = t.id*/
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'product_code') PC
+        ON SO.SERVICE_ID = PC.CODE_VALUE
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'operate_type') PT
+        ON SO.ACTIVE_TYPE = PT.CODE_VALUE
+        left join (select srv_ord_id, attr_value
+        from GOM_BDW_SRV_ORD_ATTR_INFO
+        where attr_value_name = 'circuitCode') attr
+        on attr.srv_ord_id = so.srv_ord_id
+        left join GOM_BDW_DISPATCH_ORDER d
+        on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+        /**电路调度环节*/
+        left join (SELECT W.ORDER_ID,
+        CASE WHEN W.wo_state = '290000002'
+        THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+        THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000001'
+        THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000003'
+        THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+        ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+        END AS CD_STAFF,
+        dept.dept_name AS CD_ORG,
+        RANK() OVER(PARTITION BY w.ORDER_ID ORDER BY w.WO_ID DESC) RAN
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+        LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+        LEFT JOIN department dept ON dept.dept_id = info.region_id
+        WHERE T.TACHE_CODE = 'CIRCUIT_DISPATCH') cd
+        on cd.order_id = o.order_id
+        /**鉴权*/
+        INNER JOIN (
+        SELECT ORG_ID
+        FROM GOM_ORG_S
+        START WITH ORG_ID = (
+        SELECT ORG_ID
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID = (
+        SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = #{userId})
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID
+        )
+        CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID
+        ) B ON C.HANDLE_DEP_ID = B.ORG_ID
+        where so.system_resource = 'flow-schedule-lt'
+        AND O.ORDER_STATE = '200000002'
+        AND  O.REQ_FIN_DATE IS NOT NULL
+        <![CDATA[ AND O.REQ_FIN_DATE < SYSDATE ]]>
+        and ran=1)
+        where RESOURCES_NAME is not null
+        --and is_finished = '1'
+        /*只统计超时*/
+        --<![CDATA[  and OVER_TIME > 0 ]]>
+        /*没有要求完成时间的不统计*/
+        --and REQ_FIN_DATE is not null
+        <if test="beginDate !='' and beginDate !=null ">
+            /**开始时间*/
+            <![CDATA[   and REQ_FIN_DATE > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and REQ_FIN_DATE < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+
+        <if test="resources.size()>0">
+            /**单据来源*/
+            and RESOURCES_NAME in
+            <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                #{resource}
+            </foreach>
+        </if>
+        <if test="productType.size()>0 ">
+            /**产品类型*/
+            and product_value in
+            <foreach collection="productType" item="productValue" open="(" separator="," close=")">
+                #{productValue}
+            </foreach>
+        </if>
+
+        <if test="operateType.size()>0 ">
+            /**动作类型*/
+            and operate_value in
+            <foreach collection="operateType" item="operateValue" open="(" separator="," close=")">
+                #{operateValue}
+            </foreach>
+        </if>
+
+        <if test="dcStaffOrg.size()>0 ">
+            /**电路调度环节处理人员/角色所属分公司*/
+            and cd_org in
+            <foreach collection="dcStaffOrg" item="dcOrg" open="(" separator="," close=")">
+                #{dcOrg}
+            </foreach>
+        </if>
+        <if test="handelDep.size()>0 ">
+            /**发起单位*/
+            and HANDLE_DEP in
+            <foreach collection="handelDep" item="handel" open="(" separator="," close=")">
+                #{handel}
+            </foreach>
+        </if>
+
+        <if test="tacheTimeOut !='' and tacheTimeOut !=null ">
+            /**环节超时时长（天）*/
+            and OVER_TIME = #{tacheTimeOut}
+        </if>
+
+    </sql>
+
+
+    <!-- 未完成环节工单明细 -->
+    <sql id="queryUndoneTache">
+        SELECT
+        row_number() over(order by z.CREATE_DATE desc) as rowindex,
+        z.RESOURCES_NAME,
+        z.APPLY_ORD_ID /**申请单创建时间*/,
+        z.CREATE_DATE /**申请单标题*/,
+        z.APPLY_ORD_NAME /**客户名称*/,
+        z.CUST_NAME_CHINESE /**业务号码*/,
+        z.SERIAL_NUMBER /**电路编号*/,
+        z.ATTR_VALUE /**产品名称（产品类型）*/,
+        z.PRODUCT_VALUE /**动作类型*/,
+        z.OPERATE_VALUE /**当前环节名称*/,
+        z.TACHE_NAME /**当前环节编码*/,
+        z.TACHE_CODE /**调度单号*/,
+        z.isTimeOut /**是否超时*/,
+        z.tacheTimeOut /**环节超时时长*/,
+        z.DISP_DEP, /** 环节所属分公司*/
+        z.DISPATCH_ORDER_NO /**客户订单号*/,
+        z.SUBSCRIBE_ID /**业务订单号*/,
+        z.TRADE_ID /**发起单位（分公司）-只能用受理部门替代*/,
+        z.HANDLE_DEP, /**当前环节未完成单位*/
+        z.DISP_ORG_NAME /**当前处理人*/,
+        z.DU_STAFF_NAME /**当前处理人电话*/,
+        z.SU_STAFF_PHONE /**环节历时*/,
+        z.TACHE_DURATION,
+        z.DISP_OBJ_TYE,
+        z.WO_ID,
+        z.CD_STAFF /**电路调度环节处理人员/角色所属分公司*/,
+        z.CD_ORG,
+        (SELECT DECODE(MAX(BACK_FLAG), '1', '是', '否')
+        FROM GOM_BDW_WO_ATTR
+        WHERE WO_ID = Z.WO_ID) AS ISRETURN,
+        z.ARRIVAL_TIME,
+        z.ORDER_TYEP
+        FROM (
+
+        SELECT  /*+ PARALLEL(t1,6) */
+        RESOURCES_NAME,
+        ARRIVAL_TIME,
+        APPLY_ORD_ID /**申请单创建时间*/,
+        CREATE_DATE /**申请单标题*/,
+        APPLY_ORD_NAME /**客户名称*/,
+        CUST_NAME_CHINESE /**业务号码*/,
+        SERIAL_NUMBER /**电路编号*/,
+        ATTR_VALUE /**产品名称（产品类型）*/, -- PRODUCT_NAME /**产品类型（编码）*/,
+        PRODUCT_VALUE /**动作类型*/, -- OPERATE_NAME /**动作类型*/,
+        OPERATE_VALUE /**当前环节名称*/,
+        TACHE_NAME /**当前环节编码*/,
+        TACHE_CODE /**调度单号*/,
+        isTimeOut /**是否超时*/,
+        tacheTimeOut /**环节超时时长*/,
+        DISPATCH_ORDER_NO /**客户订单号*/,
+        SUBSCRIBE_ID /**业务订单号*/,
+        TRADE_ID /**发起单位（分公司）-只能用受理部门替代*/,
+        HANDLE_DEP, /**当前环节未完成单位*/
+        DISP_ORG_NAME /**当前处理人*/,
+        DU_STAFF_NAME /**当前处理人电话*/,
+        SU_STAFF_PHONE /**环节历时*/,
+        TACHE_DURATION,
+        DISP_OBJ_TYE,
+        DISP_DEP, /** 环节所属分公司*/
+        CD_STAFF /**电路调度环节处理人员/角色所属分公司*/,
+        CD_ORG,
+        WO_ID,
+        ORDER_TYEP
+
+        FROM (
+        SELECT   /**单据来源*/
+        So.RESOURCES  RESOURCES_NAME /**申请单号*/,
+        C.APPLY_ORD_ID /**申请单创建时间*/,
+        C.CREATE_DATE /**申请单标题*/,
+        C.APPLY_ORD_NAME /**客户名称*/,
+        C.CUST_NAME_CHINESE /**业务号码*/,
+        SO.SERIAL_NUMBER /**电路编号*/,
+        ATTR.ATTR_VALUE /**产品名称（产品类型）*/, -- PC.CODE_CONTENT PRODUCT_NAME /**产品类型（编码）*/,
+        so.SERVICE_ID PRODUCT_VALUE /**动作类型*/, -- PT.CODE_CONTENT OPERATE_NAME /**动作类型*/,
+        so.ACTIVE_TYPE OPERATE_VALUE /**当前环节名称*/,
+        r.TACHE_NAME /**当前环节编码*/,
+        r.TACHE_CODE /**调度单号*/,
+        r.create_date ARRIVAL_TIME,
+        r.DEPT_NAME as DISP_DEP, /** 环节所属分公司*/
+        r.req_fin_date /**环节要求完成时间*/,
+        D.DISPATCH_ORDER_NO /**客户订单号*/,
+        C.SUBSCRIBE_ID /**业务订单号*/,
+        SO.TRADE_ID /**发起单位（分公司）-只能用受理部门替代*/,
+        C.HANDLE_DEP, /**当前环节未完成单位*/
+        CASE
+        WHEN r.DISP_OBJ_TYE = '260000001' THEN
+        (SELECT ORG_NAME   FROM GOM_ORG_S  WHERE ORG_ID = r.DISP_OBJ_ID)
+        WHEN r.DISP_OBJ_TYE = '260000002' THEN
+        (CASE
+        WHEN r.DEAL_USER_ID IS NOT NULL THEN  (SELECT ORG_NAME  FROM GOM_USER_S   WHERE USER_ID = r.DEAL_USER_ID)
+        WHEN r.DEAL_USER_ID IS NULL THEN  (
+        SELECT DEPT.DEPT_NAME FROM WORK_GROUP WG
+        JOIN DEPARTMENT DEPT ON DEPT.REGION_ID = WG.REGION_ID
+        WHERE WG.WORK_GROUP_ID = r.DISP_OBJ_ID AND DEPT.PARENT_ID = 1
+        )
+        END)
+        WHEN r.DISP_OBJ_TYE = '260000003' THEN
+        (CASE
+        WHEN r.DEAL_USER_ID IS NULL THEN
+        (SELECT ORG_NAME  FROM GOM_USER_S  WHERE USER_ID = r.DISP_OBJ_ID)
+        WHEN r.DEAL_USER_ID IS NOT NULL THEN
+        (SELECT ORG_NAME   FROM GOM_USER_S  WHERE USER_ID = r.DEAL_USER_ID)
+        END)
+        END AS DISP_ORG_NAME /**当前处理人*/,
+        r.DU_STAFF_NAME /**当前处理人电话*/,
+        r.SU_STAFF_PHONE /**环节历时*/,
+        SF_FLOW_GET_WORKING_DATE(TO_CHAR(r.CREATE_DATE,'yyyy-mm-dd hh24:mi:ss'),TO_CHAR(SYSDATE,'yyyy-mm-dd hh24:mi:ss'), '350002000000000042766427') TACHE_DURATION /**派发类型*/,
+        <![CDATA[  CASE
+        WHEN r.req_fin_date <= sysdate then
+        '是'
+        ELSE
+        '否'
+        END isTimeOut]]> /*是否超时*/,
+         <![CDATA[ CASE
+        WHEN r.req_fin_date <= sysdate then
+        SF_FLOW_GET_WORKING_DATE(TO_CHAR(r.REQ_FIN_DATE, 'yyyy-mm-dd hh24:mi:ss'),TO_CHAR(SYSDATE,'yyyy-mm-dd hh24:mi:ss'), '350002000000000042766427')
+        ELSE
+        0
+        END tacheTimeOut]]>,
+        r.DISP_OBJ_TYE,
+        CASE
+        WHEN r.DISP_OBJ_TYE = 260000001 THEN
+        (SELECT ORG.ORG_NAME
+        FROM GOM_ORG_S ORG
+        WHERE r.DISP_OBJ_ID = ORG.ORG_ID)
+        WHEN r.DISP_OBJ_TYE = 260000003 THEN
+        (SELECT U.ORG_NAME
+        FROM GOM_USER_S U
+        WHERE r.DISP_OBJ_ID = U.USER_ID)
+        WHEN r.DISP_OBJ_TYE = 260000002 THEN
+        (SELECT GRO.NAME
+        FROM GOM_STAFF_GROUP_S GRO
+        WHERE r.DISP_OBJ_ID = GRO.ID)
+        ELSE  ''
+        END AS SEND_ORG_NAME /**电路调度环节处理人员/角色*/,
+
+        CD.CD_STAFF /**电路调度环节处理人员/角色所属分公司*/,
+        CD.CD_ORG /**客户订单*/,
+        R.WO_ID,
+        so.ORDER_TYPE AS ORDER_TYEP
+        FROM GOM_BDW_CST_ORD C /**业务订单*/
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SO   ON C.CST_ORD_ID = SO.CST_ORD_ID /**调单*/
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER D  ON D.DISPATCH_ORDER_ID = SO.DISPATCH_ORDER_ID /** 流程定单*/
+        LEFT JOIN (
+        SELECT wo.wo_id,
+        oo.order_id     AS orderId,
+        t.tache_name,
+        t.tache_code,
+        du.staff_name   DU_STAFF_NAME,
+        du.phone        SU_STAFF_PHONE,
+        Wo.DISP_OBJ_id,
+        Wo.DISP_OBJ_TYE,
+        wo.DEAL_USER_ID,
+        wo.CREATE_DATE,
+        DEPT.DEPT_NAME,
+        wo.req_fin_date
+        FROM GOM_ORDER oo
+        LEFT JOIN gom_wo wo ON wo.order_id = oo.order_id  AND Wo.WO_STATE = '290000002'
+        JOIN GOM_PS_2_WO_S S  ON Wo.PS_ID = S.ID
+        JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = wo.order_id
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = INFO.REGION_ID
+        LEFT JOIN bfm_staff DU ON wo.DEAL_USER_ID = DU.staff_id
+        <![CDATA[ WHERE T.tache_code <> 'CHILDFLOWWAIT']]>
+        UNION ALL
+        SELECT wo.wo_id,
+        oo.parent_order_id AS orderId,
+        pd.pub_date_name || t.tache_name,
+        t.tache_code,
+        du.staff_name DU_STAFF_NAME,
+        du.phone SU_STAFF_PHONE,
+        Wo.DISP_OBJ_id,
+        Wo.DISP_OBJ_TYE,
+        wo.DEAL_USER_ID,
+        wo.CREATE_DATE,
+        DEPT.DEPT_NAME,
+        wo.req_fin_date
+        FROM GOM_ORDER oo
+        LEFT JOIN gom_wo wo ON wo.order_id = oo.order_id AND Wo.WO_STATE = '290000002'
+        LEFT JOIN GOM_PS_2_WO_S S ON Wo.PS_ID = S.ID
+        LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = wo.order_id
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = INFO.REGION_ID
+        LEFT JOIN gom_pub_date_s pd  ON pd.pub_date_id = info.specialty_code AND pd.DF_TYPE = 'SPECIALTY_TYPE'
+        LEFT JOIN bfm_staff DU ON wo.DEAL_USER_ID = DU.staff_id
+        <![CDATA[ WHERE T.tache_code <> 'CHILDFLOWWAIT']]>
+
+        ) r  ON r.orderId = SO.order_id /**电路编号*/
+        LEFT JOIN (SELECT SRV_ORD_ID, ATTR_VALUE  FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE ATTR_VALUE_NAME = 'circuitCode') ATTR  ON ATTR.SRV_ORD_ID = SO.SRV_ORD_ID /**产品动作类型*/
+        LEFT JOIN (
+        SELECT W.ORDER_ID,
+        CASE  WHEN W.WO_STATE = '290000002'
+        THEN (
+        CASE WHEN W.DISP_OBJ_TYE = '260000002' THEN ( SELECT WG.NAME FROM WORK_GROUP WG WHERE WG.WORK_GROUP_ID = W.DISP_OBJ_ID )
+        WHEN W.DISP_OBJ_TYE = '260000001' THEN ( SELECT DEPT.DEPT_NAME FROM DEPARTMENT DEPT WHERE DEPT.DEPT_ID = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000003' THEN ( SELECT VS.USER_NAME FROM VW_PUB_STAFF VS WHERE VS.STAFF_ID = W.DISP_OBJ_ID)
+        END)
+        ELSE
+        (SELECT VS.USER_NAME FROM VW_PUB_STAFF VS WHERE VS.STAFF_ID = W.DEAL_USER_ID)
+        END AS CD_STAFF,
+        DEPT.DEPT_NAME AS CD_ORG
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+        LEFT JOIN GOM_ORD_KEY_INFO INFO  ON INFO.ORDER_ID = W.ORDER_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = INFO.REGION_ID
+        WHERE s.TACHE_ID = '500001153'
+        ) CD ON CD.ORDER_ID = SO.order_id /**人员*/ /**鉴权*/
+        INNER JOIN (SELECT ORG_ID FROM GOM_ORG_S START WITH ORG_ID = #{orgId} CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID ) B ON C.HANDLE_DEP_ID = B.ORG_ID /**限定为本地网*/
+        WHERE SO.SYSTEM_RESOURCE = 'flow-schedule-lt' and ( SO.RESOURCES='localBuild'OR  SO.RESOURCES='onedry'OR  SO.RESOURCES='secondary' OR  SO.RESOURCES='cloudNetwork' OR  SO.RESOURCES='jike')
+        <if test="isTimeOut == 0 and isTimeOut != null and isTimeOut !='' ">
+            and  r.req_fin_date >  sysdate
+        </if>
+
+        <if test="isTimeOut == 1">
+            <![CDATA[  and  r.req_fin_date <=  sysdate ]]>
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            /**开始时间*/
+            <![CDATA[ and c.CREATE_DATE > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+
+        <if test="endDate !='' and endDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and c.CREATE_DATE < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="resources.size()>0">
+            /**单据来源*/
+            and so.RESOURCES in
+            <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                #{resource}
+            </foreach>
+        </if>
+        <if test="handelDep.size()>0 ">
+            /**发起单位*/
+            and c.HANDLE_DEP in
+            <foreach collection="handelDep" item="handel" open="(" separator="," close=")">
+                #{handel}
+            </foreach>
+        </if>
+        <if test="tacheCodes.size()>0 ">
+            /**环节名称*/
+            and r.tache_code in
+            <foreach collection="tacheCodes" item="tacheCode" open="(" separator="," close=")">
+                #{tacheCode}
+            </foreach>
+        </if>
+        <if test="productType.size()>0 ">
+            /**产品类型*/
+            and so.service_id in
+            <foreach collection="productType" item="productValue" open="(" separator="," close=")">
+                #{productValue}
+            </foreach>
+        </if>
+
+        <if test="operateType.size()>0 ">
+            /**动作类型*/
+            and so.ACTIVE_TYPE in
+            <foreach collection="operateType" item="operateValue" open="(" separator="," close=")">
+                #{operateValue}
+            </foreach>
+        </if>
+
+        )  t1
+
+        ) z
+        /* AND RAN = 1*/
+         where 1=1
+
+        <if test="tacheDuration !='' and tacheDuration !=null ">
+            /**环节历时*/
+            <![CDATA[  and TACHE_DURATION > = #{tacheDuration}    ]]>
+        </if>
+
+        <if test="dcStaffOrg.size()>0 ">
+            /**电路调度环节处理人员/角色所属分公司*/
+            and cd_org in
+            <foreach collection="dcStaffOrg" item="dcOrg" open="(" separator="," close=")">
+                #{dcOrg}
+            </foreach>
+        </if>
+
+        <if test="orgName.size()>0 ">
+            /**当前环节未完成单位*/
+            and disp_dep in
+            <foreach collection="orgName" item="org" open="(" separator="," close=")">
+                #{org}
+            </foreach>
+        </if>
+
+
+        <if test="tacheTimeOut !='' and tacheTimeOut !=null ">
+            /**环节超时时长（天）*/
+            and  tacheTimeOut = #{tacheTimeOut}
+        </if>
+
+    </sql>
+
+    <!-- 未完成环节工单明细（总数） -->
+    <select id="queryUndoneTacheCount" parameterType="map" resultType="int" timeout="2000">
+        select
+        /*+
+        BEGIN_OUTLINE_DATA
+        first_ROWS
+        */
+        count(1) from (
+        <include refid="queryUndoneTache"/>
+        ) t
+    </select>
+
+    <!-- 未完成环节工单明细（分页） -->
+    <select id="queryUndoneTacheList" parameterType="map" resultType="map" timeout="2000">
+
+        SELECT  /*+ PARALLEL(y,6) */ rowindex,
+                RESOURCES_NAME,
+                APPLY_ORD_ID /**申请单创建时间*/,
+                CREATE_DATE /**申请单标题*/,
+                APPLY_ORD_NAME /**客户名称*/,
+                CUST_NAME_CHINESE /**业务号码*/,
+                SERIAL_NUMBER /**电路编号*/,
+                ATTR_VALUE /**产品名称（产品类型）*/,
+                PRODUCT_VALUE /**动作类型*/,
+                OPERATE_VALUE /**当前环节名称*/,
+                TACHE_NAME /**当前环节编码*/,
+                TACHE_CODE /**调度单号*/,
+                isTimeOut /**是否超时*/,
+                tacheTimeOut /**环节超时时长*/,
+                DISP_DEP,/** 环节所属分公司*/
+                DISPATCH_ORDER_NO /**客户订单号*/,
+                SUBSCRIBE_ID /**业务订单号*/,
+                TRADE_ID /**发起单位（分公司）-只能用受理部门替代*/,
+                HANDLE_DEP, /**当前环节未完成单位*/
+                DISP_ORG_NAME /**当前处理人*/,
+                DU_STAFF_NAME /**当前处理人电话*/,
+                SU_STAFF_PHONE /**环节历时*/,
+                TACHE_DURATION,
+                DISP_OBJ_TYE,
+                CD_STAFF /**电路调度环节处理人员/角色所属分公司*/,
+                CD_ORG,
+                ISRETURN,
+                ARRIVAL_TIME,
+                WO_ID,
+                ORDER_TYEP
+        From (
+        <include refid="queryUndoneTache"/>
+        ) y
+
+        where 1=1
+        <if test="startRow !='' and startRow !=null ">
+            <![CDATA[
+	        and y.rowindex >#{startRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+        <if test="endRow !='' and endRow !=null ">
+            <![CDATA[
+          and y.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+
+    </select>
+
+
+    <!-- 得到本地网流程环节信息（本地网、中继、核查） -->
+    <select id="getLocalNetworkTache" resultType="map" timeout="2000">
+        select tache_name "text", tache_code "value"
+        from uos_tache
+        where tache_catalog_id in (500001062, 500001061)
+    </select>
+
+    <!-- 得到当前登录人省份/地市下属分公司 -->
+    <select id="getCityInfo" parameterType="string" resultType="map" timeout="2000">
+        SELECT ORG_ID "value", ORG_NAME "text"
+        FROM GOM_ORG_S
+        WHERE PARENT_ORG_ID = (
+            SELECT ORG_ID
+            FROM GOM_ORG_S a
+            where a.PARENT_ORG_ID = 1
+            START WITH a.ORG_ID = (select u.ORG_ID from gom_user_s u WHERE u.user_id = #{userId})
+            CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID
+        )
+    </select>
+
+    <!--未完成环节汇总源数据查询-->
+    <select id="queryUndoneTacheStatistics" parameterType="map" resultType="map" timeout="2000">
+        select /*+
+        BEGIN_OUTLINE_DATA
+        first_ROWS
+        */tache_name "tacheName",
+        tache_code "tacheCode",
+        disp_org_name "orgName",
+        count(1) "num" from (
+        <include refid="queryUndoneTache"/>
+        )
+        group by tache_name,
+        disp_org_name,
+        tache_code
+    </select>
+
+    <!--超时未报竣电路明细(总数)-->
+    <select id="queryOvertimeUnfinishedCount" parameterType="map" resultType="int" timeout="4000">
+        SELECT count(1)
+        From (
+            select
+                ci.remark as RESOURCES_NAME,
+                c.HANDLE_DEP,
+                c.APPLY_ORD_ID,
+                c.CREATE_DATE,
+                c.APPLY_ORD_NAME,
+                c.CUST_NAME_CHINESE,
+                pc.code_content product_name,
+                pc.code_value product_value,
+                PT.code_content operate_name,
+                PT.code_value operate_value,
+                SO.SERIAL_NUMBER,
+                attr.attr_value,
+                o.REQ_FIN_DATE,
+                SF_FLOW_GET_WORKING_DATE(to_char(o.REQ_FIN_DATE,
+                'yyyy-mm-dd hh24:mi:ss'),
+                to_char(sysdate,
+                'yyyy-mm-dd hh24:mi:ss'),
+                #{areaId}
+                ) OVER_TIME,
+                cd.cd_staff,
+                cd.cd_org,
+                d.DISPATCH_ORDER_NO,
+                c.SUBSCRIBE_ID,
+                SO.TRADE_ID
+            from gom_bdw_cst_ord c
+            join gom_bdw_srv_ord_info so on c.cst_ord_id = SO.cst_ord_id
+            join gom_order o on o.order_id = so.order_id
+            join gom_wo w on o.order_id = w.order_id and w.wo_state = '290000002'
+            left join gom_bdw_code_info ci on so.RESOURCES = ci.code_value and ci.code_type = 'RESOURCE_FROM'
+            LEFT JOIN GOM_BDW_CODE_INFO PC ON SO.SERVICE_ID = PC.CODE_VALUE and pc.CODE_TYPE = 'product_code'
+            LEFT JOIN GOM_BDW_CODE_INFO PT ON SO.ACTIVE_TYPE = PT.CODE_VALUE and PT.CODE_TYPE = 'operate_type'
+            left JOIN (select srv_ord_id,ATTR_CODE,ATTR_VALUE from GOM_BDW_SRV_ORD_ATTR_INFO WHERE attr_code = '20000064') attr on so.SRV_ORD_ID = attr.srv_ord_id
+            left join GOM_BDW_DISPATCH_ORDER d on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+            left join (
+            SELECT/*+parallel (6)*/ W.ORDER_ID,
+            CASE WHEN W.wo_state = '290000002'
+            THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+            THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+            WHEN W.DISP_OBJ_TYE = '260000001'
+            THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+            WHEN W.DISP_OBJ_TYE = '260000003'
+            THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+            ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+            END AS CD_STAFF,
+            dept.dept_name AS CD_ORG,
+            RANK() OVER(PARTITION BY w.ORDER_ID ORDER BY w.WO_ID DESC) RAN
+            FROM GOM_WO W
+            LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+            LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+            LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+            LEFT JOIN department dept ON dept.dept_id = info.region_id
+            WHERE T.TACHE_CODE  = 'CIRCUIT_DISPATCH'
+            ) cd on cd.order_id = o.order_id
+            where so.system_resource = 'flow-schedule-lt'
+            AND O.ORDER_STATE = '200000002'
+            AND O.REQ_FIN_DATE IS NOT NULL
+            <![CDATA[ AND O.REQ_FIN_DATE < SYSDATE ]]>
+            and ran=1
+            <if test="beginDate !='' and beginDate !=null ">
+                /**开始时间*/
+                <![CDATA[   and O.REQ_FIN_DATE > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            <if test="endDate !='' and endDate !=null ">
+                /**结束时间*/
+                <![CDATA[  and O.REQ_FIN_DATE < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            <if test="resources.size()>0">
+                /**单据来源*/
+                and SO.RESOURCES in
+                <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                    #{resource}
+                </foreach>
+            </if>
+            <if test="productType.size()>0 ">
+                /**产品类型*/
+                and SO.SERVICE_ID in
+                <foreach collection="productType" item="productValue" open="(" separator="," close=")">
+                    #{productValue}
+                </foreach>
+            </if>
+            <if test="operateType.size()>0 ">
+                /**动作类型*/
+                and SO.ACTIVE_TYPE in
+                <foreach collection="operateType" item="operateValue" open="(" separator="," close=")">
+                    #{operateValue}
+                </foreach>
+            </if>
+            <if test="dcStaffOrg.size()>0 ">
+                /**电路调度环节处理人员/角色所属分公司*/
+                and cd.cd_org in
+                <foreach collection="dcStaffOrg" item="dcOrg" open="(" separator="," close=")">
+                    #{dcOrg}
+                </foreach>
+            </if>
+            <if test="handelDep.size()>0 ">
+                /**发起单位*/
+                and c.HANDLE_DEP in
+                <foreach collection="handelDep" item="handel" open="(" separator="," close=")">
+                    #{handel}
+                </foreach>
+            </if>
+            AND C.HANDLE_DEP_ID IN (
+                SELECT dept_id
+                FROM department
+                START WITH dept_id =
+                (SELECT a.dept_id ORG_ID
+                FROM department A
+                WHERE A.Parent_Id = 1
+                START WITH A.dept_id =
+                (SELECT ext_num_01 ORG_ID
+                FROM bfm_staff
+                WHERE STAFF_ID = #{userId})
+                CONNECT BY PRIOR A.Parent_Id = A.dept_id)
+                CONNECT BY Parent_Id = PRIOR dept_id
+            )
+        ) y
+        where 1=1
+        <if test="tacheTimeOut !='' and tacheTimeOut !=null ">
+            /**环节超时时长（天）*/
+            and y.OVER_TIME = #{tacheTimeOut}
+        </if>
+    </select>
+
+    <!--超时未报竣电路明细(分页)-->
+    <select id="queryOvertimeUnfinishedList" parameterType="map" resultType="map" timeout="12000">
+        select
+        z.rowindex,
+        z.RESOURCES_NAME,
+        z.HANDLE_DEP,
+        z.APPLY_ORD_ID,
+        z.CREATE_DATE,
+        z.APPLY_ORD_NAME,
+        z.CUST_NAME_CHINESE,
+        z.product_name,
+        z.product_value,
+        z.operate_name,
+        z.operate_value,
+        z.SERIAL_NUMBER,
+        z.attr_value,
+        z.REQ_FIN_DATE,
+        z.OVER_TIME,
+        z.cd_staff,
+        z.cd_org,
+        z.DISPATCH_ORDER_NO,
+        z.SUBSCRIBE_ID,
+        z.TRADE_ID
+        FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex,
+            RESOURCES_NAME,
+            HANDLE_DEP,
+            APPLY_ORD_ID,
+            CREATE_DATE,
+            APPLY_ORD_NAME,
+            CUST_NAME_CHINESE,
+            product_name,
+            product_value,
+            operate_name,
+            operate_value,
+            SERIAL_NUMBER,
+            attr_value,
+            REQ_FIN_DATE,
+            OVER_TIME,
+            cd_staff,
+            cd_org,
+            DISPATCH_ORDER_NO,
+            SUBSCRIBE_ID,
+            TRADE_ID
+            From (
+                select
+                ci.remark as RESOURCES_NAME,
+                c.HANDLE_DEP,
+                c.APPLY_ORD_ID,
+                c.CREATE_DATE,
+                c.APPLY_ORD_NAME,
+                c.CUST_NAME_CHINESE,
+                pc.code_content product_name,
+                pc.code_value product_value,
+                PT.code_content operate_name,
+                PT.code_value operate_value,
+                SO.SERIAL_NUMBER,
+                attr.attr_value,
+                o.REQ_FIN_DATE,
+                SF_FLOW_GET_WORKING_DATE(to_char(o.REQ_FIN_DATE,
+                'yyyy-mm-dd hh24:mi:ss'),
+                to_char(sysdate,
+                'yyyy-mm-dd hh24:mi:ss'),
+                #{areaId}
+                ) OVER_TIME,
+                cd.cd_staff,
+                cd.cd_org,
+                d.DISPATCH_ORDER_NO,
+                c.SUBSCRIBE_ID,
+                SO.TRADE_ID
+                from gom_bdw_cst_ord c
+                join gom_bdw_srv_ord_info so on c.cst_ord_id = SO.cst_ord_id
+                join gom_order o on o.order_id = so.order_id
+                join gom_wo w on o.order_id = w.order_id and w.wo_state = '290000002'
+                left join gom_bdw_code_info ci on so.RESOURCES = ci.code_value and ci.code_type = 'RESOURCE_FROM'
+                LEFT JOIN GOM_BDW_CODE_INFO PC ON SO.SERVICE_ID = PC.CODE_VALUE and pc.CODE_TYPE = 'product_code'
+                LEFT JOIN GOM_BDW_CODE_INFO PT ON SO.ACTIVE_TYPE = PT.CODE_VALUE and PT.CODE_TYPE = 'operate_type'
+                left JOIN (select srv_ord_id,ATTR_CODE,ATTR_VALUE from GOM_BDW_SRV_ORD_ATTR_INFO WHERE attr_code = '20000064') attr on so.SRV_ORD_ID = attr.srv_ord_id
+                left join GOM_BDW_DISPATCH_ORDER d on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+                left join (
+                SELECT/*+parallel (6)*/ W.ORDER_ID,
+                CASE WHEN W.wo_state = '290000002'
+                THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+                THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+                WHEN W.DISP_OBJ_TYE = '260000001'
+                THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+                WHEN W.DISP_OBJ_TYE = '260000003'
+                THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+                ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+                END AS CD_STAFF,
+                dept.dept_name AS CD_ORG,
+                RANK() OVER(PARTITION BY w.ORDER_ID ORDER BY w.WO_ID DESC) RAN
+                FROM GOM_WO W
+                LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+                LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+                LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+                LEFT JOIN department dept ON dept.dept_id = info.region_id
+                WHERE T.TACHE_CODE  = 'CIRCUIT_DISPATCH'
+                ) cd on cd.order_id = o.order_id
+                where so.system_resource = 'flow-schedule-lt'
+                AND O.ORDER_STATE = '200000002'
+                AND O.REQ_FIN_DATE IS NOT NULL
+                <![CDATA[ AND O.REQ_FIN_DATE < SYSDATE ]]>
+                and ran=1
+                <if test="beginDate !='' and beginDate !=null ">
+                    /**开始时间*/
+                    <![CDATA[   and O.REQ_FIN_DATE > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                <if test="endDate !='' and endDate !=null ">
+                    /**结束时间*/
+                    <![CDATA[  and O.REQ_FIN_DATE < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                <if test="resources.size()>0">
+                    /**单据来源*/
+                    and SO.RESOURCES in
+                    <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                        #{resource}
+                    </foreach>
+                </if>
+                <if test="productType.size()>0 ">
+                    /**产品类型*/
+                    and SO.SERVICE_ID in
+                    <foreach collection="productType" item="productValue" open="(" separator="," close=")">
+                        #{productValue}
+                    </foreach>
+                </if>
+                <if test="operateType.size()>0 ">
+                    /**动作类型*/
+                    and SO.ACTIVE_TYPE in
+                    <foreach collection="operateType" item="operateValue" open="(" separator="," close=")">
+                        #{operateValue}
+                    </foreach>
+                </if>
+                <if test="dcStaffOrg.size()>0 ">
+                    /**电路调度环节处理人员/角色所属分公司*/
+                    and cd.cd_org in
+                    <foreach collection="dcStaffOrg" item="dcOrg" open="(" separator="," close=")">
+                        #{dcOrg}
+                    </foreach>
+                </if>
+                <if test="handelDep.size()>0 ">
+                    /**发起单位*/
+                    and c.HANDLE_DEP in
+                    <foreach collection="handelDep" item="handel" open="(" separator="," close=")">
+                        #{handel}
+                    </foreach>
+                </if>
+                AND C.HANDLE_DEP_ID IN (
+                    SELECT dept_id
+                    FROM department
+                    START WITH dept_id =
+                    (SELECT a.dept_id ORG_ID
+                    FROM department A
+                    WHERE A.Parent_Id = 1
+                    START WITH A.dept_id =
+                    (SELECT ext_num_01 ORG_ID
+                    FROM bfm_staff
+                    WHERE STAFF_ID = #{userId})
+                    CONNECT BY PRIOR A.Parent_Id = A.dept_id)
+                    CONNECT BY Parent_Id = PRIOR dept_id
+                )
+            ) y
+            where 1=1
+            <if test="tacheTimeOut !='' and tacheTimeOut !=null ">
+                /**环节超时时长（天）*/
+                and y.OVER_TIME = #{tacheTimeOut}
+            </if>
+        )z
+        where 1=1
+        <if test="startRow !='' and startRow !=null ">
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+        <if test="endRow !='' and endRow !=null ">
+            <![CDATA[
+          and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+    </select>
+
+
+    <!-- 电路完工及时率统计 -->
+    <select id="queryFinishTimeRateStatistics" resultType="map" parameterType="map" timeout="2000">
+        select *
+        from (select
+        /**电路调度环节处理人员/角色所属分公司*/
+        cd.cd_org,
+        bdw_get_order_type(srv_ord_id) RESOURCES_NAME,
+        /**已报竣*/
+        SUM(CASE WHEN O.ORDER_STATE = '200000004' THEN 1 ELSE 0 END) IS_FINISH, /**未超时*/
+        SUM(CASE WHEN O.ORDER_STATE = '200000004' AND <![CDATA[  o.STATE_DATE < o.REQ_FIN_DATE THEN 1 ]]>
+        ELSE 0 END) UN_ORVERTIME /**客户订单*/
+        from gom_bdw_cst_ord c
+        /**业务订单*/
+        join gom_bdw_srv_ord_info SO
+        on c.cst_ord_id = SO.cst_ord_id
+
+        /** 流程定单*/
+        join gom_order o
+        on o.order_id = so.order_id
+
+        /**流程工单(执行中)*/
+        left join gom_wo w
+        on o.order_id = w.order_id
+        and w.wo_state = '290000002'
+        /**流程环节*/
+        left join gom_ps_2_wo_s s
+        on w.ps_id = s.id
+        left join uos_tache t
+        on s.tache_id = t.id
+        /**产品动作类型*/
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'product_code') PC
+        ON SO.SERVICE_ID = PC.CODE_VALUE
+        LEFT JOIN (SELECT CODE_CONTENT, CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'operate_type') PT
+        ON SO.ACTIVE_TYPE = PT.CODE_VALUE
+        /**电路调度环节*/
+        left join (SELECT W.ORDER_ID,
+        CASE WHEN W.wo_state = '290000002'
+        THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+        THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000001'
+        THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000003'
+        THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+        ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+        END AS CD_STAFF,
+        dept.dept_name AS CD_ORG,
+        RANK() OVER(PARTITION BY w.ORDER_ID ORDER BY w.WO_ID DESC) RAN
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+        LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+        LEFT JOIN department dept ON dept.dept_id = info.region_id
+        WHERE T.TACHE_CODE = 'CIRCUIT_DISPATCH') cd
+        on cd.order_id = o.order_id
+        /**鉴权*/
+        INNER JOIN (SELECT ORG_ID
+        FROM GOM_ORG_S
+        START WITH ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = #{userId})
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID) B
+        ON C.HANDLE_DEP_ID = B.ORG_ID
+        /**限定为本地网*/
+        where so.system_resource = 'flow-schedule-lt'
+        and ran = 1
+        <if test="beginDate !='' and beginDate !=null ">
+            /**开始时间*/
+            <![CDATA[   and  o.REQ_FIN_DATE > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and  o.REQ_FIN_DATE < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+
+        <if test="productType.size()>0 ">
+            /**产品类型*/
+            and pc.code_value in
+            <foreach collection="productType" item="productValue" open="(" separator="," close=")">
+                #{productValue}
+            </foreach>
+        </if>
+
+        <if test="operateType.size()>0 ">
+            /**动作类型*/
+            and PT.code_value in
+            <foreach collection="operateType" item="operateValue" open="(" separator="," close=")">
+                #{operateValue}
+            </foreach>
+        </if>
+        <if test="handelDep.size()>0 ">
+            /**发起单位*/
+            and c.HANDLE_DEP in
+            <foreach collection="handelDep" item="handel" open="(" separator="," close=")">
+                #{handel}
+            </foreach>
+        </if>
+
+        group by cd.cd_org, bdw_get_order_type(srv_ord_id))
+        where IS_FINISH > 0
+        AND CD_ORG IS NOT NULL
+        <if test="resources.size()>0">
+            /**单据来源*/
+            and RESOURCES_NAME in
+            <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                #{resource}
+            </foreach>
+        </if>
+        <if test="dcStaffOrg.size()>0 ">
+            /**电路调度环节处理人员/角色所属分公司*/
+            and cd_org in
+            <foreach collection="dcStaffOrg" item="dcOrg" open="(" separator="," close=")">
+                #{dcOrg}
+            </foreach>
+        </if>
+    </select>
+
+    <!--资源分配未入库查询（总数）-->
+    <select id="queryResAllocateUnStorageCount" parameterType="map" resultType="int" timeout="2000">
+        select
+        count(1) from (
+            select
+            ci.REMARK RESOURCES_NAME,
+            c.HANDLE_DEP,
+            c.APPLY_ORD_ID,
+            c.CREATE_DATE,
+            c.APPLY_ORD_NAME,
+            c.CUST_NAME_CHINESE,
+            pc.code_content product_name,
+            pc.code_value product_value,
+            PT.code_content operate_name,
+            PT.code_value operate_value,
+            SO.SERIAL_NUMBER,
+            attr.attr_value,
+            d.DISPATCH_ORDER_NO,
+            c.SUBSCRIBE_ID,
+            SO.TRADE_ID,
+            CASE WHEN O.ORDER_STATE = '200000004' THEN '是' ELSE '否' END IS_FINISH,
+            fp.un_save_specialty,
+            fp_org,
+            fp_staff
+            from gom_bdw_cst_ord c
+            join gom_bdw_srv_ord_info SO
+            on c.cst_ord_id = SO.cst_ord_id
+            join gom_order o on o.order_id = so.order_id
+            left join gom_wo w on o.order_id = w.order_id  and w.wo_state = '290000002'
+            left join gom_bdw_code_info ci on so.RESOURCES = ci.code_value and ci.code_type = 'RESOURCE_FROM'
+            LEFT JOIN GOM_BDW_CODE_INFO PC ON SO.SERVICE_ID = PC.CODE_VALUE and pc.CODE_TYPE = 'product_code'
+            LEFT JOIN GOM_BDW_CODE_INFO PT ON SO.ACTIVE_TYPE = PT.CODE_VALUE and PT.CODE_TYPE = 'operate_type'
+            left JOIN (select srv_ord_id,ATTR_CODE,ATTR_VALUE from GOM_BDW_SRV_ORD_ATTR_INFO WHERE attr_code = '20000064') attr on so.SRV_ORD_ID = attr.srv_ord_id
+            left join GOM_BDW_DISPATCH_ORDER d on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+            left join (
+            SELECT O.PARENT_ORDER_ID ORDER_ID,
+            PDS.PUB_DATE_NAME  UN_SAVE_SPECIALTY,
+            FP.FP_ORG FP_ORG,
+            FP.FP_STAFF FP_STAFF
+            FROM GOM_ORDER O
+            LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = O.ORDER_ID
+            LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+            LEFT JOIN (
+            SELECT ATTR_VALUE
+            FROM GOM_BDW_SRV_ORD_ATTR_INFO
+            WHERE ATTR_CODE = 'orderId') K ON K.ATTR_VALUE = O.ORDER_ID
+            LEFT JOIN (
+            SELECT W.ORDER_ID,
+            W.STATE_DATE,
+            CASE WHEN W.wo_state = '290000002'
+            THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+            THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+            WHEN W.DISP_OBJ_TYE = '260000001'
+            THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+            WHEN W.DISP_OBJ_TYE = '260000003'
+            THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+            ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+            END AS FP_STAFF,
+            dept.dept_name AS FP_ORG,
+            RANK() OVER(PARTITION BY W.ORDER_ID ORDER BY W.WO_ID DESC) RAN
+            FROM GOM_WO W
+            LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+            LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+            LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+            LEFT JOIN department dept ON dept.dept_id = info.region_id
+            WHERE T.TACHE_CODE IN ('RES_ALLOCATE', 'FIBER_RES_ALLOCATE')) FP
+            ON FP.ORDER_ID = O.ORDER_ID
+            WHERE K.ATTR_VALUE IS NULL
+            AND FP.RAN = 1
+            <if test="beginDate !='' and beginDate !=null ">
+                /**开始时间*/
+                <![CDATA[   and fp.state_date > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            <if test="endDate !='' and endDate !=null ">
+                /**结束时间*/
+                <![CDATA[  and fp.state_date < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            ) fp
+            on fp.order_id = o.order_id
+            where so.system_resource = 'flow-schedule-lt'
+            AND O.PS_ID IN ('1000212', '1000207', '1000209')
+            and pt.CODE_VALUE not in (104, 105, 102)
+            and nvl(fp.un_save_specialty,'1') <![CDATA[ <> ]]> '1'
+            <if test="resources.size()>0">
+                /**单据来源*/
+                and so.RESOURCES in
+                <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                    #{resource}
+                </foreach>
+            </if>
+            <if test="fpStaffOrg.size()>0 ">
+                /**分配环节处理人员/角色所属分公司*/
+                and
+                <foreach collection="fpStaffOrg" item="fpOrg" open="(" separator=" or " close=")">
+                    instr( fp_org,#{fpOrg} )>0
+                </foreach>
+            </if>
+            <if test="specialtyType.size()>0 ">
+                /**分配环节专业*/
+                and
+                <foreach collection="specialtyType" item="specialty" open="(" separator=" or " close=")">
+                    instr( fp.un_save_specialty, #{specialty} )>0
+                </foreach>
+            </if>
+            <if test="applyBeginDate !='' and applyBeginDate !=null ">
+                /**开始时间*/
+                <![CDATA[   and c.CREATE_DATE > = to_date(#{applyBeginDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            <if test="applyEndDate !='' and applyEndDate !=null ">
+                /**结束时间*/
+                <![CDATA[  and c.CREATE_DATE < = to_date(#{applyEndDate}, 'yyyy-mm-dd')    ]]>
+            </if>
+            and c.HANDLE_DEP_ID in (
+            SELECT ORG_ID
+            FROM GOM_ORG_S
+            START WITH ORG_ID =
+            (SELECT ORG_ID
+            FROM GOM_ORG_S A
+            WHERE A.PARENT_ORG_ID = 1
+            START WITH A.ORG_ID =
+            (SELECT ORG_ID
+            FROM GOM_USER_S
+            WHERE USER_ID = #{userId})
+            CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+            CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID
+            )
+        ) t
+    </select>
+
+    <!--资源分配未入库查询（分页）-->
+    <select id="queryResAllocateUnStorageList" parameterType="map" resultType="map" timeout="2000">
+        select
+        z.*
+        FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+            From (
+                select
+                ci.REMARK RESOURCES_NAME,
+                c.HANDLE_DEP,
+                c.APPLY_ORD_ID,
+                c.CREATE_DATE,
+                c.APPLY_ORD_NAME,
+                c.CUST_NAME_CHINESE,
+                pc.code_content product_name,
+                pc.code_value product_value,
+                PT.code_content operate_name,
+                PT.code_value operate_value,
+                SO.SERIAL_NUMBER,
+                attr.attr_value,
+                d.DISPATCH_ORDER_NO,
+                c.SUBSCRIBE_ID,
+                SO.TRADE_ID,
+                CASE WHEN O.ORDER_STATE = '200000004' THEN '是' ELSE '否' END IS_FINISH,
+                fp.un_save_specialty,
+                fp_org,
+                fp_staff
+                from gom_bdw_cst_ord c
+                join gom_bdw_srv_ord_info SO
+                on c.cst_ord_id = SO.cst_ord_id
+                join gom_order o on o.order_id = so.order_id
+                left join gom_wo w on o.order_id = w.order_id  and w.wo_state = '290000002'
+                left join gom_bdw_code_info ci on so.RESOURCES = ci.code_value and ci.code_type = 'RESOURCE_FROM'
+                LEFT JOIN GOM_BDW_CODE_INFO PC ON SO.SERVICE_ID = PC.CODE_VALUE and pc.CODE_TYPE = 'product_code'
+                LEFT JOIN GOM_BDW_CODE_INFO PT ON SO.ACTIVE_TYPE = PT.CODE_VALUE and PT.CODE_TYPE = 'operate_type'
+                left JOIN (select srv_ord_id,ATTR_CODE,ATTR_VALUE from GOM_BDW_SRV_ORD_ATTR_INFO WHERE attr_code = '20000064') attr on so.SRV_ORD_ID = attr.srv_ord_id
+                left join GOM_BDW_DISPATCH_ORDER d on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+                left join (
+                SELECT O.PARENT_ORDER_ID ORDER_ID,
+                PDS.PUB_DATE_NAME  UN_SAVE_SPECIALTY,
+                FP.FP_ORG FP_ORG,
+                FP.FP_STAFF FP_STAFF
+                FROM GOM_ORDER O
+                LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+                LEFT JOIN (
+                SELECT ATTR_VALUE
+                FROM GOM_BDW_SRV_ORD_ATTR_INFO
+                WHERE ATTR_CODE = 'orderId') K ON K.ATTR_VALUE = O.ORDER_ID
+                LEFT JOIN (
+                SELECT W.ORDER_ID,
+                W.STATE_DATE,
+                CASE WHEN W.wo_state = '290000002'
+                THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+                THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+                WHEN W.DISP_OBJ_TYE = '260000001'
+                THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+                WHEN W.DISP_OBJ_TYE = '260000003'
+                THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+                ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+                END AS FP_STAFF,
+                dept.dept_name AS FP_ORG,
+                RANK() OVER(PARTITION BY W.ORDER_ID ORDER BY W.WO_ID DESC) RAN
+                FROM GOM_WO W
+                LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+                LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+                LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+                LEFT JOIN department dept ON dept.dept_id = info.region_id
+                WHERE T.TACHE_CODE IN ('RES_ALLOCATE', 'FIBER_RES_ALLOCATE')) FP
+                ON FP.ORDER_ID = O.ORDER_ID
+                WHERE K.ATTR_VALUE IS NULL
+                AND FP.RAN = 1
+                <if test="beginDate !='' and beginDate !=null ">
+                    /**开始时间*/
+                    <![CDATA[   and fp.state_date > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                <if test="endDate !='' and endDate !=null ">
+                    /**结束时间*/
+                    <![CDATA[  and fp.state_date < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                ) fp
+                on fp.order_id = o.order_id
+                where so.system_resource = 'flow-schedule-lt'
+                AND O.PS_ID IN ('1000212', '1000207', '1000209')
+                and pt.CODE_VALUE not in (104, 105, 102)
+                and nvl(fp.un_save_specialty,'1') <![CDATA[ <> ]]> '1'
+                <if test="resources.size()>0">
+                    /**单据来源*/
+                    and so.RESOURCES in
+                    <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                        #{resource}
+                    </foreach>
+                </if>
+                <if test="fpStaffOrg.size()>0 ">
+                    /**分配环节处理人员/角色所属分公司*/
+                    and
+                    <foreach collection="fpStaffOrg" item="fpOrg" open="(" separator=" or " close=")">
+                        instr( fp_org,#{fpOrg} )>0
+                    </foreach>
+                </if>
+                <if test="specialtyType.size()>0 ">
+                    /**分配环节专业*/
+                    and
+                    <foreach collection="specialtyType" item="specialty" open="(" separator=" or " close=")">
+                        instr( fp.un_save_specialty, #{specialty} )>0
+                    </foreach>
+                </if>
+                <if test="applyBeginDate !='' and applyBeginDate !=null ">
+                    /**开始时间*/
+                    <![CDATA[   and c.CREATE_DATE > = to_date(#{applyBeginDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                <if test="applyEndDate !='' and applyEndDate !=null ">
+                    /**结束时间*/
+                    <![CDATA[  and c.CREATE_DATE < = to_date(#{applyEndDate}, 'yyyy-mm-dd')    ]]>
+                </if>
+                and c.HANDLE_DEP_ID in (
+                    SELECT ORG_ID
+                    FROM GOM_ORG_S
+                    START WITH ORG_ID =
+                    (SELECT ORG_ID
+                    FROM GOM_ORG_S A
+                    WHERE A.PARENT_ORG_ID = 1
+                    START WITH A.ORG_ID =
+                    (SELECT ORG_ID
+                    FROM GOM_USER_S
+                    WHERE USER_ID = #{userId})
+                    CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+                    CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID
+                )
+            ) y
+        )z
+        where 1=1
+        <if test="startRow !='' and startRow !=null ">
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+        <if test="endRow !='' and endRow !=null ">
+            <![CDATA[
+          and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+        </if>
+    </select>
+    <!--资源分配未入库基础数据查询(汇总)-->
+    <select id="queryResAllocateUnStorageStatistics" parameterType="map" resultType="map" timeout="2000">
+        select *
+        from (select /*+parallel (6)*/ fp.specialty,
+        /*资源分配人员所属分公司*/
+        fp_org,
+        sum(
+        case
+        when fp.attr_value is null then 1
+        else 0
+        end
+        ) as un_save_specialty_count,
+        count(fp.specialty) should_save_specialty_count
+        /**客户订单*/
+        from gom_bdw_cst_ord c
+        /**业务订单*/
+        join gom_bdw_srv_ord_info SO on c.cst_ord_id = SO.cst_ord_id
+        /** 流程定单*/
+        join gom_order o on o.order_id = so.order_id
+        /**流程工单(执行中)*/
+        /*left join gom_wo w on o.order_id = w.order_id
+        left join gom_ps_2_wo_s s on w.ps_id = s.id
+        left join uos_tache t on s.tache_id = t.id*/
+        LEFT JOIN (
+        SELECT CODE_CONTENT,
+        CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'product_code'
+        ) PC ON SO.SERVICE_ID = PC.CODE_VALUE
+        LEFT JOIN (
+        SELECT CODE_CONTENT,
+        CODE_VALUE
+        FROM GOM_BDW_CODE_INFO
+        WHERE CODE_TYPE = 'operate_type'
+        ) PT ON SO.ACTIVE_TYPE = PT.CODE_VALUE
+        /* 电路编号*/
+        left join (
+        select srv_ord_id,
+        attr_value
+        from GOM_BDW_SRV_ORD_ATTR_INFO
+        where attr_value_name = 'circuitCode'
+        ) attr on attr.srv_ord_id = so.srv_ord_id
+        left join GOM_BDW_DISPATCH_ORDER d on d.DISPATCH_ORDER_ID = so.DISPATCH_ORDER_ID
+        /*资源分配*/
+        left join (
+        select k.attr_value,
+        o.PARENT_ORDER_ID order_id,
+        pds.pub_date_name specialty,
+        fp.fp_org,
+        fp.fp_staff
+        from gom_order o
+        /*专业名称*/
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE
+        AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        /*资源信息返回接口返回的子流程id*/
+        left join (
+        select attr_value
+        from GOM_BDW_SRV_ORD_ATTR_INFO
+        where attr_code = 'orderId'
+        ) k on k.attr_value = o.order_id
+        /*资源分配环节*/
+        left join (SELECT W.ORDER_ID,
+        W.STATE_DATE,
+        CASE WHEN W.wo_state = '290000002'
+        THEN (CASE WHEN  W.DISP_OBJ_TYE = '260000002'
+        THEN (SELECT wg.name FROM Work_Group wg WHERE wg.work_group_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000001'
+        THEN (SELECT dept.dept_name FROM department dept WHERE dept.dept_id = W.DISP_OBJ_ID)
+        WHEN W.DISP_OBJ_TYE = '260000003'
+        THEN (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DISP_OBJ_ID) END)
+        ELSE (SELECT vs.user_name FROM vw_pub_staff vs WHERE vs.staff_id = W.DEAL_USER_ID)
+        END AS FP_STAFF,
+        dept.dept_name AS FP_ORG,
+        RANK() OVER(PARTITION BY W.ORDER_ID ORDER BY W.WO_ID DESC) RAN
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S S ON W.PS_ID = S.ID
+        LEFT JOIN UOS_TACHE T ON S.TACHE_ID = T.ID
+        LEFT JOIN gom_ord_key_info info ON info.order_id = W.order_id
+        LEFT JOIN department dept ON dept.dept_id = info.region_id
+        WHERE T.TACHE_CODE IN ('RES_ALLOCATE', 'FIBER_RES_ALLOCATE')
+        AND W.WO_STATE != '290000004'
+        ) fp on fp.order_id = o.order_id
+        /*未入库*/
+        /* where k.attr_value is null*/
+        where fp.ran = 1
+        <if test="beginDate !='' and beginDate !=null ">
+            /**开始时间*/
+            <![CDATA[   and fp.state_date > = to_date(#{beginDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            /**结束时间*/
+            <![CDATA[  and fp.state_date < = to_date(#{endDate}, 'yyyy-mm-dd')    ]]>
+        </if>
+        ) fp on fp.order_id = o.order_id
+        /**鉴权*/
+        INNER JOIN (
+        SELECT DEPT_ID ORG_ID
+        FROM DEPARTMENT
+        START WITH DEPT_ID =
+        (SELECT A.DEPT_ID ORG_ID
+        FROM DEPARTMENT A
+        WHERE A.PARENT_ID = 1
+        START WITH A.DEPT_ID =
+        (SELECT EXT_NUM_01 ORG_ID
+        FROM BFM_STAFF
+        WHERE STAFF_ID = #{userId})
+        CONNECT BY PRIOR A.PARENT_ID = A.DEPT_ID)
+        CONNECT BY PARENT_ID = PRIOR DEPT_ID
+        ) B ON C.HANDLE_DEP_ID = B.ORG_ID
+        where so.system_resource = 'flow-schedule-lt' /*排除停、复、拆、核查,只查询新开变更移机*/
+        AND (O.PS_ID ='1000212'OR O.PS_ID = '1000207'OR O.PS_ID = '1000209' )
+        and pt.CODE_VALUE not in (104, 105, 102)
+        /*历时遗留数据不统计*/
+        AND length(FP.SPECIALTY)>0
+        AND length(FP.FP_ORG)>0
+        <if test="resources.size()>0">
+            /**单据来源*/
+            and bdw_get_order_type(so.srv_ord_id) in
+            <foreach collection="resources" item="resource" open="(" separator="," close=")">
+                #{resource}
+            </foreach>
+        </if>
+        <if test="fpStaffOrg.size()>0 ">
+            /**分配环节处理人员/角色所属分公司*/
+            and fp_org in
+            <foreach collection="fpStaffOrg" item="fp_org" open="(" separator="," close=")">
+                #{fp_org}
+            </foreach>
+        </if>
+        <if test="specialtyType.size()>0 ">
+            /**分配环节专业*/
+            and specialty in
+            <foreach collection="specialtyType" item="specialty" open="(" separator=" , " close=")">
+                #{specialty}
+            </foreach>
+        </if>
+        group by fp.specialty,
+        fp.fp_org)
+        where un_save_specialty_count > 0
+    </select>
+
+    <!--得到分公司信息-->
+    <select id="getSonCompany" parameterType="string" resultType="map">
+        SELECT *
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID = (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{userId})
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID
+
+    </select>
+
+    <!--得到专业字典-->
+    <select id="getSpecialtyType" resultType="map">
+        select pub_date_id "value", pub_date_name "text"
+        from GOM_PUB_DATE_S
+        where DF_TYPE = 'SPECIALTY_TYPE'
+    </select>
+
+
+    <!--得到分公司信息-->
+    <select id="getOrgName" parameterType="string" resultType="map">
+
+        SELECT ORG_ID "value", ORG_NAME "text"
+          FROM GOM_ORG_S
+         WHERE PARENT_ORG_ID =
+               (SELECT ORG_ID
+                  FROM GOM_ORG_S a
+                 where a.PARENT_ORG_ID = 1
+                 START WITH a.ORG_ID = (select u.ORG_ID
+                                          from gom_user_s u
+                                         WHERE u.user_id = #{userId})
+                CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID)
+        UNION all
+        SELECT s.DEPT_ID AS "value", s.DEPT_NAME AS "text"
+          FROM department s
+         WHERE (s.DEPT_NAME like '%分公司' or s.DEPT_NAME like '%分公司网络建%' or
+               s.DEPT_NAME like '%分公司本部%' or s.DEPT_NAME like '%濮院经营部' or
+               s.DEPT_NAME like '%分公司网络部' or s.DEPT_NAME like '%分公司网络运营部' or
+               s.DEPT_NAME = '太原市分公司设备维护中心' or s.DEPT_NAME = '太原市分公司网络优化中心' or
+               s.DEPT_NAME = '太原市分公司客户响应中心')
+           and s.DEPT_ID in
+               (select DEPT_ID
+          FROM department
+         WHERE PARENT_ID in(SELECT org_id
+          FROM GOM_ORG_S
+         WHERE PARENT_ORG_ID =
+               (SELECT ORG_ID
+                  FROM GOM_ORG_S a
+                 WHERE a.PARENT_ORG_ID = 1
+                 START WITH a.ORG_ID =
+                            (select u.ORG_ID
+                               FROM gom_user_s u
+                              WHERE u.user_id = #{userId})
+                CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID)))
+           and s.delete_state = '0'
+
+
+    </select>
+
+</mapper>

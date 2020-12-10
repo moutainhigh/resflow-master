@@ -1,0 +1,388 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">下发工建系统</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <!-- 电路信息 -->
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+
+                    <!-- 核查反馈 A端   masterRetDiv-->
+                    <div class="row form-group" id="feedBackADiv" hidden >
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">A端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_CONSTRUCT_SCHEME" name="A_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id ="a"><span style="color: red">*</span>A端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_RES_SATISFY" name="A_RES_SATISFY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomADiv">
+                                <label class="col-md-4 col-sm-4 control-label">A端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="A_ACCESS_ROOM" name="A_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountA">A端投资金额(万):</label>
+                                    <label class="control-label" id="amount" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_INVESTMENT_AMOUNT" name="A_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodA">A端建设工期(工作日):</label>
+                                    <label class="control-label" id="period" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_CONSTRUCT_PERIOD" name="A_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--添加字段-->
+                        <div class="col-md-12 col-sm-12" id="resAp" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端资源提供方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_RES_PROVIDE" name="A_RES_PROVIDE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端资源接入方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="A_RES_ACCESS" name="A_RES_ACCESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12" id="resA" hidden  style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端备货情况:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_EQUIP_READY" name="A_EQUIP_READY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <!--设备是否具备-->
+                        <div class="col-md-12 col-sm-12" id="aDevice">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端设备是否具备:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_EQUIPMENT_IS_HAVE" name="A_EQUIPMENT_IS_HAVE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="transConfigA">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="trsConfigBtnA" class="btn btn-danger">核查传输资源</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="trsFlushBtnA" class="btn btn-danger">刷新传输资源</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--传输网元-->
+                        <div id="transA" >
+                            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" >
+                                <label class="col-md-2 col-sm-2 control-label">A端传输网元:</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <textarea id="A_TRANS_ELEMENT" name="A_TRANS_ELEMENT" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" >
+                                <div class="col-md-6 col-sm-6">
+                                    <label class="col-md-4 col-sm-4 control-label">A端IP地址:</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="A_IP_ADDRESS" name="A_IP_ADDRESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <label class="col-md-4 col-sm-4 control-label">A端网元端口:</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="A_NETWORK_PORT" name="A_NETWORK_PORT" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--A端设备型号-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="deviceTypeA" hidden>
+                            <label class="col-md-2 col-sm-2 control-label">A端设备型号:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_EQUIPMENT_MODEL" name="A_EQUIPMENT_MODEL" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <!--光缆是否具备-->
+                        <div class="col-md-12 col-sm-12" id="aOptical" >
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端光缆是否具备:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_OPTICALCABLE_IS_HAVE" name="A_OPTICALCABLE_IS_HAVE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="optConfigA">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="optConfigBtnA" class="btn btn-danger">核查光缆资源</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="optFlushBtnA" class="btn btn-danger">刷新光缆资源</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--光缆资源-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="opticalA">
+                            <label class="col-md-2 col-sm-2 control-label">A端光缆路由:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_OPTICALCABLE_ROUTE" name="A_OPTICALCABLE_ROUTE" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <!--A端光缆文本备注说明-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="opticalRemarkA" hidden>
+                            <label class="col-md-2 col-sm-2 control-label">A端光缆文本备注说明:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_OPTICALCABLE_TEXT" name="A_OPTICALCABLE_TEXT" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 核查反馈 Z端-->
+                    <div class="row form-group" id="feedBackZDiv" hidden >
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">Z端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_CONSTRUCT_SCHEME" name="Z_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_RES_SATISFY" name="Z_RES_SATISFY" class="form-control"  data-rule="required ">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomZDiv">
+                                <label class="col-md-4 col-sm-4 control-label">Z端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="Z_ACCESS_ROOM" name="Z_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountZ">Z端投资金额(万):</label>
+                                    <label class="control-label" id="amountLabel" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_INVESTMENT_AMOUNT" name="Z_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodZ">Z端建设工期(工作日):</label>
+                                    <label class="control-label" id="periodLabel" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_CONSTRUCT_PERIOD" name="Z_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--添加字段-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="resZp" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id="resProvideZ"><span style="color: red">*</span>Z端资源提供方式:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="resProvide" hide><span style="color: red">*</span>资源提供方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_RES_PROVIDE" name="Z_RES_PROVIDE" class="form-control"  data-rule="required" style="width: 300px">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"id="resAccessZ"><span style="color: red">*</span>Z端资源接入方式:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="resAccess" hide><span style="color: red">*</span>资源接入方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="Z_RES_ACCESS" name="Z_RES_ACCESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="resZ" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id="equipReadyZ"><span style="color: red">*</span>Z端备货情况:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="equipReady" hide><span style="color: red">*</span>备货情况:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_EQUIP_READY" name="Z_EQUIP_READY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <!--设备是否具备-->
+                        <div class="col-md-12 col-sm-12" id="zDevice">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端设备是否具备:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_EQUIPMENT_IS_HAVE" name="Z_EQUIPMENT_IS_HAVE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="transConfigZ">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="trsConfigBtnZ" class="btn btn-danger">核查传输资源</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="trsFlushBtnZ" class="btn btn-danger">刷新传输资源</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Z端传输网元-->
+                        <div id="transZ" >
+                            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" >
+                                <label class="col-md-2 col-sm-2 control-label" id="trsLabelZ">Z端传输网元:</label>
+                                <label class="col-md-2 col-sm-2 control-label" id="trsLabel" hidden>传输网元:</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <textarea id="Z_TRANS_ELEMENT" name="Z_TRANS_ELEMENT" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" >
+                                <div class="col-md-6 col-sm-6">
+                                    <label class="col-md-4 col-sm-4 control-label" id="trsIpLabelZ">Z端IP地址:</label>
+                                    <label class="col-md-4 col-sm-4 control-label" id="trsIpLabel" hidden>IP地址:</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="Z_IP_ADDRESS" name="Z_IP_ADDRESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <label class="col-md-4 col-sm-4 control-label" id="trsPortLabelZ">Z端网元端口:</label>
+                                    <label class="col-md-4 col-sm-4 control-label" id="trsPortLabel" hidden>网元端口:</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="Z_NETWORK_PORT" name="Z_NETWORK_PORT" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Z端设备型号-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="deviceTypeZ" hidden>
+                            <label class="col-md-2 col-sm-2 control-label" id="devTypLabelZ">Z端设备型号:</label>
+                            <label class="col-md-2 col-sm-2 control-label" id="devTypLabel" hidden>设备型号:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_EQUIPMENT_MODEL" name="Z_EQUIPMENT_MODEL" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <!--光缆是否具备-->
+                        <div class="col-md-12 col-sm-12" id="zOptical" >
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端光缆是否具备:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_OPTICALCABLE_IS_HAVE" name="Z_OPTICALCABLE_IS_HAVE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="optConfigZ">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="optConfigBtnZ" class="btn btn-danger">核查光缆资源</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="input-group">
+                                        <button type="button" id="optFlushBtnZ" class="btn btn-danger">刷新光缆资源</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Z端光缆路由-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="opticalZ">
+                            <label class="col-md-2 col-sm-2 control-label" id="optLabelZ">Z端光缆路由:</label>
+                            <label class="col-md-2 col-sm-2 control-label" id="optLabel" hidden>光缆路由:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_OPTICALCABLE_ROUTE" name="Z_OPTICALCABLE_ROUTE" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <!--Z端光缆文本备注说明-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="opticalRemarkZ" hidden>
+                            <label class="col-md-2 col-sm-2 control-label" id="optRemLabelZ">Z端光缆文本备注说明:</label>
+                            <label class="col-md-2 col-sm-2 control-label"id="optRemLabel" hidden>光缆文本备注说明:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_OPTICALCABLE_TEXT" name="Z_OPTICALCABLE_TEXT" class="form-control" rows="2" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+
+                    <div class="form-group" style="text-align: right;"  id="checkSaveBtnDiv">
+                        <button type="button" id="checkSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存</button>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="row form-group" id="fileUpdateDiv">
+                        <div id="attach" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <form id="displaySource">
+                                    <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="" data-rule="required">
+                                        </span>
+                                    </div>
+                                    <div id="fileGrid"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 说明 -->
+                    <div class="row form-group" id="remarkDiv">
+                        <div id="remarkGoRoll" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"> 说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                          data-rule="required;length[10~, true]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">派单</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>

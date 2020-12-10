@@ -1,0 +1,42 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">开通单下发工建系统</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+                    <!-- AZ端是否具备资源 -->
+                    <!--A端资源是否具备-->
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6 requireds" id="ASourceDiv">
+                            <label class="col-md-4 col-sm-4 control-label">A端资源具备情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input name="AResouresType" id="AResouresType" class="form-control"  data-rule="required">
+                            </div>
+                        </div>
+                        <!--z端资源是否具备-->
+                        <div class="col-md-6 col-sm-6 requireds" id="ZSourceDiv">
+                            <label class="col-md-4 col-sm-4 control-label" >Z端资源具备情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input  name="ZResouresType" id="ZResouresType" class="form-control" data-rule="required">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>

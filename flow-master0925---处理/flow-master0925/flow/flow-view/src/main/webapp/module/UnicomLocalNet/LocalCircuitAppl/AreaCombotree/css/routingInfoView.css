@@ -1,0 +1,15 @@
+.title_left{
+    border-left: 4px solid #EB4A4B ;
+    margin-top: 15px;
+}
+.title_left .title_left_span{
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    margin-left:10px;
+
+}
+.form-order-info{
+    padding-top: 6px;
+
+}

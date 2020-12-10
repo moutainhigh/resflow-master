@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.common.dao.CommonDealDao">
+
+    <select id="qryTacheDto" parameterType="int" resultType="com.ztesoft.res.frame.flow.xpdl.model.TacheDto" >
+        SELECT UT.ID         AS TACHEID,
+               UT.TACHE_CODE AS TACHECODE,
+               UT.TACHE_NAME AS TACHENAME
+          FROM UOS_TACHE UT
+         WHERE UT.ID = #{tacheId}
+           AND UT.STATE = '10A'
+    </select>
+
+    <select id="qryAreaName" resultType="string" parameterType="string">
+       SELECT DP.DEPT_NAME FROM DEPARTMENT DP WHERE DP.DEPT_ID =  #{childConfig}
+    </select>
+    <select id="qryChildOrderState" resultType="String" parameterType="String">
+        SELECT T.ORDER_STATE
+          FROM (SELECT O.ORDER_STATE
+                  FROM GOM_ORDER O
+                  LEFT JOIN GOM_ORD_KEY_INFO K
+                    ON K.ORDER_ID = O.ORDER_ID
+                 WHERE O.PARENT_ORDER_ID = #{orderId}
+                   AND K.REGION_ID = #{childConfig}
+                   AND O.PARENT_ORDER_CODE = #{parentOrderCode}
+                 ORDER BY O.CREATE_DATE DESC) T
+         WHERE ROWNUM = 1
+    </select>
+
+</mapper>

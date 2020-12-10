@@ -1,0 +1,165 @@
+<div class="modal-header">
+    <h4 id="qr-modal-title" class="modal-title">事务确认</h4>
+</div>
+<div class="modal-body" id="qr-body-div">
+    <div id="qr-tabs" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a id="tab-li-a" href="#tabs-a">事务调单信息</a>
+            </li>
+            <li>
+                <a id="tab-li-b" href="#tabs-b">事务处理进度</a>
+            </li>
+        </ul>
+        <div id="tabs-a" class="ui-tabs-panel-new">
+            <div class="panel-body">
+                <form class="form-horizontal" id="qr-form">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <label>调单详情</label>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务调单编号</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="affairAffirm-code"
+                                               name="AFFAIR_DISPATCH_ORDER_CODE"
+                                               placeholder="保存或提交后系统自动生成" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务状态</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="affairAffirm-state" name="state" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务类型</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="type" name="type" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group  ">
+                                    <label class="col-md-2 col-sm-2 control-label">事务调单标题</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <input class="form-control" id="affairAffirm-title" name="TITLE" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group  ">
+                                    <label class="col-md-2 col-sm-2 control-label">调单正文</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="5" id="affairAffirm-content" name="CONTENT" class="form-control"
+                                  placeholder="2000字以内"
+                                  data-rule="required;length[~2000, true]" disabled></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class=" form-group">
+                                    <label class="col-md-2 col-sm-2 control-label">调单附件</label>
+                                    <div class="input-group col-md-10 col-sm-10" id="affairFileInfoDiv"
+                                         style="padding-top: 5px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group ">
+                                    <label class="col-md-2 col-sm-2 control-label">调单处理人</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <div style="width: 90%" id="affairAffirm-disposeStaffGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group required">
+                                    <label class="col-md-4 col-sm-4 control-label">是否审核</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="affairAffirm-isCheck" type="text" name="isCheck"
+                                               data-rule="required"
+                                               class="combobox form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6" id="checkStaff-div">
+                                <div class="form-group" id="checkStaffDiv">
+                                    <label class="col-md-4 col-sm-4 control-label">审核人</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="affairAffirm-checkStaff" name="CHECK_STAFF_NAME"
+                                               class="form-control"
+                                               disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-sm-2 control-label">抄送人</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <div style="width: 90%" id="affairAffirm-copyStaffArrGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" id="checkDetail-div">
+                        <div class="panel-heading">
+                            <label>审核详情</label>
+                        </div>
+                        <div class="panel-body">
+                            <div id="affairAffirm-shAffairGrid"></div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div id="tabs-b" class="ui-tabs-panel-new">
+            <div class="panel-body">
+                <div id="affairAffirm-clAffairGrid" class="affair">
+                </div>
+
+                <div class="panel panel-default" id="qr-panel-div" style="margin-top: 5px">
+                    <div class="panel-heading">
+                        <label>事务确认处理</label>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label class="col-md-1 col-sm-1 control-label">驳回原因</label>
+                                <div class="col-md-11 col-sm-11">
+                                        <textarea rows="5" class="form-control" placeholder="2000字以内"
+                                                  id="rejectRemark" data-rule="required;length[~2000, true]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-top: 5px;">
+                            <div class="form-group">
+                                <label class="col-md-1 col-sm-1 control-label">确认说明</label>
+                                <div class="col-md-11 col-sm-11">
+                                        <textarea rows="5" class="form-control" placeholder="2000字以内"
+                                                  id="affirmRemark" data-rule="required;length[~2000, true]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="reject" type="button" class="btn btn-danger">批量驳回</button>
+    <button id="commit" type="button" class="btn btn-danger">确认关闭</button>
+    <button id="cancel" type="reset" class="btn btn-default">取消</button>
+</div>

@@ -1,0 +1,88 @@
+<div id="isa-operTaskManagement-mainPanel">
+    <div style="padding: 15px 15px 0 15px;">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="operTaskManagement-btn-row" style="margin-bottom: 0">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">申请单标题</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="orderTitle" name="orderTitle" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="custName" name="custName" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">调单编号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="cirNum" name="cirNum" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="serialNumber" name="serialNumber" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">客户订单号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="subscribeId" name="subscribeId" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">业务订单号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="tradeId" name="tradeId" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input class="combobox form-control" name="productType" id="productType">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">动作类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input class="combobox form-control" name="actType" id="actType" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group" style="text-align: right;margin-right: 30px">
+                            <button type="button" class="btn btn-danger" id="queryGomDispatcher">查询</button>
+                            <button type="button" class="btn btn-danger" id="exportGomDispatcher">导出数据</button>
+                            <button type="reset" class="btn btn-default" id="resetGomDispatcher">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px">
+        <div id="orderDeal-grid"></div>
+    </div>
+</div>

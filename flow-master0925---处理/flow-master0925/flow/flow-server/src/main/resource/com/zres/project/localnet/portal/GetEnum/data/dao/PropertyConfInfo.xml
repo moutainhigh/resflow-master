@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.PropertyCofgDao">
+
+    <select id="qureyPropConfBySrvId" resultMap="PropertyDto">
+      select SRV_ID,SRV_NAME,PROPERTY_ID,PROPERTY_NAME,LOCAL_CODE
+      FROM GOM_BDW_PROPERTY_INFO
+      WHERE SRV_ID = #{srvid} AND  LOCAL_CODE IS NOT NULL
+    </select>
+    <resultMap type="com.zres.project.localnet.portal.applpage.domain.PropertyDto" id="PropertyDto">
+        <result column="SRV_ID" property="SRV_ID"/>
+        <result column="SRV_NAME" property="SRV_NAME"/>
+        <result column="PROPERTY_ID" property="PROPERTY_ID"/>
+        <result column="PROPERTY_NAME" property="PROPERTY_NAME"/>
+        <result column="LOCAL_CODE" property="LOCAL_CODE"/>
+    </resultMap>
+
+</mapper>

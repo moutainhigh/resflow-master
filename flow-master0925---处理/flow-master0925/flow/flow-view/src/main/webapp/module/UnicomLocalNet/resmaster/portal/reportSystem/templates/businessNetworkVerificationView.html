@@ -1,0 +1,83 @@
+<div id="affairDispatcher-mainPanel">
+    <div style="padding: 15px;">
+        <form class="form-horizontal" id="busNetWorkVer-form">
+            <div class="row" style="margin: 0 !important;">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-serialNumber" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">电路编号</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-circuitCode" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">起租时间</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-beginDate" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">至</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-endDate" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-custName" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">单据类型</label>
+                        <div class="col-md-8 col-sm-8">
+                            <select name="itemType" id="busNetWorkVer-itemType" class="form-control">
+                                <option value="101">开通单</option>
+                                <option value="102">核查单</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-productType" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">动作类型</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="busNetWorkVer-operateType" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" style="text-align: right;padding-right: 10px">
+                    <button id="busNetWorkVer-queryBtn" type="button" class="btn btn-danger">查询</button>
+                    <button id="busNetWorkVer-exportBtn" type="button" class="btn btn-default">导出</button>
+                    <button type="reset" class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="busNetWorkVer-grid"></div>
+    </div>
+</div>

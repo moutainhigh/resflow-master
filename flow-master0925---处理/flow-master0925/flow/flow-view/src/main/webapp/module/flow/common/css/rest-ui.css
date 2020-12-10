@@ -1,0 +1,2776 @@
+/*重写fish的样式
+*这个文件放到fish的后面引入
+*/
+/*add by ma.furong*/
+/*公共*/
+
+/*end 公共*/
+/*Pagination*/
+.pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 17px 0;
+    border-radius: 0px;
+}
+.pagination > li {
+    display: inline;
+}
+.pagination > li > a,
+.pagination > li > span {
+    position: relative;
+    float: left;
+    padding: 3px 6px;
+    line-height: 1.42857143;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-left: -1px;
+}
+.pagination > .first{
+    display: none;
+}
+.pagination > .last{
+    display: none;
+}
+.pagination > li:first-child > a,
+.pagination > li:first-child > span {
+    margin-left: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+}
+.pagination > li:last-child > a,
+.pagination > li:last-child > span {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+    z-index: 2;
+    color: #188ef1;
+    background-color: #fff;
+    border-color: #188ef1;
+}
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus {
+    z-index: 3;
+    color: #188ef1;
+    background-color: #fff;
+    border-color: #188ef1;
+    cursor: default;
+}
+.pagination > .disabled > span,
+.pagination > .disabled > span:hover,
+.pagination > .disabled > span:focus,
+.pagination > .disabled > a,
+.pagination > .disabled > a:hover,
+.pagination > .disabled > a:focus {
+    color: #9e9e9e;
+    background-color: #fff;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+.pagination > li {
+    display: inline-table;
+    vertical-align: top;
+    padding-left: 4px;
+}
+.pagination > li > span,
+.pagination > li > a {
+    padding: 3px 8px;
+    border: 0.5px solid #ddd;
+    border-radius: 4px;
+}
+.pagination > li .ellipsis {
+    max-width: 52px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.pagination .pgtext:hover > span,
+.pagination .rowtext:hover > span,
+.pagination .gotext:hover > span {
+    background: none;
+}
+.pagination li.pgtext > span {
+    margin: 0 0 0 4px;
+    color: #333;
+    border: none;
+}
+.pagination li.rowtext > span {
+    margin-left: 0;
+    color: #333;
+    border: none;
+    padding: 0px 6px;
+}
+.pagination li.rowtext > span select {
+    width: 46px;
+    height:20px;
+    margin: 0 5px;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.pagination li.rowtext > span select option{
+    border: 0;
+    padding: 2px;
+}
+.pagination li.gotext > span {
+    margin-left: 0;
+    color: #333;
+    border: none;
+    padding: 0px 6px;
+}
+.pagination li.gotext > span input {
+    width: 32px;
+    height: 20px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding-left: 10px;
+}
+.glyphicon-triangle-left:before {
+    content: "\e257";
+}
+.glyphicon-triangle-right:before {
+    content: "\e258";
+}
+/*end  Pagination*/
+
+/*form*/
+/*下拉框 hover颜色 #6bc6ff
+*input框边框颜色 #6bc6ff
+*/
+.form-horizontal .control-label {
+    text-align: right;
+    margin-bottom: 0;
+    padding-top: 6px;
+    font-weight: normal;
+    color: #4A4A4A;
+}
+.form-clear-input {
+    font-size: 18px;
+    font-weight: normal;
+    color: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: 25px;
+    padding: 3px 6px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    color: #555555;
+    background-color: #fff;
+    background-image: none;
+    border: 0.5px solid #e6e6e6;
+    border-radius: 4px;
+    box-shadow: inset 0px 0px 0px rgba(255,255,255,1);
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-control:focus {
+    border-color: #6bc6ff;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.input-group-addon {
+    padding: 3px 6px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555555;
+    text-align: center;
+    background-color: #fff;
+    border:0.5px solid #e6e6e6;
+    border-radius: 4px;
+}
+.dropdown-list {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 100000;
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x:hidden ;
+    margin: 0;
+    padding: 5px 0;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+.dropdown-list > li,
+.ui-multiselect-results li {
+    padding: 3px 20px;
+    color: #333333;
+    white-space: nowrap;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dropdown-list > li:hover,
+.dropdown-list > li:focus,
+.ui-multiselect-results li:hover,
+.ui-multiselect-results li:focus {
+    color: #fff;
+    background-color: #188fe1;
+}
+.dropdown-list > .disabled,
+.dropdown-list > .disabled:hover,
+.dropdown-list > .disabled:focus {
+    color: #777777;
+    background-color: transparent;
+    cursor: not-allowed;
+}
+.dropdown-list.multiselect {
+    max-height: none;
+    overflow-y: visible;
+}
+.glyphicon-triangle-bottom:before {
+    content: "\e259";
+}
+.glyphicon-triangle-top:before {
+    content: "\e260";
+}
+/*多选下拉*/
+.ui-multiselect-container {
+    width: 100%;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    min-height: 25px;
+    color: #555555;
+    background-color: #fff;
+    border: 0.5px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0px 0px 0px rgba(255,255,255,1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.ui-multiselect-container:focus {
+    border-color: #6bc6ff;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.ui-multiselect-container .ui-multiselect-choices li.search-choice {
+    position: relative;
+    border: 0.5px solid #ccc;
+    color: #555555;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.ui-multiselect-results li.active,
+.ui-multiselect-results li.active:focus,
+.ui-multiselect-results li.active:hover {
+    color: #fff;
+    background-color: #188fe1;
+}
+.dropdown-list > .active,
+.dropdown-list > .active:hover,
+.dropdown-list > .active:focus,
+.multiselect-dropdown .ui-multiselect-results > li:hover {
+    color: #fff;
+    background-color: #188fe1;
+}
+/*end 多选下拉*/
+/*spinner*/
+.btn-stepper {
+    padding: 0 5px;
+    border-top: 0;
+    border-bottom: 0;
+    height: 10px;
+    background-color: transparent;
+}
+/*end spinner*/
+/*end form*/
+/*grid*/
+.ui-jqgrid-view .ui-jqgrid-bdiv {
+    position: relative;
+    text-align: left;
+    border: 0;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-bdiv .ui-jqgrid-btable tr td {
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-btable tr .ui-subgrid-href{
+    color: #999;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-btable tr.ui-state-highlight .ui-subgrid-href{
+    color: #EB4A4B;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-btable tr:nth-child(odd) {
+    background-color: #fafafa;
+    border-color: #fafafa;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr:nth-child(odd).ui-state-highlight {
+    background-color: #ccc;
+    color: #333;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-bdiv .ui-jqgrid-btable tr:nth-child(odd) td {
+    border-right-color: #f5f5f5;
+}
+.ui-jqgrid-view {
+    position: relative;
+    border: 1px #EBEBEF solid;
+    border-top: none;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-htable th{
+    font-size: 14px;
+    color: #333;
+    /*height: 30px;*/
+    border-bottom: 1px solid #EBEBEF;
+}
+.ui-jqgrid .ui-jqgrid-view .ui-jqgrid-btable tr{
+    height:30px;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.ui-state-highlight a {
+    color: #fff;
+}
+.ui-jqgrid-view .ui-jqgrid-htable {
+    table-layout: fixed;
+    color: #333;
+    border-collapse: separate;
+    background: #F2F2F2;
+}
+.ui-jqgrid-view .ui-jqgrid-htable .ui-th-column {
+    padding:6px 0 6px 6px;
+    text-align: left;
+    white-space: nowrap;
+    border-right: 1px solid #EBEBEF;
+}
+.ui-jqgrid-view .ui-jqgrid-hdiv {
+    border: 1px solid #EBEBEF;
+    border-bottom: 0;
+    overflow: hidden;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.jqgrow td {
+    padding: 3px 0 3px 6px;
+    white-space: nowrap;
+    border-bottom: 0px;
+    border-right: 0px;
+    overflow: hidden;
+    position: relative;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.jqgrow:hover {
+    background-color: #F2F2F2;
+    cursor: pointer;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.ui-state-highlight {
+    background-color: #ccc;
+    color: #333;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.ui-state-highlight:hover {
+    background-color: #F2F2F2;
+}
+.ui-jqgrid-view .ui-jqgrid-btable tr.ui-state-highlight .ui-inline-operate {
+    color: #333;
+}
+.ui-jqgrid-view .ui-jqgrid-htable .s-ico {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 10px;
+    margin-top: -8px;
+    color: #6bc6ff;
+    text-align: left;
+}
+.ui-grid-ico-sort.ui-state-disabled {
+    opacity: .35;
+    color: #333;
+}
+.ui-jqgrid {
+    position: relative;
+    background: #fff;
+    border-bottom: 0;
+}
+/*grid 里面的分页*/
+.ui-jqgrid-pager {
+    position: relative;
+    height: 24px;
+    padding: 10px 0;
+    white-space: nowrap;
+    border: 0;
+    margin-bottom: 10px;
+}
+.ui-jqgrid-pager .ui-pg-control .pagination > li.active > a {
+    border: 1px solid #EB4A4B;
+    font-weight: normal;
+    background-color: #EB4A4B;
+    color: #fff;
+}
+/*end grid*/
+/*modal  openView*/
+.ui-dialog {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    background-clip: padding-box;
+    outline: 0;
+}
+.ui-dialog .modal-header {
+    background-color: #f5f5f5;
+    color: #000;
+    border-bottom: 1px solid #D5D5D5;
+    font-weight: bold;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin-right: 1px;
+}
+.ui-dialog .modal-header .close {
+    color: #999;
+    text-shadow: none;
+    margin-top: 0;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+/*end modal*/
+/*panel*/
+.panel {
+    margin-bottom: 10px;
+    margin-top: 5px;
+    background-color: #fff;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+}
+.panel-heading {
+    padding: 8px 0px 6px 14px;
+    border-bottom: 1px solid #d5d5d5;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    margin-right: 0.5px;
+}
+.panel-primary > .panel-heading {
+    color: #fff;
+    background-color: #188ef1;
+    border-color: #188ef1;
+}
+.panel-footer {
+    background-color: #fff;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    padding: 8px 16px 6px 14px;
+    border-bottom: 0;
+    border-top: 0;
+    margin-right: 1px;
+}
+/*end panel*/
+/*时间框*/
+.datetimepicker table tr td.active, .datetimepicker table tr td.active:hover, .datetimepicker table tr td.active.disabled, .datetimepicker table tr td.active.disabled:hover {
+    background-color: #188ef1;
+    color: #fff;
+}
+.res_form_range_input_s{
+    width: 50%;
+}
+.res_form_range_input_e{
+    width: 50%;
+}
+.res_form_range_input_c{
+    display: none;
+}
+/*end 时间框*/
+/*pagesidebar*/
+.ui-sidebar {
+    min-height: 100%;
+    background-color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu > li.active > a {
+    background-color: #188fe1;
+    color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu > li > a {
+    border-top: 1px solid #fff;
+    color: #666;
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 10px 15px;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ui-sidebar .ui-sidebar-menu > li > a:hover {
+    background-color: #188fe1;
+    color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu .sub-menu > li > a:hover {
+    background-color: #188fe1;
+    border-left-color: transparent;
+    color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu .sub-menu > li.active > a {
+    background-color: #188fe1;
+    border-left-color: transparent;
+    color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu .sub-menu > li > a {
+    display: block;
+    margin: 0;
+    padding: 10px 15px 10px 43px;
+    text-decoration: none;
+    position: relative;
+    color: #666;
+    border-left: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ui-sidebar .ui-sidebar-menu.ui-sidebar-menu-closed > li > a {
+    background-color: #fff;
+}
+.ui-sidebar .ui-sidebar-menu.ui-sidebar-menu-closed > li.active > a {
+    background-color: #188fe1;
+    border-left-color: transparent;
+}
+.ui-sidebar .ui-sidebar-menu.ui-sidebar-menu-closed > li > a:hover {
+    background-color: #188fe1;
+    border-left-color: transparent;
+}
+.ui-sidebar .ui-sidebar-menu.ui-sidebar-menu-closed > li:hover .sub-menu {
+    width: 210px;
+    position: absolute;
+    z-index: 2000;
+    left: 50px;
+    margin-top: 0;
+    display: block;
+    background-color: #188fe1;
+}
+/*end pagesidebar*/
+/*第三方插件*/
+/*图片上传*/
+.input-group-addon.fileinput-container .fileinput-pick {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: -2px;
+    height: 22px;
+    padding: 3px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 0;
+    margin-right: 1px;
+    cursor: pointer;
+}
+
+/*end 图片上传*/
+/*end 第三方插件*/
+/*end  ma.furong*/
+/*add zhao.yehua*/
+/**
+运营商切换
+由移动切换到联通
+\/\*移动start\*\/ (.*) \/\*移动end\*\/
+正则替换-->
+\/\*移动start $1 移动end\*\/
+
+\/\*联通start (.*) 联通end\*\/
+正则替换-->
+\/\*联通start\*\/ $1 \/\*联通end\*\/
+ */
+
+
+/*button样式 */
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 3px 10px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    height: 30px;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+}
+.btn:hover,
+.btn:focus,
+.btn.focus {
+    color: #333;
+    text-decoration: none;
+}
+.btn:active,
+.btn.active {
+    outline: 0;
+    background-image: none;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+    color:#999999;
+    background-color: #f5f5f5;
+    border-color: #dbdbdb;
+    opacity: 1;
+}
+a.btn.disabled,
+fieldset[disabled] a.btn {
+    pointer-events: none;
+}
+.btn-default {
+    color: #444444;
+    background-color: #fff;
+    border-color: #d9d9d9;
+}
+.btn-default:focus,
+.btn-default.focus {
+    color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-default:hover {
+    color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-default:active,
+.btn-default.active{
+    color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.open > .dropdown-toggle.btn-default {
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-default:active:hover,
+.btn-default.active:hover,
+.btn-default:active:focus,
+.btn-default.active:focus,
+.btn-default:active.focus,
+.btn-default.active.focus{
+    color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+
+.open > .dropdown-toggle.btn-default:hover,
+.open > .dropdown-toggle.btn-default:focus,
+.open > .dropdown-toggle.btn-default.focus{
+
+    background-color: #fff;
+    border-color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+    background-image: none;
+}
+.btn-default.disabled:hover,
+.btn-default[disabled]:hover,
+fieldset[disabled] .btn-default:hover,
+.btn-default.disabled:focus,
+.btn-default[disabled]:focus,
+fieldset[disabled] .btn-default:focus,
+.btn-default.disabled.focus,
+.btn-default[disabled].focus,
+fieldset[disabled] .btn-default.focus {
+    color:#999999;
+    background-color: #f5f5f5;
+    border-color: #dbdbdb;
+}
+.btn-default .badge {
+    color: #fff;
+    background-color: #333;
+}
+.btn-primary {
+    border-width: 0;
+    color: #fff;
+    background-color:#EB4A4B;
+}
+.btn-primary:focus,
+.btn-primary.focus {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+.btn-primary:active:hover,
+.btn-primary.active:hover,
+.open > .dropdown-toggle.btn-primary:hover,
+.btn-primary:active:focus,
+.btn-primary.active:focus,
+.open > .dropdown-toggle.btn-primary:focus,
+.btn-primary:active.focus,
+.btn-primary.active.focus,
+.open > .dropdown-toggle.btn-primary.focus {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+    background-image: none;
+}
+.btn-primary.disabled:hover,
+.btn-primary[disabled]:hover,
+fieldset[disabled] .btn-primary:hover,
+.btn-primary.disabled:focus,
+.btn-primary[disabled]:focus,
+fieldset[disabled] .btn-primary:focus,
+.btn-primary.disabled.focus,
+.btn-primary[disabled].focus,
+fieldset[disabled] .btn-primary.focus {
+    color:#999999;
+    background-color: #f5f5f5;
+    border-color: #dbdbdb;
+}
+.btn-primary .badge {
+    color: #337ab7;
+    background-color: #fff;
+}
+
+.btn-success {
+    border-width: 0;
+    color: #fff;
+    background-color: #5cb85c;
+    /*border-color: #4cae4c;*/
+}
+.btn-success:focus,
+.btn-success.focus {
+    color: #fff;
+    background-color: #449d44;
+    border-color: #255625;
+}
+.btn-success:hover {
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+.btn-success:active,
+.btn-success.active,
+.open > .dropdown-toggle.btn-success {
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+.btn-success:active:hover,
+.btn-success.active:hover,
+.open > .dropdown-toggle.btn-success:hover,
+.btn-success:active:focus,
+.btn-success.active:focus,
+.open > .dropdown-toggle.btn-success:focus,
+.btn-success:active.focus,
+.btn-success.active.focus,
+.open > .dropdown-toggle.btn-success.focus {
+    color: #fff;
+    background-color: #398439;
+    border-color: #255625;
+}
+.btn-success:active,
+.btn-success.active,
+.open > .dropdown-toggle.btn-success {
+    background-image: none;
+}
+.btn-success.disabled:hover,
+.btn-success[disabled]:hover,
+fieldset[disabled] .btn-success:hover,
+.btn-success.disabled:focus,
+.btn-success[disabled]:focus,
+fieldset[disabled] .btn-success:focus,
+.btn-success.disabled.focus,
+.btn-success[disabled].focus,
+fieldset[disabled] .btn-success.focus {
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+.btn-success .badge {
+    color: #5cb85c;
+    background-color: #fff;
+}
+.btn-info {
+    border-width: 0;
+    color: #fff;
+    background-color: #188fe1;
+    /*border-color: #46b8da;*/
+}
+.btn-info:focus,
+.btn-info.focus {
+    color: #fff;
+    background-color: #188fe1;
+    border-color: #1b6d85;
+}
+.btn-info:hover {
+    color: #fff;
+    background-color: #188fe1;
+    border-color: #1b6d85;
+}
+.btn-info:active,
+.btn-info.active,
+.open > .dropdown-toggle.btn-info {
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #269abc;
+}
+.btn-info:active:hover,
+.btn-info.active:hover,
+.open > .dropdown-toggle.btn-info:hover,
+.btn-info:active:focus,
+.btn-info.active:focus,
+.open > .dropdown-toggle.btn-info:focus,
+.btn-info:active.focus,
+.btn-info.active.focus,
+.open > .dropdown-toggle.btn-info.focus {
+    color: #fff;
+    background-color: #188fe1;
+    border-color: #1b6d85;
+}
+.btn-info:active,
+.btn-info.active,
+.open > .dropdown-toggle.btn-info {
+    background-image: none;
+}
+.btn-info.disabled:hover,
+.btn-info[disabled]:hover,
+fieldset[disabled] .btn-info:hover,
+.btn-info.disabled:focus,
+.btn-info[disabled]:focus,
+fieldset[disabled] .btn-info:focus,
+.btn-info.disabled.focus,
+.btn-info[disabled].focus,
+fieldset[disabled] .btn-info.focus {
+    color:#999999;
+    background-color: #f5f5f5;
+    border-color: #dbdbdb;
+}
+.btn-info .badge {
+    color: #5bc0de;
+    background-color: #fff;
+}
+.btn-warning {
+    border-width: 0;
+    color: #fff;
+    background-color: #f0ad4e;
+    /*border-color: #eea236;*/
+}
+.btn-warning:focus,
+.btn-warning.focus {
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #985f0d;
+}
+.btn-warning:hover {
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #d58512;
+}
+.btn-warning:active,
+.btn-warning.active,
+.open > .dropdown-toggle.btn-warning {
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #d58512;
+}
+.btn-warning:active:hover,
+.btn-warning.active:hover,
+.open > .dropdown-toggle.btn-warning:hover,
+.btn-warning:active:focus,
+.btn-warning.active:focus,
+.open > .dropdown-toggle.btn-warning:focus,
+.btn-warning:active.focus,
+.btn-warning.active.focus,
+.open > .dropdown-toggle.btn-warning.focus {
+    color: #fff;
+    background-color: #d58512;
+    border-color: #985f0d;
+}
+.btn-warning:active,
+.btn-warning.active,
+.open > .dropdown-toggle.btn-warning {
+    background-image: none;
+}
+.btn-warning.disabled:hover,
+.btn-warning[disabled]:hover,
+fieldset[disabled] .btn-warning:hover,
+.btn-warning.disabled:focus,
+.btn-warning[disabled]:focus,
+fieldset[disabled] .btn-warning:focus,
+.btn-warning.disabled.focus,
+.btn-warning[disabled].focus,
+fieldset[disabled] .btn-warning.focus {
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+.btn-warning .badge {
+    color: #f0ad4e;
+    background-color: #fff;
+}
+.btn-danger {
+    border-width: 0;
+    color: #fff;
+    background-color: #EB4A4B;
+    /*border-color: #d43f3a;*/
+}
+.btn-danger:focus,
+.btn-danger.focus {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+.btn-danger:hover {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+.btn-danger:active:hover,
+.btn-danger.active:hover,
+.open > .dropdown-toggle.btn-danger:hover,
+.btn-danger:active:focus,
+.btn-danger.active:focus,
+.open > .dropdown-toggle.btn-danger:focus,
+.btn-danger:active.focus,
+.btn-danger.active.focus,
+.open > .dropdown-toggle.btn-danger.focus {
+    color: #fff;
+    background-color: #ac2925;
+    border-color: #761c19;
+}
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+    background-image: none;
+}
+.btn-danger.disabled:hover,
+.btn-danger[disabled]:hover,
+fieldset[disabled] .btn-danger:hover,
+.btn-danger.disabled:focus,
+.btn-danger[disabled]:focus,
+fieldset[disabled] .btn-danger:focus,
+.btn-danger.disabled.focus,
+.btn-danger[disabled].focus,
+fieldset[disabled] .btn-danger.focus {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+.btn-danger .badge {
+    color: #d9534f;
+    background-color: #fff;
+}
+.btn-link {
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    font-weight: normal;
+    border-radius: 0;
+}
+.btn-link,
+.btn-link:active,
+.btn-link.active,
+.btn-link[disabled],
+fieldset[disabled] .btn-link {
+    background-color: transparent;
+    box-shadow: none;
+}
+.btn-link,
+.btn-link:hover,
+.btn-link:focus,
+.btn-link:active {
+    border-color: transparent;
+}
+.btn-link:hover,
+.btn-link:focus {
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    text-decoration: underline;
+    background-color: transparent;
+}
+.btn-link[disabled]:hover,
+fieldset[disabled] .btn-link:hover,
+.btn-link[disabled]:focus,
+fieldset[disabled] .btn-link:focus {
+    color: #777777;
+    text-decoration: none;
+}
+.btn-lg,
+.btn-group-lg > .btn {
+    padding: 6px 9px;
+    font-size: 15px;
+    line-height: 1.3333333;
+    border-radius: 0px;
+}
+.btn-sm,
+.btn-group-sm > .btn {
+    padding: 2px 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 0px;
+}
+.btn-xs,
+.btn-group-xs > .btn {
+    padding: 1px 2px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 0px;
+}
+.btn-block {
+    display: block;
+    width: 100%;
+}
+.btn-block + .btn-block {
+    margin-top: 5px;
+}
+input[type="submit"].btn-block,
+input[type="reset"].btn-block,
+input[type="button"].btn-block {
+    width: 100%;
+}
+
+button[disabled] {
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    cursor: default;
+}
+.btn.btn-min-width {
+    min-width: 68px;
+}
+.btn:focus,
+.btn:active,
+.btn:active:focus {
+    outline: 0;
+    box-shadow: none;
+}
+.btn-separate-group,
+.btn-separate-group-vertical {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+}
+.btn-separate-group > .btn {
+    float: left;
+    margin-right: 15px;
+}
+.btn-separate-group-vertical > .btn {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 15px;
+}
+.btn-outline-danger {
+    color: #d9534f;
+    background-color: #fff;
+    border-color: #d9534f;
+}
+.btn-outline-danger:focus,
+.btn-outline-danger.focus,
+.btn-outline-danger:hover,
+.btn-outline-danger:active,
+.btn-outline-danger.active {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d9534f;
+}
+.btn-outline-warning {
+    color: #f0ad4e;
+    background-color: #fff;
+    border-color: #f0ad4e;
+}
+.btn-outline-warning:focus,
+.btn-outline-warning.focus,
+.btn-outline-warning:hover,
+.btn-outline-warning:active,
+.btn-outline-warning.active {
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #f0ad4e;
+}
+.btn-outline-info {
+    color: #5bc0de;
+    background-color: #fff;
+    border-color: #5bc0de;
+}
+.btn-outline-info:focus,
+.btn-outline-info.focus,
+.btn-outline-info:hover,
+.btn-outline-info:active,
+.btn-outline-info.active {
+    color: #fff;
+    background-color: #5bc0de;
+    border-color: #5bc0de;
+}
+.btn-outline-success {
+    color: #5cb85c;
+    background-color: #fff;
+    border-color: #5cb85c;
+}
+.btn-outline-success:focus,
+.btn-outline-success.focus,
+.btn-outline-success:hover,
+.btn-outline-success:active,
+.btn-outline-success.active {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #5cb85c;
+}
+.btn-outline-primary {
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-outline-primary:focus,
+.btn-outline-primary.focus,
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+    color: #fff;
+    background-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+
+/*buttongroup样式*/
+.btn-group,
+.btn-group-vertical {
+    position: relative;
+    vertical-align: middle;
+}
+.btn-group > .btn,
+.btn-group-vertical > .btn {
+    position: relative;
+    float: left;
+}
+.btn-group > .btn:hover,
+.btn-group-vertical > .btn:hover,
+.btn-group > .btn:focus,
+.btn-group-vertical > .btn:focus,
+.btn-group > .btn:active,
+.btn-group-vertical > .btn:active,
+.btn-group > .btn.active,
+.btn-group-vertical > .btn.active {
+    z-index: 2;
+}
+.btn-group .btn + .btn,
+.btn-group .btn + .btn-group,
+.btn-group .btn-group + .btn,
+.btn-group .btn-group + .btn-group {
+    margin-left: -1px;
+    margin-right: 0px;
+}
+.btn-toolbar {
+    margin-left: -5px;
+}
+.btn-toolbar .btn,
+.btn-toolbar .btn-group,
+.btn-toolbar .input-group {
+    float: left;
+}
+.btn-toolbar > .btn,
+.btn-toolbar > .btn-group,
+.btn-toolbar > .input-group {
+    margin-left: 5px;
+}
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+    border-radius: 0;
+}
+.btn-group > .btn:first-child {
+    margin-left: 0;
+    margin-right: 0;
+}
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group > .dropdown-toggle:not(:first-child) {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.btn-group > .btn-group {
+    float: left;
+}
+.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+    border-radius: 0;
+}
+.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,
+.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.btn-group .dropdown-toggle:active,
+.btn-group.open .dropdown-toggle {
+    outline: 0;
+}
+.btn-group > .btn + .dropdown-toggle {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.btn-group > .btn-lg + .dropdown-toggle {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.btn-group.open .dropdown-toggle {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+.btn-group.open .btn-default {
+    box-shadow: 0 0 5px /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.btn-group.open .dropdown-toggle.btn-link {
+    box-shadow: none;
+}
+.btn .caret {
+    margin-left: 0;
+}
+.btn-lg .caret {
+    border-width: 5px 5px 0;
+    border-bottom-width: 0;
+}
+.dropup .btn-lg .caret {
+    border-width: 0 5px 5px;
+}
+.btn-group-vertical > .btn,
+.btn-group-vertical > .btn-group,
+.btn-group-vertical > .btn-group > .btn {
+    display: block;
+    float: none;
+    width: 100%;
+    max-width: 100%;
+}
+.btn-group-vertical > .btn-group > .btn {
+    float: none;
+}
+.btn-group-vertical > .btn + .btn,
+.btn-group-vertical > .btn + .btn-group,
+.btn-group-vertical > .btn-group + .btn,
+.btn-group-vertical > .btn-group + .btn-group {
+    margin-top: -1px;
+    margin-left: 0;
+}
+.btn-group-vertical > .btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+.btn-group-vertical > .btn:first-child:not(:last-child) {
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.btn-group-vertical > .btn:last-child:not(:first-child) {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
+    border-radius: 0;
+}
+.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,
+.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+.btn-group-justified {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+}
+.btn-group-justified > .btn,
+.btn-group-justified > .btn-group {
+    float: none;
+    display: table-cell;
+    width: 1%;
+}
+.btn-group-justified > .btn-group .btn {
+    width: 100%;
+}
+.btn-group-justified > .btn-group .dropdown-menu {
+    left: auto;
+}
+.btn+.btn {
+    margin-left:5px;
+}
+[data-toggle="buttons"] > .btn input[type="radio"],
+[data-toggle="buttons"] > .btn-group > .btn input[type="radio"],
+[data-toggle="buttons"] > .btn input[type="checkbox"],
+[data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"] {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+/**
+dropDown
+
+ */
+
+.caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-top: 4px solid \9;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+.dropup,
+.dropdown {
+    position: relative;
+}
+.dropdown-toggle:focus {
+    outline: 0;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    /*min-width: 100%;*/
+    padding: 5px 0;
+    margin: 2px 0 0;
+    list-style: none;
+    font-size: 12px;
+    text-align: left;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    background-clip: padding-box;
+}
+.dropdown-menu.pull-right {
+    right: 0;
+    left: auto;
+}
+.dropdown-menu .divider {
+    height: 1px;
+    margin: 7.5px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+.dropdown-menu > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333333;
+    white-space: nowrap;
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    text-decoration: none;
+    color: #262626;
+    background-color: #f5f5f5;
+}
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+    color: #fff;
+    text-decoration: none;
+    outline: 0;
+    background-color: #337ab7;
+}
+.dropdown-menu > .disabled > a,
+.dropdown-menu > .disabled > a:hover,
+.dropdown-menu > .disabled > a:focus {
+    color: #777777;
+}
+.dropdown-menu > .disabled > a:hover,
+.dropdown-menu > .disabled > a:focus {
+    text-decoration: none;
+    background-color: transparent;
+    background-image: none;
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    cursor: not-allowed;
+}
+.open > .dropdown-menu {
+    display: block;
+}
+.open > a {
+    outline: 0;
+}
+.dropdown-menu-right {
+    left: auto;
+    right: 0;
+}
+.dropdown-menu-left {
+    left: 0;
+    right: auto;
+}
+.dropdown-header {
+    display: block;
+    padding: 3px 20px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    color: #777777;
+    white-space: nowrap;
+}
+.dropdown-backdrop {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 990;
+}
+.pull-right > .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+.dropup .caret,
+.navbar-fixed-bottom .dropdown .caret {
+    border-top: 0;
+    border-bottom: 4px dashed;
+    border-bottom: 4px solid \9;
+    content: "";
+}
+.dropup .dropdown-menu,
+.navbar-fixed-bottom .dropdown .dropdown-menu {
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 2px;
+}
+@media (min-width: 768px) {
+    .navbar-right .dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+    .navbar-right .dropdown-menu-left {
+        left: 0;
+        right: auto;
+    }
+}
+
+/**
+tab样式
+ */
+
+.ui-tabs {
+    width: 100%;
+}
+.res_component_tab{top:-2px;}
+.ui-tabs.tabs-outline .ui-tabs-nav {
+    padding: 4px 0 0;
+    margin-bottom: 0;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li {
+    position: relative;
+    display: block;
+    float: left;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-state-default {
+    margin-left: 5px;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li a {
+    position: relative;
+    display: block;
+    padding: 4px 10px;
+    margin-right: 0;
+    line-height: 1.42857143;
+    border-width: 1px 1px 0;
+    border-style: solid;
+    color: #777777;
+    background-color: #f5f5f5;
+    border-color: #e5e5e5;
+    outline: none;
+    overflow: hidden;
+    border-radius: 4px 4px 0px 0px;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li a:focus {
+    text-decoration: none;
+    border-width: 1px 1px 0;
+    border-style: solid;
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: transparent;
+    border-color: #ddd;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li a:hover .ui-tabs-close,
+.ui-tabs.tabs-outline .ui-tabs-nav li a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a {
+    padding-bottom: 5px;
+    margin-bottom: -1px;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a:focus {
+    border-width: 1px 1px 0;
+    border-style: solid;
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: #fff;
+    border-color: #ddd;
+    cursor: default;
+    border-radius: 4px 4px 0px 0px;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a .ui-tabs-close,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a:hover .ui-tabs-close,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-active > a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-disabled > a {
+    color: #777777;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-disabled > a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-disabled > a:focus {
+    color: #777777;
+    text-decoration: none;
+    background-color: transparent;
+    cursor: not-allowed;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-state-disabled > a {
+    padding: 4px 10px;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-state-disabled > a,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-state-disabled > a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-state-disabled > a:focus {
+    border-width: 1px 1px 0 1px;
+    border-style: solid;
+    color: #777777;
+    background-color: transparent;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-next {
+    float: right;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-prev > a,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-next > a {
+    width: auto;
+    border: 0;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-prev > a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-next > a:hover,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-prev > a:focus,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-next > a:focus {
+    color: #000;
+    background: transparent;
+}
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-disabled.ui-tabs-paging-prev > a,
+.ui-tabs.tabs-outline .ui-tabs-nav li.ui-tabs-paging-disabled.ui-tabs-paging-next > a {
+    color: #777777;
+    cursor: not-allowed;
+}
+.ui-tabs .ui-tabs-nav {
+    padding: 4px 0 0;
+    margin-bottom: 0;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.ui-tabs .ui-tabs-nav li {
+    position: relative;
+    display: block;
+    float: left;
+}
+.ui-tabs .ui-tabs-nav li.ui-state-default {
+    margin-left: 5px;
+}
+.ui-tabs .ui-tabs-nav li a {
+    position: relative;
+    display: block;
+    padding: 4px 10px;
+    margin-right: 0;
+    line-height: 1.42857143;
+    border-width: 1px 1px 0px;
+    border-style: solid;
+    color: #333333;
+    background-color: transparent;
+    border-color: transparent;
+    outline: none;
+    overflow: hidden;
+}
+.ui-tabs .ui-tabs-nav li a:hover,
+.ui-tabs .ui-tabs-nav li a:focus {
+    text-decoration: none;
+    border-width: 1px 1px 0;
+    border-style: solid;
+    color: /*移动start*/ #EB4A4B /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    background-color: transparent;
+    border-color: transparent;
+}
+.ui-tabs .ui-tabs-nav li a:hover .ui-tabs-close,
+.ui-tabs .ui-tabs-nav li a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a {
+    padding-bottom: 5px;
+    margin-bottom: -1px;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a:focus {
+    border-width: 1px 1px 2px;
+    border-style: solid;
+    color: #666;
+    background-color: #fff;
+    border-color: transparent;
+    border-bottom-color:#EB4A4B;
+    cursor: default;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a .ui-tabs-close,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a:hover .ui-tabs-close,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active > a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-disabled > a {
+    color: #777777;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-disabled > a:hover,
+.ui-tabs .ui-tabs-nav li.ui-tabs-disabled > a:focus {
+    color: #777777;
+    text-decoration: none;
+    background-color: transparent;
+    cursor: not-allowed;
+}
+.ui-tabs .ui-tabs-nav li.ui-state-disabled > a {
+    padding: 4px 10px;
+}
+.ui-tabs .ui-tabs-nav li.ui-state-disabled > a,
+.ui-tabs .ui-tabs-nav li.ui-state-disabled > a:hover,
+.ui-tabs .ui-tabs-nav li.ui-state-disabled > a:focus {
+    border-width: 1px 1px 0 1px;
+    border-style: solid;
+    color: #777777;
+    background-color: transparent;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-next {
+    float: right;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-prev > a,
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-next > a {
+    width: auto;
+    border: 0;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-prev > a:hover,
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-next > a:hover,
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-prev > a:focus,
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-next > a:focus {
+    color: #000;
+    background: transparent;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-disabled.ui-tabs-paging-prev > a,
+.ui-tabs .ui-tabs-nav li.ui-tabs-paging-disabled.ui-tabs-paging-next > a {
+    color: #777777;
+    cursor: not-allowed;
+}
+.ui-tabs .ui-tabs-panel {
+    padding: 10px 4px 4px 10px;
+}
+.ui-tabs .ui-tabs-hide {
+    display: none !important;
+}
+.ui-tabs .ui-tabs-panel-absolute {
+    position: absolute;
+    top: 23px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav {
+    padding: 4px 0 0;
+    border-bottom: 0;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav a .close {
+    display: none;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav a:hover .close {
+    display: block;
+    position: absolute;
+    right: 2px;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li:before {
+    content: '';
+    width: 1px;
+    height: 17px;
+    position: absolute;
+    top: 4px;
+    left: -3px;
+    background-color: #efefef;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li a {
+    background: transparent;
+    border-color: transparent;
+    padding: 4px 10px 4px 11px;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-separate .ui-tabs-nav li a:focus {
+    background: transparent;
+    padding: 4px 10px 4px 11px;
+    border-color: transparent;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li:first-child:before {
+    display: none;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li:first-child a {
+    padding: 4px 10px;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-separate .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-separate .ui-tabs-nav li.ui-tabs-active > a:focus {
+    color: #337ab7;
+    border-width: 1px;
+    border-color: transparent;
+}
+.ui-tabs.tabs-separate .ui-tabs-nav li.ui-tabs-active > a:hover .close {
+    display: block;
+    color: #337ab7;
+}
+.ui-tabs.tabs-separate .ui-tabs-panel {
+    padding: 0;
+}
+.ui-tabs .ui-tabs-panel .tabs-separate > .ui-tabs-nav li:first-child a {
+    padding-left: 0;
+}
+.ui-tabs.tabs-border {
+    border: 1px solid #ddd;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav {
+    padding: 4px 0 0;
+    background-color: #f5f5f5;
+    border-color: #ddd;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li a {
+    border-radius: 0;
+    background-color: transparent;
+    border-width: 1px 1px 0;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-border > .ui-tabs-nav li a:focus {
+    background-color: #e6e6e6;
+    border-width: 1px 1px 0;
+    border-style: solid;
+    border-color: #c5c5c5;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li a:hover .ui-tabs-close,
+.ui-tabs.tabs-border > .ui-tabs-nav li a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li a .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a:focus {
+    background-color: #fff;
+    border-width: 1px 1px 0;
+    border-style: solid;
+    border-color: #ddd;
+}
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a .ui-tabs-close,
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a:hover .ui-tabs-close,
+.ui-tabs.tabs-border > .ui-tabs-nav li.ui-tabs-active > a:focus .ui-tabs-close {
+    color: #989898;
+}
+.ui-tabs.tabs-border > .ui-tabs-panel {
+    border-width: 0;
+    border-style: solid;
+    border-color: transparent;
+}
+.ui-tabs.ui-tabs-left {
+    overflow: hidden;
+    border-color: transparent;
+}
+.ui-tabs.ui-tabs-left:before,
+.ui-tabs.ui-tabs-left:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-left:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-left:before,
+.ui-tabs.ui-tabs-left:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-left:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav {
+    float: left;
+    width: 110px;
+    padding-top: 4px;
+    border-bottom: 0;
+    border-color: #ddd;
+    border-right: 1px solid #ddd;
+    background-color:  #fff;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a {
+    width: 105px;
+    margin-right: -1px;
+    margin-bottom: 0;
+    padding-bottom: 4px;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a,
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:hover,
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:focus {
+    border-width: 1px 2px 1px 1px;
+    border-style: solid;
+    border-color: transparent;
+    border-right-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-radius: 0;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default {
+    margin-left: 5px;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default a {
+    width: 104px;
+    border: 1px solid transparent;
+    /* border-right: 0; */
+    border-radius: 0;
+    margin-right: 0;
+    border-right-width: 2px;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default a:hover,
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li.ui-state-default a:focus {
+    border: 1px solid;
+    border-color: transparent;
+    border-right: 0;
+    background-color: #fff;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li a {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav li + li a {
+    margin-top: 5px;
+}
+.ui-tabs.ui-tabs-left > .ui-tabs-panel {
+    border-top: 0;
+    border-left: 0;
+    min-height: 150px;
+}
+.ui-tabs.ui-tabs-left > ul.ui-tabs-nav {
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
+}
+.ui-tabs.ui-tabs-left > .ui-tabs-panel {
+    overflow: hidden;
+}
+.ui-tabs.ui-tabs-right {
+    overflow: hidden;
+    border-color: transparent;
+}
+.ui-tabs.ui-tabs-right:before,
+.ui-tabs.ui-tabs-right:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-right:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-right:before,
+.ui-tabs.ui-tabs-right:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-right:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav {
+    float: right;
+    width: 110px;
+    padding-top: 4px;
+    border-bottom: 0;
+    border-color: #ddd;
+    border-left: 1px solid #ddd;
+    background-color:  #fff;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a {
+    width: 105px;
+    margin-left: -1px;
+    margin-bottom: 0;
+    padding-bottom: 4px;
+    padding-left: 11px;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a,
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:hover,
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:focus {
+    border-width: 1px 1px 1px 2px;
+    border-style: solid;
+    border-color: transparent;
+    border-radius: 0;
+    border-left-color:  /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default {
+    margin-left: 0;
+    margin-right: 5px;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default a {
+    width: 104px;
+    border: 1px solid transparent;
+    /* border-left: 0; */
+    border-radius: 0;
+    margin-right: 0;
+    border-left-width: 2px;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default a:hover,
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li.ui-state-default a:focus {
+    border: 1px solid;
+    border-color: transparent;
+    border-left-width: 2px;
+    background-color: #fff;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li a {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav li + li a {
+    margin-top: 5px;
+}
+.ui-tabs.ui-tabs-right > .ui-tabs-panel {
+    border-top: 0;
+    border-right: 0;
+    min-height: 150px;
+}
+.ui-tabs.ui-tabs-right > ul.ui-tabs-nav {
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
+}
+.ui-tabs.ui-tabs-right > .ui-tabs-panel {
+    overflow: hidden;
+}
+.ui-tabs.ui-tabs-bottom{
+    border-color: transparent;
+}
+.ui-tabs.ui-tabs-bottom:before,
+.ui-tabs.ui-tabs-bottom:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-bottom:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-bottom:before,
+.ui-tabs.ui-tabs-bottom:after {
+    content: " ";
+    display: table;
+}
+.ui-tabs.ui-tabs-bottom:after {
+    clear: both;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav {
+    padding-top: 0;
+    padding-bottom: 4px;
+    border-bottom: 0;
+    border-top: 1px solid #ddd;
+    background-color: #fff;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a {
+    padding-top: 5px;
+    padding-bottom: 4px;
+    margin-top: -1px;
+    margin-bottom: 0;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a,
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:hover,
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default.ui-tabs-active a:focus {
+    border-width: 2px 1px 1px 1px;
+    border-style: solid;
+    border-color: transparent;
+    border-top-color:  /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-radius: 0;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default a {
+    border: 1px solid transparent;
+    border-top-width: 2px;
+    border-radius: 0;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default a:hover,
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li.ui-state-default a:focus {
+    border: 1px solid;
+    border-color: transparent;
+    border-top-width: 2px;
+    background-color: transparent;
+}
+.ui-tabs.ui-tabs-bottom > ul.ui-tabs-nav li a {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.ui-tabs.ui-tabs-bottom > .ui-tabs-panel {
+    border-top: 0;
+    border-bottom: 0;
+}
+.ui-tabs.tabs-pill {
+    border: 0;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav {
+    background-color: transparent;
+    border: 0;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li a {
+    margin-bottom: 0;
+    border: 1px solid /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-radius: 4px;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:focus {
+    border-width: 1px;
+    border-style: solid;
+    color: #fff;
+    background-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-bottom: 1px solid /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:focus {
+    margin-bottom: 0;
+    padding-bottom: 4px;
+    border-width: 1px;
+    border-style: solid;
+    color: #fff;
+    background-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    border-bottom: 1px solid /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-tabs-close {
+    margin: 2px 2px 0 5px;
+    font-size: 18px;
+    font-weight: 400;
+    opacity: 1;
+    filter: alpha(opacity=100);
+    color: #989898;
+}
+.ui-tabs-close:hover,
+.ui-tabs-close:focus {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.tabs-pill .ui-tabs-nav > .ui-state-default:not(:first-child):not(:last-child){
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:not(:first-child):not(:last-child) > a{
+    border-radius: 0;
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child{
+
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child > a{
+    margin-left: 0;
+    margin-right: 0;
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child:not(:last-child){
+
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child:not(:last-child) > a{
+    border-radius: 4px 0px 0px 4px;
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:last-child:not(:first-child){
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default:last-child:not(:first-child) > a{
+    border-radius:  0px 4px 4px 0px;
+}
+.tabs-pill .ui-tabs-nav > .ui-state-default + .ui-state-default{
+    margin-left: -1px;
+}
+
+/**
+switchButton
+ */
+.ui-switch {
+    display: inline-block;
+    cursor: pointer;
+    border:0;
+    position: relative;
+    text-align: left;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    vertical-align: middle;
+    line-height: normal;
+    border-radius: 20px;
+}
+.ui-switch.ui-switch-animate .ui-switch-container {
+    transition: margin-left 0.5s,background-color 0.5s;
+}
+.ui-switch.ui-switch-on .ui-switch-container {
+    margin-left: 0;
+}
+.ui-switch.ui-switch-off .ui-switch-container {
+    margin-left: -60%;
+}
+.ui-switch.ui-switch-focused {
+    border-color: #66afe9;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.ui-switch .ui-switch-container {
+    display: inline-block;
+    width: 160%;
+    top: 0;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    line-height: normal;
+}
+.ui-switch .ui-switch-handle-on,
+.ui-switch .ui-switch-handle-off,
+.ui-switch .ui-switch-label {
+    cursor: pointer;
+    display: inline-block;
+    height: 100%;
+    padding: 3px 6px;
+    font-size: 12px;
+    line-height: 1.42857143;
+    border-radius: 0;
+}
+.ui-switch .ui-switch-handle-on,
+.ui-switch .ui-switch-handle-off {
+    text-align: center;
+    z-index: 1;
+    width: 37.5%;
+}
+.ui-switch.ui-switch-off.ui-switch-primary,
+.ui-switch.ui-switch-on.ui-switch-primary{
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-switch.ui-switch-off.ui-switch-primary .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-primary .ui-switch-container{
+    background-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-primary,
+.ui-switch .ui-switch-handle-off.ui-switch-primary {
+    color: #fff;
+    background: transparent;
+}
+.ui-switch.ui-switch-focused.ui-switch-primary{
+    border-color: /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+    outline: 0;
+    box-shadow: inset 0 1px 1px /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/, 0 0 8px /*移动start*/ #188ef1 /*移动end*/ /*联通start #f06e69 联通end*/ /*电信start #69a9e0 电信end*/;
+}
+.ui-switch.ui-switch-off.ui-switch-info,
+.ui-switch.ui-switch-on.ui-switch-info{
+    border-color: #5bc0de;
+}
+.ui-switch.ui-switch-off.ui-switch-info .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-info .ui-switch-container{
+    background-color: #5bc0de;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-info,
+.ui-switch .ui-switch-handle-off.ui-switch-info {
+    color: #fff;
+    background: transparent;
+}
+.ui-switch.ui-switch-focused.ui-switch-info{
+    border-color: #5bc0de;
+    outline: 0;
+    box-shadow: inset 0 1px 1px #5bc0de, 0 0 8px #5bc0de;
+}
+.ui-switch.ui-switch-off.ui-switch-success,
+.ui-switch.ui-switch-on.ui-switch-success{
+    border-color: #5cb85c;
+}
+.ui-switch.ui-switch-off.ui-switch-success .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-success .ui-switch-container{
+    background-color: #5cb85c;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-success,
+.ui-switch .ui-switch-handle-off.ui-switch-success {
+    color: #fff;
+    background: transparent;
+}
+.ui-switch.ui-switch-focused.ui-switch-success{
+    border-color: #5cb85c;
+    outline: 0;
+    box-shadow: inset 0 1px 1px #5cb85c, 0 0 8px #5cb85c;
+}
+.ui-switch.ui-switch-off.ui-switch-warning,
+.ui-switch.ui-switch-on.ui-switch-warning{
+    border-color: #f0ad4e;
+}
+.ui-switch.ui-switch-off.ui-switch-warning .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-warning .ui-switch-container{
+    background-color: #f0ad4e;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-warning,
+.ui-switch .ui-switch-handle-off.ui-switch-warning {
+    background: transparent;
+    color: #fff;
+}
+.ui-switch.ui-switch-focused.ui-switch-warning{
+    border-color: #f0ad4e;
+    outline: 0;
+    box-shadow: inset 0 1px 1px #f0ad4e, 0 0 8px #f0ad4e;
+}
+.ui-switch.ui-switch-off.ui-switch-danger,
+.ui-switch.ui-switch-on.ui-switch-danger{
+    border-color: #d9534f;
+}
+.ui-switch.ui-switch-off.ui-switch-danger .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-danger .ui-switch-container{
+    background-color: #d9534f;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-danger,
+.ui-switch .ui-switch-handle-off.ui-switch-danger {
+    color: #fff;
+    background: transparent;
+}
+.ui-switch.ui-switch-focused.ui-switch-danger{
+    border-color: #d9534f;
+    outline: 0;
+    box-shadow: inset 0 1px 1px #d9534f, 0 0 8px #d9534f;
+}
+.ui-switch.ui-switch-off.ui-switch-default,
+.ui-switch.ui-switch-on.ui-switch-default{
+    border-color: #eeeeee;
+}
+.ui-switch.ui-switch-off.ui-switch-default .ui-switch-container,
+.ui-switch.ui-switch-on.ui-switch-default .ui-switch-container{
+    background-color: #eeeeee;
+}
+.ui-switch .ui-switch-handle-on.ui-switch-default,
+.ui-switch .ui-switch-handle-off.ui-switch-default {
+    color: #000;
+    background: transparent;
+}
+.ui-switch.ui-switch-focused.ui-switch-default{
+    border-color: #eeeeee;
+    outline: 0;
+    box-shadow: inset 0 1px 1px #eeeeee, 0 0 8px #eeeeee;
+}
+.ui-switch.ui-switch-disabled {
+    cursor: default;
+}
+.ui-switch.ui-switch-disabled .ui-switch-handle-on,
+.ui-switch.ui-switch-disabled .ui-switch-handle-off,
+.ui-switch.ui-switch-disabled .ui-switch-label {
+    cursor: default;
+}
+.ui-switch.ui-switch-disabled .ui-switch-container{
+    background-color:#eeeeee !important;
+    transition:backgroud-color 0s;
+
+}
+.ui-switch.ui-switch-disabled .ui-switch-container .ui-switch-handle-on,
+.ui-switch.ui-switch-disabled .ui-switch-container .ui-switch-handle-off {
+    color: #000;
+    background: transparent;
+}
+.ui-switch .ui-switch-label {
+    text-align: center;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    z-index: 100;
+    width: 25%;
+    color: #333;
+    background: #fff;
+    border-radius: 50%;
+    border: 1px solid #eee;
+}
+.ui-switch .ui-switch-handle-off{
+    margin-right: -22px;
+}
+.ui-switch.ui-switch-lg .ui-switch-handle-off{
+    margin-right: -32px;
+}
+.ui-switch.ui-switch-lg .ui-switch-handle-on,
+.ui-switch.ui-switch-lg .ui-switch-handle-off,
+.ui-switch.ui-switch-lg .ui-switch-label {
+    padding: 6px 9px;
+    font-size: 15px;
+    line-height: 1.3333333;
+}
+.ui-switch.ui-switch-sm .ui-switch-handle-off{
+    margin-right: -14px;
+}
+.ui-switch.ui-switch-sm .ui-switch-handle-on,
+.ui-switch.ui-switch-sm .ui-switch-handle-off,
+.ui-switch.ui-switch-sm .ui-switch-label {
+    padding: 2px 4px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.ui-switch.ui-switch-xs .ui-switch-handle-off{
+    margin-right: -7px;
+}
+.ui-switch.ui-switch-xs .ui-switch-handle-on,
+.ui-switch.ui-switch-xs .ui-switch-handle-off,
+.ui-switch.ui-switch-xs .ui-switch-label {
+    padding: 1px 2px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.switch-btn,
+.ui-switch input[type='radio'],
+.ui-switch input[type='checkbox'] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    z-index: -1;
+}
+.switch-btn.form-control,
+.ui-switch input[type='radio'].form-control,
+.ui-switch input[type='checkbox'].form-control {
+    height: auto;
+}
+
+
+/*alert*/
+.ui-dialog.alert-modal{
+    /* border-radius: 4px; */
+    border: 1px solid transparent;
+    min-height: 104px;
+    /* box-shadow: 5px 5px 4px #ddd; */
+}
+.ui-dialog.alert-modal .modal-header{
+    border-bottom: 1px solid transparent;
+    padding: 14px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    margin-right: 0px;
+}
+.ui-dialog.alert-modal .modal-header .close{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+.ui-dialog.modal-info .modal-body{
+    border-bottom: 1px solid transparent;
+    margin-top: 0px;
+    background-color: #fff;
+    border-radius: 4px;
+}
+.ui-dialog.modal-success .modal-body{
+    border-bottom: 1px solid transparent;
+    margin-top: 0px;
+    background-color: #fff;
+    border-radius: 4px;
+}
+.ui-dialog.modal-info .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-success .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-info .modal-header > .close {
+    color: #000;
+}
+.ui-dialog.modal-info .modal-title {
+    color: #188ef1;
+    margin-left: 67px;
+    margin-top: -4px;
+    font-size: 19px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+}
+.ui-dialog.modal-info .modal-message {
+    display: block;
+    background-color: #fff;
+    overflow-y: auto;
+    word-wrap: break-word;
+    margin-left: 60px;
+    margin-right: 43px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ui-dialog.modal-info .modal-footer {
+    border-top-width: 0;
+    padding: 0 15px 15px 15px;
+}
+.ui-dialog.modal-info .glyphicon {
+    margin-top: -4px;
+    margin-right: 5px;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+    color: #188ef1;
+}
+.ui-dialog.modal-confirm {
+    width: auto;
+    padding: 0;
+    border: 0;
+}
+.ui-dialog.modal-confirm .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-confirm .modal-header > .close {
+    color: #000;
+}
+.ui-dialog.modal-confirm .modal-title {
+    color: #333;
+}
+.ui-dialog.modal-confirm .modal-body {
+    padding: 10px 15px;
+}
+.ui-dialog.modal-confirm .modal-message {
+    display: block;
+    background-color: #fff;
+    overflow-y: auto;
+    max-height: 153px;
+    min-height: 25px;
+    word-wrap: break-word;
+}
+.ui-dialog.modal-confirm .modal-footer {
+    border-top-width: 0;
+    padding: 0 15px 15px 15px;
+}
+.ui-dialog.modal-confirm .glyphicon {
+    margin-top: -2px;
+    margin-right: 5px;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+    color: #EB4A4B;
+}
+.ui-dialog.modal-success {
+    width: auto;
+    padding: 0;
+    border: 1px solid transparent;
+    background-color: #fff;
+}
+.ui-dialog.modal-info {
+    width: auto;
+    padding: 0;
+    border: 0;
+    background-color: #fff;
+}
+.ui-dialog.modal-success .modal-header > .close {
+    color: #000;
+}
+.ui-dialog.modal-success .modal-title {
+    color: #5cb85c;
+    margin-left: 67px;
+    margin-top: -4px;
+    font-size: 19px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+}
+.ui-dialog.modal-success .modal-body {
+    padding: 10px 15px;
+}
+.ui-dialog.modal-success .modal-message {
+    display: block;
+    background-color: #fff;
+    overflow-y: auto;
+    word-wrap: break-word;
+    margin-left: 60px;
+    margin-right: 43px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ui-dialog.modal-success .modal-footer {
+    border-top-width: 0;
+    padding: 0 15px 15px 15px;
+}
+.ui-dialog.modal-success .glyphicon {
+    margin-top: -4px;
+    margin-right: 5px;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+    color: #5cb85c;
+}
+.ui-dialog.modal-warning {
+    width: auto;
+    padding: 0;
+    border: 0;
+    background-color: #fff;
+}
+.ui-dialog.modal-warning .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-warning .modal-header > .close {
+    color: #000;
+}
+.ui-dialog.modal-warning .modal-title {
+    color: #f0ad4e;
+    margin-left: 67px;
+    margin-top: -4px;
+    font-size: 19px;
+    margin-right: 43px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+}
+.ui-dialog.modal-warning .modal-body {
+    padding: 10px 15px;
+}
+.ui-dialog.modal-warning .modal-message {
+    display: block;
+    background-color: #fff;
+    overflow-y: auto;
+    word-wrap: break-word;
+    margin-left: 60px;
+    margin-right: 43px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ui-dialog.modal-warning .modal-footer {
+    border-top-width: 0;
+    padding: 0 15px 15px 15px;
+}
+.ui-dialog.modal-warning .glyphicon {
+    margin-top: -4px;
+    margin-right: 5px;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+    color: #f0ad4e;
+}
+.ui-dialog.modal-warning .modal-body{
+    border-bottom: 1px solid transparent;
+    margin-top: 0px;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.ui-dialog.modal-warning .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-danger {
+    width: auto;
+    padding: 0;
+    border: 0;
+    background-color: #fff;
+}
+.ui-dialog.modal-danger .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+.ui-dialog.modal-danger .modal-header > .close {
+    color: #000;
+}
+.ui-dialog.modal-danger .modal-title {
+    color: #d9534f;
+    margin-left: 67px;
+    margin-top: -4px;
+    margin-right: 43px;
+    font-size: 19px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+}
+.ui-dialog.modal-danger .modal-body {
+    padding: 10px 15px;
+}
+.ui-dialog.modal-danger .modal-message {
+    display: block;
+    background-color: #fff;
+    overflow-y: auto;
+    word-wrap: break-word;
+    margin-left: 60px;
+    margin-right: 43px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.ui-dialog.modal-danger .modal-footer {
+    border-top-width: 0;
+    padding: 0 15px 15px 15px;
+}
+.ui-dialog.modal-danger .glyphicon {
+    margin-top: -4px;
+    margin-right: 5px;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 1.42857143;
+    color: #d9534f;
+}
+.ui-dialog.modal-danger .modal-body{
+    border-bottom: 1px solid transparent;
+    margin-top: 0px;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.ui-dialog.modal-danger .modal-header {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+
+
+
+
+.alert-toast {
+    position: fixed;
+    width: 500px;
+    top: 0;
+    left: 50%;
+    margin: 5px 0 0 -250px;
+    z-index: 10003;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 17px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.alert h4 {
+    margin-top: 0;
+    color: inherit;
+}
+.alert .alert-link {
+    font-weight: bold;
+}
+.alert > p,
+.alert > ul {
+    margin-bottom: 0;
+}
+.alert > p + p {
+    margin-top: 5px;
+}
+.alert-dismissable,
+.alert-dismissible {
+    padding-right: 35px;
+}
+.alert-dismissable .close,
+.alert-dismissible .close {
+    position: relative;
+    top: -2px;
+    right: -21px;
+    color: inherit;
+}
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+}
+.alert-success hr {
+    border-top-color: #c9e2b3;
+}
+.alert-success .alert-link {
+    color: #2b542c;
+}
+.alert-info {
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    color: #31708f;
+}
+.alert-info hr {
+    border-top-color: #a6e1ec;
+}
+.alert-info .alert-link {
+    color: #245269;
+}
+.alert-warning {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+}
+.alert-warning hr {
+    border-top-color: #f7e1b5;
+}
+.alert-warning .alert-link {
+    color: #66512c;
+}
+.alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+.alert-danger hr {
+    border-top-color: #e4b9c0;
+}
+.alert-danger .alert-link {
+    color: #843534;
+}
+/*end zhao.yehua*/
+
+/*这些样式要放到最后去覆盖之前的样式 不是单纯的覆盖 是用class去覆盖
+eg:class="input-group-addon btn-group-vertical btn-group-stepper"
+用 btn-group-stepper去覆盖btn-group-vertical 所以要放到最后
+*/
+/*form  上下按钮*/
+.btn-group-stepper{
+    padding: 0px 4px 2px 4px;
+}
+.btn-stepper{
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0;
+    height: 10px;
+}
+/*end  form 上下按钮*/
+
+/*customer define*/
+.customer_define_form_english_font{
+    font-size: 10px;
+}
+/*查询控件分页特定样式*/
+.pagination input{
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+.text-right {
+    text-align: right;
+    padding-right:16px;
+}
+.ngc-define-box-show{
+    box-shadow: 2px 2px 5px #ddd;
+}
+/*end customer define*/

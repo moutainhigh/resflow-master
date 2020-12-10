@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.resourceInitiate.data.dao.ResourceInitiateDao">
+
+    <select id="qryTacheInfo"  resultType="map" parameterType="String">
+        SELECT R.ID, R.TACHE_NAME, R.TACHE_CODE
+          FROM UOS_TACHE R
+         WHERE R.ID = #{tacheId}
+    </select>
+
+    <select id="qryResSupplementConfigData"  resultType="map" parameterType="String">
+        SELECT RS.SPECIALTY_CONFIG,
+               RS.IS_LOCAL,
+               RS.LOCAL_CONFIG,
+               RS.SERIAL_NUMBER,
+               RS.REGION_ID,
+               RS.INSTANCE_ID,
+               RS.CIRCUIT_CODE,
+               RS.SERVICE_ID,
+               RS.SYSTEM_RESOURCE,
+               RS.IS_OLDRES,
+               RS.ORDER_STATE,
+               RS.PARENT_ORDER_ID
+          FROM GOM_BDW_RES_SUPPLEMENT_INFO RS
+         WHERE RS.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryFirstTacheData"  resultType="map" parameterType="String">
+        SELECT WO.WO_ID, WO.ORDER_ID, UT.ID, UT.TACHE_CODE
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.ORDER_ID = #{orderId}
+           AND UT.ID = #{tacheId}
+           AND WO.WO_STATE = '290000002'
+    </select>
+
+    <insert id="insertResSupToLocal" parameterType="map">
+        INSERT INTO GOM_BDW_RES_SUPPLEMENT_INFO
+            (ID, ORDER_ID, SERIAL_NUMBER, REGION_ID, INSTANCE_ID, CIRCUIT_CODE, SERVICE_ID,
+             SYSTEM_RESOURCE, IS_OLDRES, PARENT_ORDER_ID, ORDER_STATE, CREATE_DATE)
+        VALUES (seq_GOM_BDW_SRV_ORD_INFO.NEXTVAL,#{ORDER_ID}, #{SERIAL_NUMBER}, #{REGION_ID},
+                #{INSTANCE_ID}, #{CIRCUIT_CODE}, #{SERVICE_ID}, #{SYSTEM_RESOURCE}, #{IS_OLDRES}, #{PARENT_ORDER_ID},
+                #{ORDER_STATE}, sysdate)
+    </insert>
+
+    <select id="qryChildOrderState" resultType="String" parameterType="String">
+        SELECT t.order_state FROM (
+        SELECT o.order_state FROM gom_order o
+        LEFT JOIN gom_ord_key_info k ON k.order_id = o.order_id
+        WHERE o.parent_order_id = #{orderId}
+        AND k.specialty_code = #{childConfig}
+        AND k.region_id = #{childConfigAreas}
+        AND o.parent_order_code = #{subName} ORDER BY o.create_date DESC
+        ) t WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryIfHasChildOrder" resultType="int" parameterType="map">
+        SELECT COUNT(1)
+          FROM GOM_ORDER ORD
+         WHERE ORD.PARENT_ORDER_ID =
+               (SELECT R.PARENT_ORDER_ID
+                  FROM GOM_ORDER R
+                 WHERE R.ORDER_ID = #{orderId})
+           AND ORD.ORDER_STATE = #{orderState}
+           AND ORD.PARENT_ORDER_CODE = #{parentOrderCode}
+    </select>
+
+    <select id="qryParentOrderWoId" resultType="map" parameterType="map">
+        SELECT WO.WO_ID,
+               WO.ORDER_ID,
+               WO.DEAL_USER_ID,
+               WO.WO_STATE,
+               UT.ID,
+               UT.TACHE_NAME
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.ORDER_ID =
+               (SELECT R.PARENT_ORDER_ID
+                  FROM GOM_ORDER R
+                 WHERE R.ORDER_ID = #{orderId}
+                   AND R.PARENT_ORDER_CODE = #{parentOrderCode})
+           AND WO.WO_STATE = #{woState}
+           AND UT.TACHE_CODE = #{tacheCode}
+    </select>
+
+    <select id="qryAreaName" resultType="string" parameterType="string">
+       SELECT DP.DEPT_NAME FROM DEPARTMENT DP WHERE DP.DEPT_ID =  #{childConfig}
+    </select>
+
+    <select id="qrySpecialtyName" resultType="string" parameterType="string">
+        SELECT PS.PUB_DATE_NAME
+          FROM GOM_PUB_DATE_S PS
+         WHERE PS.PUB_DATE_ID = #{childConfig}
+           AND PS.DF_TYPE = 'SPECIALTY_TYPE'
+    </select>
+
+    <select id="qrySrvOrdIdByInstanceId" parameterType="string" resultType="string">
+        SELECT *
+        FROM (SELECT srv.srv_ord_id
+        FROM gom_bdw_srv_ord_info srv
+        WHERE srv.instance_id = #{instanceId}
+        order by srv.create_date desc) r
+        WHERE rownum = 1
+    </select>
+    <select id="qrySrvOrdIdByParentInstanceId" parameterType="string" resultType="string">
+        SELECT *
+        FROM (SELECT srv.srv_ord_id
+        FROM gom_bdw_srv_ord_info srv
+        WHERE srv.instance_id =( select  b.instance_id from gom_bdw_res_supplement_info a join
+            gom_bdw_res_supplement_info b on a.parent_order_id=b.order_id
+        where a.system_resource='sec-flow-schedule-lt' and a.instance_id=#{instanceId})
+        order by srv.create_date desc) r
+        WHERE rownum = 1
+    </select>
+    <update id="updateResSupOrderState" parameterType="string">
+        UPDATE gom_bdw_res_supplement_info rsi
+           set rsi.order_state = '10F'
+         WHERE RSI.ORDER_ID = #{orderId}
+    </update>
+
+    <update id="updateResSupSpecialtyAndArea" parameterType="string">
+        UPDATE gom_bdw_res_supplement_info rsi
+           set rsi.specialty_config = #{specialtyConfig},
+               rsi.supplement_remark = #{remark},
+               rsi.local_config = #{localConf}
+         WHERE RSI.ORDER_ID = #{orderId}
+    </update>
+
+    <select id="initCircuitInfo" parameterType="map" resultType="map">
+        SELECT
+            CO.CUST_NAME_CHINESE AS "custName",
+            SOI.SERVICE_ID AS "serviceId",
+            SOI.INSTANCE_ID AS "prodInstId",
+            SOI.SYSTEM_RESOURCE "systemResource",
+            SOI.SERIAL_NUMBER AS "accNbr",
+            ATTR.SRV_ORD_ID AS "crmOrderCode",
+            ATTR.CIRCUITCODE AS "circuitCode",
+            ATTR.A_INSTALLED_ADD AS "aInstalledAdd",
+            ATTR.Z_INSTALLED_ADD AS "zInstalledAdd"
+        FROM GOM_BDW_SRV_ORD_INFO SOI
+        JOIN GOM_BDW_CST_ORD CO ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+        LEFT JOIN
+            (
+                SELECT
+                    B.SRV_ORD_ID,
+                    B.CIRCUITCODE,
+                    B.A_INSTALLED_ADD,
+                    B.Z_INSTALLED_ADD
+                FROM(
+                        SELECT
+                            SRV_ORD_ID,
+                            ATTR_VALUE,
+                            ATTR_CODE
+                        FROM GOM_BDW_SRV_ORD_ATTR_INFO
+                        WHERE SRV_ORD_ID = #{srvOrdId}) A PIVOT(MAX(A.ATTR_VALUE) FOR ATTR_CODE IN ('20000064'
+                                                                                             CIRCUITCODE,
+                                                                                             '20000082'
+                                                                                             A_INSTALLED_ADD,
+                                                                                             '20000100'
+                                                                                             Z_INSTALLED_ADD)
+                    ) B) ATTR ON ATTR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        WHERE SOI.SRV_ORD_ID = #{srvOrdId}
+    </select>
+    <select id="getOrgInfoByStaffId" parameterType="map" resultType="map">
+        select
+            org_id,
+            as2.area_id,
+            s.crm_region
+        from (SELECT
+                  a.org_id,
+                  a.area_id
+              FROM GOM_ORG_S a
+              WHERE a.PARENT_ORG_ID = 1
+              START WITH a.ORG_ID = ( SELECT b.ORG_ID FROM GOM_USER_S a
+                                      LEFT JOIN GOM_ORG_S b ON a.ORG_ID = b.ORG_ID WHERE a.USER_ID = #{operStaffId})
+        connect BY prior a.PARENT_org_ID = a.org_id
+        ) as2 join gom_area_s s  on  as2.area_id=s.id
+    </select>
+
+    <select id="queryDeptInfo" parameterType="string" resultType="map">
+        SELECT
+            s.DEPT_ID   AS "id",
+            s.DEPT_NAME AS "name",
+            s.PARENT_ID AS "pId",
+            CASE
+                WHEN s.PARENT_ID = 1
+                THEN 'true'
+                WHEN s.DEPT_ID = #{orgId}
+                THEN 'true'
+                ELSE 'false'
+            END         AS "open",
+            '260000001' AS "objType"
+        FROM
+            department s
+        WHERE
+            (
+                s.DEPT_ID= #{orgId}
+            OR  s.PARENT_ID= #{orgId})
+        AND (
+                s.DEPT_NAME LIKE '%分公司'
+            OR  s.DEPT_NAME LIKE '%分公司网络建%'
+            OR  s.DEPT_NAME LIKE '%分公司本部%'
+            OR  s.DEPT_NAME = '本部'
+            OR  s.DEPT_NAME LIKE '%濮院经营部'
+            OR  s.DEPT_NAME LIKE '%分公司网络部'
+            OR  s.DEPT_NAME LIKE '%分公司网络运营部'
+            OR  s.DEPT_NAME = '太原市分公司设备维护中心'
+            OR  s.DEPT_NAME = '太原市分公司网络优化中心'
+            OR  s.DEPT_NAME = '太原市分公司客户响应中心')
+    </select>
+
+    <select id="initSpecialtyInfo" parameterType="map" resultType="map">
+        select SPECIALTY_NAME as name,SPECIALTY as value from gom_bdw_SPECIALTY_config where area_id = #{areaId} and product_type = #{serviceId}
+    </select>
+
+    <insert id="insertResourceInitiateInfo" parameterType="map" keyProperty="id" keyColumn="id">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            SELECT seq_GOM_BDW_SRV_ORD_INFO.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO GOM_BDW_RES_SUPPLEMENT_INFO (
+            ID,
+            ORDER_ID,
+            SERIAL_NUMBER,
+            REGION_ID,
+            RES_REGION_ID,
+            INSTANCE_ID,
+            CIRCUIT_CODE,
+            SERVICE_ID,
+            SYSTEM_RESOURCE,
+            SPECIALTY_CONFIG,
+            IS_OLDRES,
+            LOCAL_CONFIG,
+            SUPPLEMENT_REMARK,
+            ORDER_STATE,
+            CREATE_DATE,
+            LINK_MAN,
+            CUST_ID,
+            ADDRESS
+        )
+        VALUES (
+            #{id},
+            0,
+            #{accNbr},
+            #{regionId},
+            #{resRegionId},
+            #{prodInstId},
+            #{circuitCode},
+            #{serviceId},
+            #{systemResource},
+            #{specialtyConfig},
+            #{isoldres},
+            #{localConf},
+            #{remark},
+            #{orderState},
+            sysdate,
+            #{linkMan},
+            #{custId},
+            #{address}
+        )
+
+    </insert>
+    <select id="queryFlowId" resultType="String">
+        SELECT SORT_NO FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE = 'resource_initiate_flow' AND CODE_CONTENT = '108'
+    </select>
+
+    <update id="updateOrderInfoByResourceSupplementId" parameterType="map">
+        UPDATE GOM_BDW_RES_SUPPLEMENT_INFO SET ORDER_ID = #{params.orderId},VERSION_ID = #{params.versionId} WHERE ID = #{params.id}
+    </update>
+
+    <select id="queryBranchAreaInfo" resultType="map" parameterType="string">
+        SELECT a.ORG_ID,a.ORG_NAME FROM gom_org_s a where a.PARENT_ORG_ID in ( SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+            START WITH  a.ORG_ID= (select ORG_ID from gom_user_s where user_id = #{staffId} )
+        CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+    </select>
+
+    <select id="querySrvOrdInfoByInstanceId" parameterType="map" resultType="map">
+        select soi.srv_ord_stat,co.apply_ord_id from gom_bdw_srv_ord_info soi  join gom_bdw_cst_ord co on soi.cst_ord_id = co.cst_ord_id where soi.instance_id = #{instanceId}
+    </select>
+
+    <select id="queryResourceInitiateInfoByInstanceId" parameterType="map" resultType="map">
+        SELECT ORDER_STATE FROM GOM_BDW_RES_SUPPLEMENT_INFO WHERE INSTANCE_ID = #{instanceId}
+    </select>
+
+    <select id="qrySuppleInfoByChildOrderId" resultType="map" parameterType="string">
+        SELECT SUP.ID ,SUP2.ID  PARENT_ID,SUP.ORDER_STATE FROM GOM_ORDER ORD
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP ON ORD.PARENT_ORDER_ID=SUP.ORDER_ID
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE ORD.ORDER_ID=#{orderId}
+    </select>
+    <select id="qrySuppleInfoByWoId" resultType="map" parameterType="string">
+        SELECT SUP.ID ,SUP2.ID  PARENT_ID
+        FROM GOM_WO WO
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP ON WO.ORDER_ID=SUP.ORDER_ID
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE WO.WO_ID=#{woId}
+    </select>
+    <update id="updateResSupOrderStateById" parameterType="map">
+        UPDATE gom_bdw_res_supplement_info rsi
+        set rsi.order_state = #{orderState}
+        WHERE RSI.ID = #{id}
+    </update>
+    <select id="qrySuppleInfoById" resultType="map" parameterType="string">
+        SELECT SUP.ID ,SUP2.ID  PARENT_ID
+        FROM GOM_BDW_RES_SUPPLEMENT_INFO SUP
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE SUP.ID=#{id}
+    </select>
+
+    <select id="queryResSuppleByInstanceId" parameterType="String" resultType="map">
+        SELECT ORDER_STATE,ID,ORDER_ID FROM GOM_BDW_RES_SUPPLEMENT_INFO
+        WHERE INSTANCE_ID = #{instanceId} and ORDER_STATE =#{orderState}
+    </select>
+
+    <select id="qrySuppleStateByOrderId" resultType="map" parameterType="string">
+        SELECT SUP.ID ,SUP2.ID  PARENT_ID,SUP.ORDER_STATE FROM GOM_ORDER ORD
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP ON ORD.ORDER_ID=SUP.ORDER_ID
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE ORD.ORDER_ID=#{orderId}
+    </select>
+
+    <select id="qryVersionId" resultType="String">
+        SELECT VERSION_ID FROM GOM_BDW_RES_SUPPLEMENT_INFO WHERE ID =#{id}
+    </select>
+    <select id="queryResourceOrderInfoSec" parameterType="map" resultType="map">
+        select org.ORG_NAME HANDLE_DEP,t.* from (
+            <include refid="queryResourceOrderInfo"/>
+        )t
+        left join GOM_BDW_RES_SUPPLEMENT_INFO sup on sup.id=t.SRV_ORD_ID
+        left join gom_bdw_city_tras_depart area on area.AREA_CODE=sup.res_region_id
+        left join gom_org_s org  on area.DEPT_ID=org.ORG_ID
+        order By  org.ORG_NAME
+    </select>
+    <select id="queryResourceOrderInfoLocal" parameterType="map" resultType="map">
+        SELECT ORG.ORG_NAME HANDLE_DEP,T.* FROM (
+            <include refid="queryResourceOrderInfo"/>
+        )T
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP ON SUP.ID=T.SRV_ORD_ID
+        LEFT JOIN  GOM_ORD_KEY_INFO GOKI ON GOKI.ORDER_ID=SUP.ORDER_ID
+        LEFT JOIN GOM_ORG_S ORG  ON GOKI.REGION_ID=ORG.ORG_ID
+        ORDER BY  ORG.ORG_NAME
+    </select>
+    <sql id="queryResourceOrderInfo" >
+        SELECT t.*
+        FROM (
+        (  <include refid="qryAfterRoute"/>)
+        union all
+        (  <include refid="qryResName"/>)
+        union all
+        (  <include refid="qryResAttrCode"/>)
+        union all
+        (  <include refid="qryResAsignRoute"/>)
+        ) t where t.resname is not NULL
+    </sql>
+    <sql id="compId" >
+        ('20000007','20000001','20000010','20000011')
+    </sql>
+    <!--查询传输、光纤专业、业务电路(有路由信息的专业)-->
+    <sql id="qryAfterRoute" >
+        SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SUPV_RES_INFO info
+        LEFT JOIN GOM_BDW_SUPV_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code  IN ('AFTER_ROUTE','OPT_ROAD_TEXT_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN <include refid="compId"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SUPV_RES_INFO info
+        LEFT JOIN GOM_BDW_SUPV_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code IN ('AFTER_ROUTE','OPT_ROAD_TEXT_ROUTE')
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN <include refid="compId"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) b ON b.compId = a.compId AND b.resId = a.resId
+    </sql>
+    <!--查询无路由的专业配置-->
+    <sql id="qryResName" >
+        SELECT DISTINCT a.srv_ord_id, a.resname, a.resId, a.restype,a.compId,
+        a.resname AFTER_ROUTE,a.create_date,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname AFTER_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SUPV_RES_INFO info
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN <include refid="compId"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname BEFORE_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SUPV_RES_INFO info
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN <include refid="compId"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId  and a.seq=b.seq
+    </sql>
+    <sql id="resAttrCode" >
+      ('TEXT_IP','TEXT_VLAN','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+    </sql>
+    <!--查独立的文本端口等信息-->
+    <sql id="qryResAttrCode" >
+        SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  AFTER_ROUTE,route.create_date
+        FROM  GOM_BDW_SUPV_RES_ROUTE route
+        WHERE route.resources = 'newResource'
+        and route.attr_code  IN <include refid="resAttrCode"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  BEFORE_ROUTE,route.create_date
+        FROM  GOM_BDW_SUPV_RES_ROUTE route
+        WHERE route.resources = 'oldResource' and route.attr_code IN <include refid="resAttrCode"/>
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId
+    </sql>
+    <!-- 查询汇总后的业务路由 -->
+    <sql id="qryResAsignRoute">
+        select
+        to_char( c.srv_ord_id) srv_ord_id,
+        c.CIRCUIT_NO as resname,
+        '' as resId,
+        '业务路由' as restype,
+        '' as compId,
+        case when c.ROUTE_INFO is not null then to_char(c.ROUTE_INFO) else '' end as AFTER_ROUTE,
+        c.CREATE_DATE as create_date,
+        '' as BEFORE_ROUTE
+        From gom_bdw_srv_ord_res_circuit c
+        <if test="srvOrdId != '' and srvOrdId != null">
+            where c.srv_ord_id in
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+            AND c.STATE = '10A'
+        </if>
+    </sql>
+
+    <!--查询所有下发本地网的主键Id-->
+    <select id="qryLocalId" resultType="String">
+        SELECT SUP.ID
+        FROM GOM_BDW_RES_SUPPLEMENT_INFO SUP
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE SUP2.ID=#{id}
+    </select>
+    <update id="updateResSupCirCodeById" parameterType="map">
+        UPDATE gom_bdw_res_supplement_info rsi
+        set rsi.CIRCUIT_CODE = #{circuitCode}
+        WHERE RSI.ID = #{id}
+    </update>
+
+    <select id="qryIfHasOtherWoOrder" resultType="int" parameterType="map">
+        SELECT COUNT(1) FROM GOM_WO WO
+        LEFT JOIN GOM_ORDER ORD ON WO.ORDER_ID=ORD.ORDER_ID
+        LEFT JOIN GOM_ORDER BROTHER ON ORD.PARENT_ORDER_ID = BROTHER.PARENT_ORDER_ID
+        WHERE BROTHER.ORDER_ID=#{orderId} AND WO.WO_STATE=#{woState}
+    </select>
+    <select id="qryIfHasLocalWoOrder" resultType="int" parameterType="map">
+        SELECT COUNT(1) FROM GOM_WO WO
+        LEFT JOIN GOM_ORDER ORD ON WO.ORDER_ID=ORD.ORDER_ID
+        LEFT JOIN GOM_BDW_RES_SUPPLEMENT_INFO child ON ORD.PARENT_ORDER_ID=child.ORDER_ID
+        LEFT JOIN GOM_BDW_RES_SUPPLEMENT_INFO SUP ON SUP.ORDER_ID = child.PARENT_ORDER_ID
+        WHERE SUP.ID=#{id} AND WO.WO_STATE=#{woState}
+    </select>
+    <select id="qryIfHasSpecialWoOrder" resultType="int" parameterType="map">
+        SELECT COUNT(1)
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         LEFT JOIN GOM_BDW_RES_SUPPLEMENT_INFO SUP
+            ON WO.ORDER_ID =SUP.ORDER_ID
+         WHERE  SUP.ID = #{id}
+           AND WO.WO_STATE = #{woState}
+           AND UT.TACHE_CODE = #{tacheCode}
+    </select>
+    <select id="qryChildOrder" parameterType="map" resultType="map">
+        SELECT DISTINCT ORDER_ID,ORDER_STATE
+        FROM  GOM_ORDER
+        WHERE PARENT_ORDER_ID =#{orderId}  AND PARENT_ORDER_CODE='RESSUP' AND ORDER_STATE='200000002'
+    </select>
+    <select id="qryOriginSrvInfo" parameterType="map" resultType="map">
+        SELECT SRV_ORD_ID FROM (
+            SELECT SRV.SRV_ORD_ID FROM GOM_BDW_SRV_ORD_INFO SRV
+            JOIN GOM_BDW_RES_SUPPLEMENT_INFO SUP ON SUP.IS_OLDRES='0' AND SRV.INSTANCE_ID=SUP.INSTANCE_ID
+            WHERE SUP.ID=#{id} ORDER BY SRV.SRV_ORD_ID DESC)
+        WHERE ROWNUM = 1
+        union all
+        SELECT SRV_ORD_ID FROM (
+            SELECT RELATE_INFO_ID SRV_ORD_ID FROM GOM_BDW_SEC_LOCAL_RELATE_INFO  REL
+            JOIN GOM_BDW_RES_SUPPLEMENT_INFO SUP  ON SUP.IS_OLDRES='0' AND SUP.INSTANCE_ID=REL.INSTANCE_ID
+            WHERE SUP.ID=#{id} ORDER BY RELATE_INFO_ID DESC)
+        WHERE ROWNUM = 1
+    </select>
+
+    <!--查询所有下发本地网的instanceId-->
+    <select id="qryLocalInstanceId" resultType="String">
+        SELECT SUP.INSTANCE_ID
+        FROM GOM_BDW_RES_SUPPLEMENT_INFO SUP
+        LEFT JOIN  GOM_BDW_RES_SUPPLEMENT_INFO SUP2 ON SUP.PARENT_ORDER_ID=SUP2.ORDER_ID
+        WHERE SUP2.ID=#{id}
+    </select>
+    <!--根据prodinstld 更新 GOM_BDW_srv_ord_info 更新补录状态,这里的prdInstId就是 GOM_BDW_srv_ord_info表中的SRV_ORD_ID-->
+    <update id="UpdateRecordingStatusByProdInstId" parameterType="String">
+        update GOM_BDW_SRV_ORD_INFO
+        SET RECORD_TYPE='1'
+        WHERE SRV_ORD_ID=#{srvordId}
+    </update>
+</mapper>

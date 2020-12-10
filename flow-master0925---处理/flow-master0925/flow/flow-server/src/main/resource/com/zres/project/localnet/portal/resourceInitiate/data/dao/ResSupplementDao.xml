@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.resourceInitiate.data.dao.ResSupplementDao">
+
+    <select id="qryWaitSignForOrdList" parameterType="map" resultType="map">
+        select z.*
+        FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+            From (
+                  <include refid="waitSignForResSupplementData"/>
+                 ) y
+            ) z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	     ]]>
+    </select>
+
+    <select id="qryWaitSignForOrdCount" parameterType="map" resultType="int">
+        select count(1)
+        From (
+                <include refid="waitSignForResSupplementData"/>
+              ) q
+    </select>
+
+    <sql id="waitSignForResSupplementData" >
+        /*部门待办*/
+        SELECT a.id, a.circuit_code, a.serial_number, a.service_id, a.code_content, a.instance_id, a.region_id,
+        a.order_id, a.wo_id, a.tacheId, a.tache_name, a.pub_date_name, a.system_resource, a.is_oldres,
+        a.WO_STATE, a.DEAL_USER_ID, a.disp_obj_id, a.DISP_OBJ_TYE, a.create_date
+        FROM (
+        <include refid="resSupplementData"/>
+         ) a
+        WHERE  a.WO_STATE = '290000002' AND a.DEAL_USER_ID IS NULL
+        AND a.DISP_OBJ_TYE = '260000001'
+        AND a.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId} )
+        union all
+        /*岗位待办*/
+        SELECT b.id, b.circuit_code, b.serial_number, b.service_id, b.code_content, b.instance_id, b.region_id,
+        b.order_id, b.wo_id, b.tacheId, b.tache_name, b.pub_date_name, b.system_resource, b.is_oldres,
+        b.WO_STATE, b.DEAL_USER_ID, b.disp_obj_id, b.DISP_OBJ_TYE, b.create_date
+        FROM (
+        <include refid="resSupplementData"/>
+        ) b
+        WHERE  b.WO_STATE = '290000002' AND b.DEAL_USER_ID IS NULL
+        AND b.DISP_OBJ_TYE = '260000002'
+        AND b.DISP_OBJ_ID IN (SELECT STAFF_GROUP_ID FROM GOM_STAFF_GROUP_RELA_S WHERE STAFF_ID = #{staffId} )
+        union all
+        /*个人待办*/
+        SELECT c.id, c.circuit_code, c.serial_number, c.service_id, c.code_content, c.instance_id, c.region_id,
+        c.order_id, c.wo_id, c.tacheId, c.tache_name, c.pub_date_name, c.system_resource, c.is_oldres,
+        c.WO_STATE, c.DEAL_USER_ID, c.disp_obj_id, c.DISP_OBJ_TYE, c.create_date
+        FROM (
+        <include refid="resSupplementData"/>
+        ) c
+        WHERE  c.WO_STATE = '290000002' AND c.DEAL_USER_ID IS NULL
+        AND c.DISP_OBJ_TYE = '260000003'
+        AND c.DISP_OBJ_ID = #{staffId}
+    </sql>
+
+    <select id="qryDealWithOrdList" parameterType="map" resultType="map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="dealWithResSupplementData"/>
+        ) y
+        ) z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	     ]]>
+    </select>
+
+    <select id="qryDealWithOrdCount" parameterType="map" resultType="int">
+        select count(1)
+        From (
+        <include refid="dealWithResSupplementData"/>
+        ) q
+    </select>
+
+    <sql id="dealWithResSupplementData" >
+        SELECT d.id, d.circuit_code, d.serial_number, d.service_id, d.code_content, d.instance_id, d.region_id,
+        d.order_id, d.wo_id, d.tacheId, d.tache_name, d.pub_date_name, d.system_resource, d.is_oldres,
+        d.WO_STATE, d.DEAL_USER_ID, d.disp_obj_id, d.DISP_OBJ_TYE, d.create_date
+        FROM (
+        <include refid="resSupplementData"/>
+        ) d
+        WHERE d.WO_STATE = '290000002' AND d.DEAL_USER_ID IS NOT NULL AND d.deal_user_id = #{staffId}
+    </sql>
+
+    <select id="qryCompletedOrdList" parameterType="map" resultType="map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="completedResSupplementData"/>
+        ) y
+        ) z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	     ]]>
+    </select>
+
+    <select id="qryCompletedOrdCount" parameterType="map" resultType="int">
+        select count(1)
+        From (
+        <include refid="completedResSupplementData"/>
+        ) q
+    </select>
+
+    <sql id="completedResSupplementData" >
+        SELECT e.id, e.circuit_code, e.serial_number, e.service_id, e.code_content, e.instance_id, e.region_id,
+        e.order_id, e.wo_id, e.tacheId, e.tache_name, e.pub_date_name, e.system_resource, e.is_oldres,
+        e.WO_STATE, e.DEAL_USER_ID, e.disp_obj_id, e.DISP_OBJ_TYE, e.create_date
+        FROM (
+        <include refid="resSupplementData"/>
+        ) e
+        WHERE e.WO_STATE = '290000004' AND e.COMP_USER_ID = #{staffId}
+    </sql>
+
+    <sql id="resSupplementData" >
+        SELECT rsi.id, rsi.circuit_code, rsi.serial_number, rsi.service_id, ci.code_content, rsi.instance_id, rsi.region_id,
+        ord.order_id, wo.wo_id, ut.id as tacheId, ut.tache_name, pds.pub_date_name, rsi.system_resource, rsi.is_oldres,
+        WO.WO_STATE, WO.DEAL_USER_ID, wo.disp_obj_id, WO.DISP_OBJ_TYE, rsi.create_date, wo.COMP_USER_ID
+        FROM gom_bdw_res_supplement_info rsi
+        LEFT JOIN gom_order ord ON ord.order_id = rsi.order_id
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = ord.order_id
+        LEFT JOIN gom_pub_date_s pds ON pds.pub_date_id = ki.specialty_code AND pds.df_type = 'SPECIALTY_TYPE'
+        LEFT JOIN gom_bdw_code_info ci ON ci.code_value = rsi.service_id AND ci.code_type = 'product_code'
+        WHERE wo.disp_obj_id <![CDATA[ <> ]]> '-2000' AND rsi.system_resource in ('flow-schedule-lt','sec-flow-schedule-lt')
+        <if test="circuitCode != '' and circuitCode != null" >
+            AND rsi.circuit_code like '%'||#{circuitCode}||'%'
+        </if>
+        <if test="serialNumber != '' and serialNumber != null" >
+            AND rsi.serial_number like '%'||#{serialNumber}||'%'
+        </if>
+        <if test="productType != '' and productType != null" >
+            AND rsi.service_id = #{productType}
+        </if>
+        UNION ALL
+        SELECT rsi.id, rsi.circuit_code, rsi.serial_number, rsi.service_id, ci.code_content, rsi.instance_id, rsi.region_id,
+        ord.order_id, wo.wo_id, ut.id as tacheId, ut.tache_name, pds.pub_date_name, rsi.system_resource, rsi.is_oldres,
+        WO.WO_STATE, WO.DEAL_USER_ID, wo.disp_obj_id, WO.DISP_OBJ_TYE, rsi.create_date, wo.COMP_USER_ID
+        FROM gom_bdw_res_supplement_info rsi
+        LEFT JOIN gom_order ord ON ord.parent_order_id = rsi.order_id
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = ord.order_id
+        LEFT JOIN gom_pub_date_s pds ON pds.pub_date_id = ki.specialty_code AND pds.df_type = 'SPECIALTY_TYPE'
+        LEFT JOIN gom_bdw_code_info ci ON ci.code_value = rsi.service_id AND ci.code_type = 'product_code'
+        WHERE wo.disp_obj_id <![CDATA[ <> ]]> '-2000' AND rsi.system_resource in ('flow-schedule-lt','sec-flow-schedule-lt')
+        <if test="circuitCode != '' and circuitCode != null" >
+            AND rsi.circuit_code like '%'||#{circuitCode}||'%'
+        </if>
+        <if test="serialNumber != '' and serialNumber != null" >
+            AND rsi.serial_number like '%'||#{serialNumber}||'%'
+        </if>
+        <if test="productType != '' and productType != null" >
+            AND rsi.service_id = #{productType}
+        </if>
+    </sql>
+
+</mapper>

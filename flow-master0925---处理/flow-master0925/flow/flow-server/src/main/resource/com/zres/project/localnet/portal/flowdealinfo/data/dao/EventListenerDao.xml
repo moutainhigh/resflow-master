@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.EventListenerDao">
+    <select id="queryDispInfo_bak"  resultType="map">
+        SELECT WO.WO_ID,TMP.AREA_ID
+        FROM GOM_WO WO
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN (
+          SELECT DISTINCT DDS.DISP_OBJ_ID,DDS.DISP_OBJ_TYPE,DS.TACHE_CODE,DS.AREA_ID
+          FROM GOM_DISP_SRV_S DS
+          LEFT JOIN GOM_DISP_DETAIL_SRV_S DDS ON DDS.DISP_SRV_ID = DS.ID ) TMP
+        ON TO_CHAR(WO.DISP_OBJ_ID)=TMP.DISP_OBJ_ID AND WO.DISP_OBJ_TYE =TMP.DISP_OBJ_TYPE
+        AND TMP.TACHE_CODE = UT.TACHE_CODE
+        WHERE  WO_ID= #{woId}
+    </select>
+
+    <select id="queryDispInfo"  resultType="map">
+        SELECT DISTINCT DDS.DISP_OBJ_ID,DDS.DISP_OBJ_TYPE,DS.TACHE_CODE,DS.AREA_ID
+        FROM GOM_DISP_SRV_S DS
+        LEFT JOIN GOM_DISP_DETAIL_SRV_S DDS ON DDS.DISP_SRV_ID = DS.ID
+        where  DDS.DISP_OBJ_TYPE=#{dispObjTye} and DDS.DISP_OBJ_ID=#{dispObjId} and DS.TACHE_CODE=#{tacheCode}
+    </select>
+
+    <insert id="insertWoDept" parameterType="map">
+        INSERT INTO GOM_BDW_WO_DEPT (WO_DEPT_ID,WO_ID,DEPT_ID,CREATE_DATE) VALUES(
+        SEQ_GOM_BDW_WO_DEPT.NEXTVAL+1,#{WO_ID},#{AREA_ID},SYSDATE)
+    </insert>
+
+</mapper>

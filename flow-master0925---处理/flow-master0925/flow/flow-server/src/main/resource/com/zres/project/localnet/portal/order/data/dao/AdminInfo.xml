@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.order.data.dao.AdminInfoDao">
+
+    <!-- 调单sql-->
+    <sql id="queryAdminInfo">
+        SELECT sf.login_name  as loginName,
+        sf.user_name        as staffName,
+        sf.staff_id    as staffId,
+        sf.email,
+        sf.phone_no    as phoneNo,
+        bm.delete_stat as deleteStat,
+        bm.level_id as levelId,
+        bm.is_show isShow,
+        c.ORG_NAME as orgName
+        FROM vw_pub_staff sf
+        join GOM_BDW_MANAGE bm
+        on sf.staff_id = bm.staff_id
+        JOIN (select ORG_ID,ORG_NAME
+        from GOM_ORG_S
+        START WITH oRG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S a
+        where a.PARENT_ORG_ID = 1
+        START WITH a.ORG_ID =
+        (select ORG_ID
+        from gom_user_s
+        where user_id = #{userId}
+        )
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = prior ORG_ID) c
+        ON sf.site_id = c.ORG_ID
+        where 1=1
+        <!--账号id -->
+        <if test="staffId != null and staffId != '' ">
+            and sf.staff_id =  #{staffId}
+        </if>
+        <!-- 登录名 -->
+        <if test="loginName != null and loginName != '' ">
+            and sf.login_name  = #{loginName}
+        </if>
+        <!--  -->
+        <if test="staffName != null and staffName != '' ">
+            and sf.user_name like '%'||#{staffName}||'%'
+        </if>
+    </sql>
+
+    <select id="countInfoList" resultType="int">
+         select count(1) from (
+            <include refid="queryAdminInfo"/>
+        ) q
+    </select>
+
+    <select id="queryAdminInfoList" resultType="map">
+         select * from
+         (
+            <include refid="queryAdminInfo"/>
+            ) q
+        where 1=1
+        <![CDATA[
+	        and rownum >#{startRow,jdbcType=INTEGER} and rownum <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <select id="existAdminInfo" resultType="map">
+        SELECT  sf.USER_NAME FROM GOM_BDW_MANAGE bm
+                left join vw_pub_staff sf on sf.STAFF_ID= bm.STAFF_ID
+         where bm.STAFF_ID = #{staffId}
+    </select>
+
+    <select id="existStaff"  resultType="map">
+        SELECT USER_NAME FROM vw_pub_staff sf
+        JOIN (select ORG_ID,ORG_NAME
+        from GOM_ORG_S
+        START WITH oRG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S a
+        where a.PARENT_ORG_ID = 1
+        START WITH a.ORG_ID =
+        (select ORG_ID
+        from gom_user_s
+        where user_id = #{userId}
+        )
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = prior ORG_ID) c
+        ON sf.site_id = c.ORG_ID
+        where 1=1
+        and sf.staff_id =  #{staffId}
+    </select>
+
+
+    <delete id="deleteAdminInfo" >
+        delete from GOM_BDW_MANAGE where staff_Id = #{staffId}
+    </delete>
+
+    <update id="updateAdminInfo">
+            update GOM_BDW_MANAGE
+        <trim prefix="set" suffixOverrides=",">
+            <if test="deleteStat != null and deleteStat != ''">delete_stat=#{deleteStat},</if>
+            <if test="isShow != null and isShow != ''">is_show=#{isShow},</if>
+        </trim>
+            where staff_Id=#{staffId}
+    </update>
+    <insert id="addAdminInfo">
+        insert into GOM_BDW_MANAGE(MANAGE_ID,staff_id, delete_stat,level_id,is_show, CREATE_DATE)
+        values(seq_GOM_BDW_MANAGE.nextval,#{staffId},0,#{levelId},0,sysdate)
+    </insert>
+    <insert id="addDisassemble">
+		INSERT INTO GOM_BDW_CODE_INFO_SECOND
+                  (CODE_INFO_ID,
+                   CODE_TYPE,
+                   CODE_TYPE_NAME,
+                   CODE_VALUE,
+                   CODE_CONTENT,
+                   SORT_NO,
+                   REMARK,
+                   CREATE_DATE,
+                   ORDER_NO,
+                   JIKE_ACT_TYPE)
+                VALUES
+                  (seq_gom_bdw_code_info.nextval,
+                   'spinner',
+                   '资源释放配置时长',
+                   #{serviceId},
+                   #{areaId},
+                   null,
+                   #{spinner},
+                   sysdate,
+                   null,
+                   null)
+   </insert>
+
+
+    <select id="existDisassembleInfo"  resultType="map">
+        SELECT * FROM GOM_BDW_CODE_INFO_SECOND
+        where CODE_TYPE = 'spinner'
+        and CODE_CONTENT =  #{areaId}
+        and CODE_VALUE = #{serviceId}
+
+    </select>
+
+
+    <delete id="deleteDisassemble" >
+        delete from gom_bdw_code_info_second where CODE_TYPE = #{codeType} and CODE_CONTENT = #{areaId} and CODE_VALUE=#{serviceId}
+    </delete>
+
+    <update id="updateDisassemble">
+        update gom_bdw_code_info_second set REMARK=#{spinner}
+          where CODE_TYPE = 'spinner'
+            and CODE_CONTENT = #{areaId}
+            and CODE_VALUE = #{serviceId}
+    </update>
+
+    <select id="queryDisassembleInfo"  resultType="map">
+        SELECT   ci2.CODE_CONTENT as PRODUCTTYPE,
+                 ci.code_info_id  as CODEID,
+                 ci.code_value    as SERVICEID,
+                 ci.code_content  as AREAID,
+                 ci.remark        as SPINNER
+        FROM GOM_BDW_CODE_INFO_SECOND ci
+        left join GOM_BDW_CODE_INFO ci2
+          on ci.code_value = ci2.code_value
+         and ci2.code_type = 'product_code'
+       where ci.CODE_CONTENT =#{areaId}
+
+    </select>
+</mapper>

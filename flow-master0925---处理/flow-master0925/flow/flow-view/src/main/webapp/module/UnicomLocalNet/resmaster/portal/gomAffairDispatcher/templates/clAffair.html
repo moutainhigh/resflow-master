@@ -1,0 +1,187 @@
+<div class="modal-header">
+    <h4 class="modal-title">事务处理</h4>
+</div>
+<div class="modal-body">
+    <div id="cl-tabs" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a href="#tabs-a">事务调单信息</a>
+            </li>
+            <li>
+                <a href="#tabs-b">事务处理进度</a>
+            </li>
+        </ul>
+        <div id="tabs-a" class="ui-tabs-panel-new">
+            <div class="panel-body" id="cl-body-div">
+                <form class="form-horizontal" id="cl-form">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <label>调单详情</label>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务调单编号</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="affairDispose-code"
+                                               name="AFFAIR_DISPATCH_ORDER_CODE"
+                                               placeholder="保存或提交后系统自动生成" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务状态</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="affairDispose-state" name="state" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">事务类型</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input class="form-control" id="type" name="type" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group  ">
+                                    <label class="col-md-2 col-sm-2 control-label">事务调单标题</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <input class="form-control" id="affairDispose-title" name="TITLE" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group  ">
+                                    <label class="col-md-2 col-sm-2 control-label">调单正文</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="5" id="affairDispose-content" name="CONTENT" class="form-control"
+                                  placeholder="2000字以内"
+                                  data-rule="required;length[~2000, true]" disabled></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class=" form-group">
+                                    <label class="col-md-2 col-sm-2 control-label">调单附件</label>
+                                    <div class="input-group col-md-10 col-sm-10" id="affairFileInfoDiv"
+                                         style="padding-top: 5px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group ">
+                                    <label class="col-md-2 col-sm-2 control-label">调单处理人</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <div style="width: 90%" id="affairDispose-disposeStaffGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">是否审核</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="affairDispose-isCheck" type="text" name="isCheck"
+                                               class="combobox form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group" id="checkStaffDiv">
+                                    <label class="col-md-4 col-sm-4 control-label">审核人</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="affairDispose-checkStaff" name="CHECK_STAFF_NAME"
+                                               class="form-control"
+                                               disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-sm-2 control-label">抄送人</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <div style="width: 90%" id="affairDispose-copyStaffArrGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <label>审核详情</label>
+                        </div>
+                        <div class="panel-body">
+                            <div id="affairDispose-shAffairGrid"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <label>事务处理</label>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group required">
+                                    <label class="col-md-4 col-sm-4 control-label">是否审查</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="isReviewCheck" type="text" name="isReviewCheck" data-rule="required"
+                                               class="combobox form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group" style="display: none" id="reviewStaffDiv">
+                                    <label class="col-md-4 col-sm-4 control-label">审查人</label>
+                                    <div class="input-group col-md-8 col-sm-8">
+                                        <input id="reviewStaff" name="reviewStaff" data-rule="required" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-sm-2 control-label">事务处理情况</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <textarea rows="4" id="affairDispose-remark" name="REMARK"
+                                                  class="form-control" placeholder="2000字以内"
+                                                  data-rule="required;length[~2000, true]"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="form-group" id="shfileUpdateDiv">
+                                    <label class="col-md-2 col-sm-2 control-label">处理附件</label>
+                                    <div class="input-group col-md-10 col-sm-10">
+                                        <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                <span class="btn btn-default fileinput-button">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    <span style="line-height: 23px;">选择文件...</span>
+                                    <input class="js-select-file" id="affairDispose-selectClFiles" type="file"
+                                           name="selectFiles" multiple="">
+                                </span>
+                                        </div>
+                                        <div style="width: 90%" id="affairDispose-clfileGrid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div id="tabs-b" class="ui-tabs-panel-new">
+            <div class="panel-body">
+                <div id="clAffairGrid" class="affair">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="commit" type="button" class="btn btn-danger">提交</button>
+    <button id="cancel" type="reset" class="btn btn-default">取消</button>
+</div>

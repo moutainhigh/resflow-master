@@ -1,0 +1,196 @@
+<div id="subIndexPage" class="content-back">
+    <!--个人信息-->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">个人信息</h3>
+        </div>
+        <div class="panel-body">
+            <ul class="person-data clearfix">
+                <li class="person-icon1">姓名：<span id="userNameSpan"></span></li>
+                <li class="person-icon3">所属部门：<span id="orgNameSpan"></span></li>
+            </ul>
+        </div>
+    </div>
+    <!--调单-->
+    <div class="row mgr-0">
+        <div class="col-md-6 pdr-0">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">业务单 <a id="yw-link" href="#" style="float: right">>></a></h3>
+                </div>
+                <div class="panel-body" id="panel-body-left">
+                    <h5>我的发起</h5>
+                    <ul class="orderSheet" style="padding-left: 5px !important">
+                        <li id="yw-cgx-li" class="clearfix" value="local_apply_tabs_draft_link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-1.png"/>
+                            <div class="orderInfo">
+                                <p>草稿箱</p>
+                                <span id="draftspan">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-ztd-li" class="clearfix" value="local_apply_tabs_submit_link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-2.png"/>
+                            <div class="orderInfo">
+                                <p>在途单</p>
+                                <span id="submitspan">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-ywc-li" class="clearfix" value="local_apply_tabs_completed_link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-3.png"/>
+                            <div class="orderInfo">
+                                <p>已完成</p>
+                                <span id="completespan">0</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h5>我的处理</h5>
+                    <ul class="orderSheet" style="padding-left: 5px !important">
+                        <li id="yw-bmdqs-li" class="clearfix" value="tabs-a-a-link" >
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-4.png"/>
+                            <div class="orderInfo">
+                                <p>部门待签收</p>
+                                <span id="deptStandny">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-gwdqs-li" class="clearfix" value="tabs-a-b-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-5.png"/>
+                            <div class="orderInfo">
+                                <p>岗位待签收</p>
+                                <span id="jobStandby">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-grdqs-li" class="clearfix" value="tabs-a-c-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-6.png"/>
+                            <div class="orderInfo">
+                                <p>个人待签收</p>
+                                <span id="staffStandby">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-clz-li" class="clearfix" value="tabs-a-d-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-7.png"/>
+                            <div class="orderInfo">
+                                <p>处理中</p>
+                                <span id="dealOrder">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-clywc-li" class="clearfix" value="tabs-a-e-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-3.png"/>
+                            <div class="orderInfo">
+                                <p>已完成</p>
+                                <span id="dispConfirm">0</span>
+                            </div>
+                        </li>
+                        <li id="yw-ycd-li" class="clearfix" value="tabs-a-f1-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-8.png"/>
+                            <div class="orderInfo">
+                                <p>异常单</p>
+                                <span id="abnormalOrder">0</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 pdr-0">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">事务单 <a id="sw-link" href="#" style="float: right">>></a></h3>
+                </div>
+                <div class="panel-body" id="panel-body-right">
+                    <h5>我的发起</h5>
+                    <ul class="orderSheet" style="padding-left: 5px !important">
+                        <li id="sw-mysw-li" class="clearfix" value="tabs-a-a-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-2.png"/>
+                            <div class="orderInfo">
+                                <p>我的事务</p>
+                                <span id="fqAmount">0</span>
+                            </div>
+                        </li>
+                        <li id="sw-cgx-li" class="clearfix" value="tabs-a-g-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-1.png"/>
+                            <div class="orderInfo">
+                                <p>草稿箱</p>
+                                <span id="cgAmount">0</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <h5>我的处理</h5>
+                    <ul class="orderSheet" style="padding-left: 5px !important">
+                        <li id="sw-sh-li" class="clearfix" value="tabs-a-b-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-4.png"/>
+                            <div class="orderInfo">
+                                <p>事务审核</p>
+                                <span id="shAmount">0</span>
+                            </div>
+                        </li>
+                        <li id="sw-cl-li" class="clearfix" value="tabs-a-c-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-5.png"/>
+                            <div class="orderInfo">
+                                <p>事务处理</p>
+                                <span id="clAmount">0</span>
+                            </div>
+                        </li>
+                        <li id="sw-qr-li" class="clearfix" value="tabs-a-d-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-6.png"/>
+                            <div class="orderInfo">
+                                <p>事务确认</p>
+                                <span id="qrAmount">0</span>
+                            </div>
+                        </li>
+                        <li id="sw-ls-li" class="clearfix" value="tabs-a-f-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-7.png"/>
+                            <div class="orderInfo">
+                                <p>历史工单</p>
+                                <span id="lsAmount">0</span>
+                            </div>
+                        </li>
+                        <li id="sw-cs-li" class="clearfix" value="tabs-a-e-link">
+                            <img src="module/UnicomLocalNet/resmaster/portal/subIndexPage/images/img-3.png"/>
+                            <div class="orderInfo">
+                                <p>抄送通知</p>
+                                <span id="tzAmount">0</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mgr-0">
+
+        <div class="col-md-9 pdr-0">
+            <!--月工单绩效-->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">月处理工单</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="lineBar" style="height:240px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 pdr-0">
+            <!--当前工单分布状态-->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">当前工单分布状态</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="myParBar" style="height:240px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--待办事项-->
+    <div class="panel panel-default" style="display: none;">
+        <div class="panel-heading">
+            <h3 class="panel-title">待办事项</h3>
+        </div>
+        <div class="panel-body">
+            <div id="need_dealt_grid"></div>
+        </div>
+    </div>
+
+</div>

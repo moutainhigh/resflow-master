@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetWork.dao.ReceiveOrderDao">
+    <insert id="insertIntoCstOrdInfo" parameterType="map" keyProperty="id" keyColumn="id">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            SELECT SEQ_GOM_BDW_CST_ORD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO GOM_BDW_CST_ORD（
+            CST_ORD_ID,
+            <if test="projectType != null and projectType != ''">PROJECT_TYPE,</if>
+            <if test="netWorkLevel != null and netWorkLevel != ''">NETWORK_LEVEL,</if>
+            <if test="dealAreaCode != null and dealAreaCode != ''">DEAL_AREA_CODE,</if>
+            <if test="groupPmId != null and groupPmId != ''">GROUP_PM_ID,</if>
+            <if test="groupPmName != null and groupPmName != ''">GROUP_PM_NAME,</if>
+            <if test="groupPmTel != null and groupPmTel !=''">GROUP_PM_TEL,</if>
+            <if test="groupPmEmail != null and groupPmEmail != ''">GROUP_PM_EMAIL,</if>
+            <if test="provincePmId != null and provincePmId != ''">PROVINCE_PM_ID,</if>
+            <if test="provincePmName != null and provincePmName != ''">PROVINCE_PM_NAME,</if>
+            <if test="provincePmTel != null and provincePmTel != ''">PROVINCE_PM_TEL,</if>
+            <if test="provincePmEmail != null and provincePmEmail != ''">PROVINCE_PM_EMAIL,</if>
+            <if test="initAmId != null and initAmId != ''">INIT_AM_ID,</if>
+            <if test="initAmName != null and initAmName != ''">INIT_AM_NAME,</if>
+            <if test="initAmTel != null and initAmTel != ''">INIT_AM_TEL,</if>
+            <if test="initAmEmail != null and initAmEmail != ''">INIT_AM_EMAIL,</if>
+            <if test="remark != null and remark != ''">REMARK,</if>
+            <if test="custId != null and custId != ''">CUST_ID,</if>
+            <if test="contractId != null and contractId != ''">CONTRACT_ID,</if>
+            <if test="custNameChinese != null and custNameChinese != ''">CUST_NAME_CHINESE,</if>
+            <if test="custNameEnglish != null and custNameEnglish != ''">CUST_NAME_ENGLISH,</if>
+            <if test="custAddRess != null and custAddRess != ''">CUST_ADDRESS,</if>
+            <if test="custInDustry != null and custInDustry != ''">CUST_INDUSTRY,</if>
+            <if test="custProvince != null and custProvince != ''">CUST_PROVINCE,</if>
+            <if test="custCity != null and custCity != ''">CUST_CITY,</if>
+            <if test="custTel != null and custTel != ''">CUST_TEL,</if>
+            <if test="custFax != null and custFax != ''">CUST_FAX,</if>
+            <if test="custEmail != null and custEmail != ''">CUST_EMAIL,</if>
+            <if test="custContactManId != null and custContactManId != ''">CUST_CONTACT_MAN_ID,</if>
+            <if test="custContactManName != null and custContactManName != ''">CUST_CONTACT_MAN_NAME,</if>
+            <if test="custContactManTel != null and custContactManTel != ''">CUST_CONTACT_MAN_TEL,</if>
+            <if test="custContactManEmail != null and custContactManEmail != ''">CUST_CONTACT_MAN_EMAIL,</if>
+            <if test="custOperatorName != null and custOperatorName != ''">CUST_OPERATOR_NAME,</if>
+            <if test="custOperatorTel != null and custOperatorTel != ''">CUST_OPERATOR_TEL,</if>
+            <if test="custOperatorEmail != null and custOperatorEmail != ''">CUST_OPERATOR_EMAIL,</if>
+            <if test="subscribeId != null and subscribeId != ''">SUBSCRIBE_ID,</if>
+            <if test="subscribeIdRela != null and subscribeIdRela != ''">SUBSCRIBE_ID_RELA,</if>
+            <if test="subscribeId != null and subscribeId != ''">APPLY_ORD_ID,</if>
+            <if test="applyOrdName != null and applyOrdName!= ''">APPLY_ORD_NAME,</if>
+            <if test="contractName != null and contractName != ''">CONTRACT_NAME,</if>
+            <if test="custType != null and custType != ''">CUST_TYPE,</if>
+            <if test="tradeStaffName != null and tradeStaffName != ''">HANDLE_MAN_NAME,</if>
+            <if test="tradeStaffPhone != null and tradeStaffPhone != ''">HANDLE_MAN_TEL,</if>
+            <if test="departName != null and departName != ''">HANDLE_DEP,</if>
+            <if test="handleCity != null and handleCity != ''">HANDLE_CITY,</if>
+            <if test="acceptDate != null and acceptDate != ''">HANDLE_TIME,</if>
+            <if test="handleCityId != null and handleCityId != ''">HANDLE_CITY_ID,</if>
+            <if test="handleDepId != null and handleDepId != ''">HANDLE_DEP_ID,</if>
+            <if test="routeType != null and routeType != ''">ROUTE_TYPE,</if>
+            <if test="routeValue != null and routeValue != ''">ROUTE_VALUE,</if>
+            <if test="developerDepartName != null and developerDepartName != ''">DEVELOPER_DEPART_NAME,</if>
+            <if test="certiTypeCode != null and certiTypeCode != ''">CERTI_TYPE_CODE,</if>
+            <if test="certiCode != null and certiCode != ''">CERTI_CODE,</if>
+            <if test="departName != null and departName != ''">DEPART_NAME,</if>
+            CREATE_DATE
+        )
+        VALUES(
+            #{id},
+            <if test="projectType != null and projectType != ''">#{projectType},</if>
+            <if test="netWorkLevel != null and netWorkLevel != ''">#{netWorkLevel},</if>
+            <if test="dealAreaCode != null and dealAreaCode != ''">#{dealAreaCode},</if>
+            <if test="groupPmId != null and groupPmId != ''">#{groupPmId},</if>
+            <if test="groupPmName != null and groupPmName != ''">#{groupPmName},</if>
+            <if test="groupPmTel != null and groupPmTel !=''">#{groupPmTel},</if>
+            <if test="groupPmEmail != null and groupPmEmail != ''">#{groupPmEmail},</if>
+            <if test="provincePmId != null and provincePmId != ''">#{provincePmId},</if>
+            <if test="provincePmName != null and provincePmName != ''">#{provincePmName},</if>
+            <if test="provincePmTel != null and provincePmTel != ''">#{provincePmTel},</if>
+            <if test="provincePmEmail != null and provincePmEmail != ''">#{provincePmEmail},</if>
+            <if test="initAmId != null and initAmId != ''">#{initAmId},</if>
+            <if test="initAmName != null and initAmName != ''">#{initAmName},</if>
+            <if test="initAmTel != null and initAmTel != ''">#{initAmTel},</if>
+            <if test="initAmEmail != null and initAmEmail != ''">#{initAmEmail},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="custId != null and custId != ''">#{custId},</if>
+            <if test="contractId != null and contractId != ''">#{contractId},</if>
+            <if test="custNameChinese != null and custNameChinese != ''">#{custNameChinese},</if>
+            <if test="custNameEnglish != null and custNameEnglish != ''">#{custNameEnglish},</if>
+            <if test="custAddRess != null and custAddRess != ''">#{custAddRess},</if>
+            <if test="custInDustry != null and custInDustry != ''">#{custInDustry},</if>
+            <if test="custProvince != null and custProvince != ''">#{custProvince},</if>
+            <if test="custCity != null and custCity != ''">#{custCity},</if>
+            <if test="custTel != null and custTel != ''">#{custTel},</if>
+            <if test="custFax != null and custFax != ''">#{custFax},</if>
+            <if test="custEmail != null and custEmail != ''">#{custEmail},</if>
+            <if test="custContactManId != null and custContactManId != ''">#{custContactManId},</if>
+            <if test="custContactManName != null and custContactManName != ''">#{custContactManName},</if>
+            <if test="custContactManTel != null and custContactManTel != ''">#{custContactManTel},</if>
+            <if test="custContactManEmail != null and custContactManEmail != ''">#{custContactManEmail},</if>
+            <if test="custOperatorName != null and custOperatorName != ''">#{custOperatorName},</if>
+            <if test="custOperatorTel != null and custOperatorTel != ''">#{custOperatorTel},</if>
+            <if test="custOperatorEmail != null and custOperatorEmail != ''">#{custOperatorEmail},</if>
+            <if test="subscribeId != null and subscribeId != ''">#{subscribeId},</if>
+            <if test="subscribeIdRela != null and subscribeIdRela != ''">#{subscribeIdRela},</if>
+            <if test="subscribeId != null and subscribeId != ''">#{subscribeId},</if>
+            <if test="applyOrdName != null and applyOrdName!= ''">#{applyOrdName},</if>
+            <if test="contractName != null and contractName != ''">#{contractName},</if>
+            <if test="custType != null and custType != ''">#{custType},</if>
+            <if test="tradeStaffName != null and tradeStaffName != ''">#{tradeStaffName},</if>
+            <if test="tradeStaffPhone != null and tradeStaffPhone != ''">#{tradeStaffPhone},</if>
+            <if test="departName != null and departName != ''">#{departName},</if>
+            <if test="handleCity != null and handleCity != ''">#{handleCity},</if>
+            <if test="acceptDate != null and acceptDate != ''">TO_DATE(#{acceptDate}, 'yyyy-mm-dd hh24:mi:ss'),</if>
+            <if test="handleCityId != null and handleCityId != ''">#{handleCityId},</if>
+            <if test="handleDepId != null and handleDepId != ''">#{handleDepId},</if>
+            <if test="routeType != null and routeType != ''">#{routeType},</if>
+            <if test="routeValue != null and routeValue != ''">#{routeValue},</if>
+            <if test="developerDepartName != null and developerDepartName != ''">#{developerDepartName},</if>
+            <if test="certiTypeCode != null and certiTypeCode != ''">#{certiTypeCode},</if>
+            <if test="certiCode != null and certiCode != ''">#{certiCode},</if>
+            <if test="departName != null and departName != ''">#{departName},</if>
+            SYSDATE
+        )
+    </insert>
+    <insert id="insertSrvOrdInfo" parameterType="map" keyProperty="id" keyColumn="id">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            SELECT SEQ_GOM_BDW_SRV_ORD_INFO.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO GOM_BDW_SRV_ORD_INFO(
+            SRV_ORD_ID,
+            CST_ORD_ID,
+            ORDER_ID,
+            <if test="serviceId != null and serviceId != ''">SERVICE_ID,</if>
+            <if test="tradeTypeCode != null and tradeTypeCode != ''">TRADE_TYPE_CODE,</if>
+            <if test="activeType != null and activeType != ''">ACTIVE_TYPE,</if>
+            <if test="serviceOfferId != null and serviceOfferId != ''">SERVICE_OFFER_ID,</if>
+            <if test="serialNumber != null and serialNumber != ''">SERIAL_NUMBER,</if>
+            <if test="tradeId != null and tradeId != ''">TRADE_ID,</if>
+            <if test="tradeIdRela != null and tradeIdRela != ''">TRADE_ID_RELA,</if>
+            <if test="userId != null and userId != ''">USER_ID,</if>
+            <if test="flowId != null and flowId != ''">FLOW_ID,</if>
+            SRV_ORD_STAT,
+            RESOURCES,
+            CREATE_DATE,
+            <if test="orderType != null and orderType != ''">ORDER_TYPE,</if>
+            STATE,
+            <if test="instancceId != null and instanceId != ''">INSTANCE_ID,</if>
+            <if test="reActiveType != null and reActiveType != ''">RE_ACTIVE_TYPE,</if>
+            <if test="changeFlag != null and changeFlag != ''">CHANGE_FLAG,</if>
+            <if test="reqFinTime != null and reqFinTime != ''">REQ_FIN_TIME,</if>
+            SYSTEM_RESOURCE
+        )
+        VALUES(
+            #{id},
+            #{cstOrdId},
+            '0',
+            <if test="serviceId != null and serviceId != ''">#{serviceId},</if>
+            <if test="tradeTypeCode != null and tradeTypeCode != ''">#{tradeTypeCode},</if>
+            <if test="activeType != null and activeType != ''">#{activeType},</if>
+            <if test="serviceOfferId != null and serviceOfferId != ''">#{serviceOfferId},</if>
+            <if test="serialNumber != null and serialNumber != ''">#{serialNumber},</if>
+            <if test="tradeId != null and tradeId != ''">#{tradeId},</if>
+            <if test="tradeIdRela != null and tradeIdRela != ''">#{tradeIdRela},</if>
+            <if test="userId != null and userId != ''">#{userId},</if>
+            <if test="flowId != null and flowId != ''">#{flowId},</if>
+            '10N',
+            'cloudNetwork',
+            SYSDATE,
+            <if test="orderType != null and orderType != ''">#{orderType},</if>
+            '10A',
+            <if test="instancceId != null and instanceId != ''">#{instanceId},</if>
+            <if test="reActiveType != null and reActiveType != ''">#{reActiveType},</if>
+            <if test="changeFlag != null and changeFlag != ''">#{changeFlag},</if>
+            <if test="reqFinTime != null and reqFinTime != ''">to_date(#{reqFinTime}, 'yyyy-mm-dd hh24:mi:ss'),</if>
+            'flow-schedule-lt'
+        )
+    </insert>
+    <insert id="insertSrvAttrInfo">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO （
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_NAME,
+            ATTR_VALUE,
+            OLD_ATTR_VALUE,
+            SOURSE,
+            CREATE_DATE
+        )
+        SELECT SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL,d.* FROM (
+        <foreach collection="params" item="param" index="index" separator="union all">
+            SELECT #{param.srvOrdId},
+            #{param.attrAction},
+            #{param.attrCode},
+            #{param.attrName},
+            #{param.attrValue},
+            #{param.oldAttrValue},
+            'jike',
+            sysdate
+            FROM DUAL
+        </foreach>) d
+    </insert>
+    <select id="queryFlowPsId" parameterType="map" resultType="string">
+        SELECT SORT_NO FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE = #{codeType}
+        AND CODE_TYPE_NAME = #{serviceId} AND CODE_VALUE = #{serviceOfferId}
+        <if test="serviceOfferId=='100001271'">
+            AND CODE_CONTENT=#{changeFlag}
+        </if>
+    </select>
+    <update id="updateOrderId" parameterType="string" >
+        update gom_bdw_srv_ord_info set order_id = #{orderId} where srv_ord_id = #{srvOrdId}
+    </update>
+
+    <insert id="insertAddProdInfo" parameterType="map" keyColumn="id" keyProperty="id">
+        <selectKey resultType="String" order="BEFORE" keyProperty="id">
+            SELECT SEQ_GOM_BDW_ADD_PROD_INFO.NEXTVAL from dual
+        </selectKey>
+        INSERT INTO GOM_BDW_ADD_PROD_INFO (
+            ADD_PROD_INFO_ID,
+            SRV_ORD_ID,
+            B_PRODUCT_ID,
+            START_DATE,
+            END_DATE,
+            CREATE_DATE
+        )
+        VALUES (
+            #{id},
+            #{srvOrdId},
+            #{productId},
+            #{startDate},
+            #{endDate},
+            sysdate
+        )
+    </insert>
+    <insert id="insertAddProdAttrInfo" >
+        insert into GOM_BDW_ADD_PROD_ATTR_INFO (
+            ADD_PROD_ATTR_INFO_ID,
+            ADD_PROD_INFO_ID,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE
+        )
+        SELECT SEQ_ADD_PROD_ATTR_INFO.NEXTVAL,t.* from (
+            <foreach collection="params" item="param" separator="UNION">
+                SELECT
+                #{param.addProdInfoId},
+                #{param.attrAction},
+                #{param.attrCode},
+                #{param.attrName},
+                #{param.attrValue},
+                #{param.attrValueName},
+                SYSDATE
+                FROM dual
+            </foreach>
+        ) t
+    </insert>
+    <insert id="batchInsertDeviceInfo" >
+        INSERT INTO GOM_BDW_TERMINAL_INFO_SYNC(
+             ID,
+             VENDOR,
+             MODEL,
+             NAME,
+             IP,
+             MAC,
+             PROVINCE,
+             CITY,
+             ONLINE_TIME,
+             CUST_NAME,
+             ADDRESS,
+             DEVICE_LEVEL,
+             OPERATION,
+             CREATE_DATE
+        )
+        SELECT SEQ_GOM_BDW_TERMINAL_INFO_SYNC.NEXTVAL,t.* from (
+        <foreach collection="params" item="param" separator="UNION">
+            SELECT
+            #{param.vendor},
+            #{param.model},
+            #{param.name},
+            #{param.ip},
+            #{param.mac},
+            #{param.province},
+            #{param.city},
+            TO_DATE(#{param.onlineTime}, "yyyy-mm-dd hh24:mi:ss"),
+            #{param.custName},
+            #{param.address},
+            #{param.deviceLevel},
+            #{param.operation},
+            SYSDATE
+            FROM dual
+        </foreach>
+        ) t
+    </insert>
+    <insert id="batchInsertPortInfo">
+        INSERT INTO GOM_BDW_PORT_INFO_SYNC(
+            ID,
+            DEVICE_NAME,
+            DEVICE_IP,
+            NAME,
+            RATE,
+            MANAGE_STATUS,
+            STATUS,
+            TYPE,
+            MODE,
+            IS_SUB,
+            IP_ADDRESS,
+            OPERATION,
+            CREATE_DATE
+        )
+        SELECT SEQ_GOM_BDW_PORT_INFO_SYNC.NEXTVAL,t.* from (
+        <foreach collection="params" item="param" separator="UNION">
+            SELECT
+            #{param.deviceName},
+            #{param.deviceIp},
+            #{param.name},
+            #{param.rate},
+            #{param.manageStatus},
+            #{param.status},
+            #{param.type},
+            #{param.mode},
+            #{param.isSub},
+            #{param.ipAddress},
+            #{param.operation},
+            SYSDATE
+            FROM dual
+        </foreach>
+        ) t
+    </insert>
+    <insert id="insertAttrGrpInfo" parameterType="map" keyProperty="id" keyColumn="id">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            SELECT SEQ_GOM_BDW_SRV_ORD_ATTR_GRP.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_GRP(
+            ORD_ATTR_GRP_ID,
+            SRV_ORD_ID,
+            <if test="attrGrpId != null and attrGrpId != ''">ATTR_GRP_ID,</if>
+            <if test="attrGrpCode != null and attrGrpCode != ''">ATTR_GRP_CODE,</if>
+            <if test="attrGrpName != null and attrGrpName != ''">ATTR_GRP_NAME,</if>
+            <if test="attrGrpStat != null and attrGrpStat != ''">ATTR_GRP_STAT,</if>
+            CREATE_DATE
+        )
+        VALUES (
+            #{id},
+            #{srvOrdId},
+            <if test="attrGrpId != null and attrGrpId != ''">#{attrGrpId},</if>
+            <if test="attrGrpCode != null and attrGrpCode != ''">#{attrGrpCode},</if>
+            <if test="attrGrpName != null and attrGrpName != ''">#{attrGrpName},</if>
+            <if test="attrGrpStat != null and attrGrpStat != ''">#{attrGrpStat},</if>
+            sysdate
+        )
+    </insert>
+    <insert id="batchAttrGrpInfo" >
+        insert into GOM_BDW_SRV_ORD_ATTR_GRP_INFO (
+            ATTR_GRP_INFO_ID,
+            ORD_ATTR_GRP_ID,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE
+        )
+        SELECT SEQ_GOM_BDW_SRV_ORD_ATTR_GRP_INFO.NEXTVAL,t.* from (
+        <foreach collection="params" item="param" separator="UNION">
+            SELECT
+            #{param.attrGrpId},
+            #{param.attrAction},
+            #{param.attrCode},
+            #{param.attrName},
+            #{param.attrValue},
+            #{param.attrValueName},
+            SYSDATE
+            FROM dual
+        </foreach>
+        ) t
+    </insert>
+</mapper>

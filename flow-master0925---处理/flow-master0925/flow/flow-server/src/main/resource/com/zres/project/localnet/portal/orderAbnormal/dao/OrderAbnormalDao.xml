@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.orderAbnormal.dao.OrderAbnormalDao">
+    <select id="qryOrdChgLogByCstOrdId" parameterType="String" resultType="map">
+        select a.ID,
+                a.SRC_ORDER_ID,
+                a.CHG_ORDER_ID,
+                a.CHG_TYPE,
+                a.FILED_TYPE,
+                a.CHG_VERSION,
+                a.CHANGE_DATA,
+                a.CHANGE_MESSAGE,
+                a.STATE_TIME,
+                a.IS_DELETE,
+                a.CREATE_TIME,
+                a.REMARK,
+                a.STATE,
+                a.SRC_CST_ORDER_ID,
+                c.attr_value circuit_code
+        from GOM_CHANGE_ORDER_LOG_S a
+        left join GOM_BDW_SRV_ORD_INFO b on a.SRC_ORDER_ID = b.ORDER_ID
+        left join GOM_BDW_SRV_ORD_ATTR_INFO c on b.SRV_ORD_ID = c.SRV_ORD_ID and c.attr_code = '20000064'
+        where a.IS_DELETE = '0'
+        and a.CHG_TYPE = #{chgType}
+        and a.SRC_CST_ORDER_ID = #{cstOrdId}
+        <if test="version != null and version != ''">
+            and a.chg_version = #{version}
+        </if>
+        order by a.FILED_TYPE asc, a.CHG_VERSION desc
+    </select>
+
+    <select id="qrySrvOrdIds" parameterType="String" resultType="String">
+        select to_char(WM_CONCAT(soi.srv_ord_id)) as srv_id
+        from GOM_BDW_SRV_ORD_INFO soi
+        where 1 = 1
+        and soi.cst_ord_id = #{cstOrdId}
+        group by soi.cst_ord_id
+    </select>
+
+    <select id="qryWoOperAttrs" parameterType="String" resultType="java.util.HashMap">
+        select w.attr_id as "KEY",
+                w.attr_val as "VALUE"
+        from gom_wo_oper_attr w
+        where w.rec_state = '170000001'
+        and w.WO_ID = (
+            with t as (select wo.WO_ID, wo.wiid
+            from gom_wo wo
+            left join GOM_PS_2_WO_S ws on wo.PS_ID = ws.ID,
+            (select c.SRC_ORDER_ID as order_id, ws.tache_id from GOM_CHANGE_ORDER_LOG_S c
+            left join gom_wo w on c.CHG_ORDER_ID = w.ORDER_ID
+            left join GOM_PS_2_WO_S ws on ws.id = w.PS_ID
+            where c.SRC_ORDER_ID is not null and w.WO_ID = #{woId}
+            ) a
+            where a.order_id = wo.ORDER_ID and a.TACHE_ID = ws.TACHE_ID
+            order by wo.wiid desc)
+            select t.wo_id from t
+            where rownum = 1
+        )
+    </select>
+
+    <select id="qryChangeOrderLog" resultType="java.util.Map" parameterType="map">
+        SELECT T.SRC_ORDER_ID,
+        T.CHG_TYPE,
+        T.CHG_ORDER_ID,
+        T.FILED_TYPE,
+        T.CHG_VERSION,
+        T.SRC_CST_ORDER_ID,
+        T.STATE,
+        T.REMARK,
+        T.IS_DELETE
+        FROM GOM_CHANGE_ORDER_LOG_S T
+        WHERE 1 = 1
+        <if test="srcCstOrderId != null and srcCstOrderId != '' ">
+            AND T.SRC_CST_ORDER_ID = #{srcCstOrderId}
+        </if>
+        <if test="chgOrderIds != null and chgOrderIds.size > 0 ">
+            AND T.CHG_ORDER_ID IN
+            <foreach collection="chgOrderIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="chgOrderId != null and chgOrderId != '' ">
+            AND T.CHG_ORDER_ID = #{chgOrderId}
+        </if>
+        <if test="chgType != null and chgType != '' ">
+            AND T.CHG_TYPE = #{chgType}
+        </if>
+        <if test="lessVerion != null and lessVerion != '' ">
+            AND T.CHG_VERSION &lt; #{lessVerion}
+        </if>
+        <if test="needSrcOrderId != null and needSrcOrderId != '' ">
+            AND T.SRC_ORDER_ID IS NOT NULL
+        </if>
+    </select>
+    <select id="qryCldOrderIdAndPsCode" resultType="java.util.Map">
+        SELECT
+               GW.ORDER_ID CHG_ORDER_ID,
+               GW.WO_ID CHG_WO_ID,
+               O.PARENT_ORDER_ID,
+               OKI.SRC_ORDER_ID,
+               SLO.ORDER_ID SRC_CLD_ORDER_ID,
+               SLO.AREA_ID,
+               POS.ORDER_TYPE,
+               POS.OBJ_TYPE,
+               POS.ACT_TYPE
+        FROM GOM_WO GW
+                 JOIN GOM_ORDER O ON O.ORDER_ID = GW.ORDER_ID
+                 JOIN GOM_ORD_KEY_INFO OKI ON OKI.ORDER_ID = GW.ORDER_ID
+                 LEFT JOIN GOM_ORDER SLO ON SLO.PARENT_ORDER_ID = OKI.SRC_ORDER_ID
+                 LEFT JOIN GOM_PS_2_ORD_S POS ON POS.ID = SLO.PS_ID
+        where 1 = 1
+        <if test="chgWoIds != null and chgWoIds.size > 0">
+            AND GW.WO_ID in
+            <foreach collection="chgWoIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="chgWoId != null and chgWoId != '' ">
+            AND GW.WO_ID = #{chgWoId}
+        </if>
+    </select>
+    <select id="qryGomWOInfo" resultType="java.util.Map">
+        select a.WO_ID, a.WO_STATE, a.PS_ID, a.WIID, a.ORDER_ID, c.TACHE_CODE, c.TACHE_NAME
+        from GOM_WO a
+               join GOM_PS_2_WO_S b on b.ID = a.PS_ID
+               join UOS_TACHE c on c.ID = b.TACHE_ID
+        where a.WO_ID = #{woId}
+    </select>
+    <select id="qryOrderInfo" resultType="java.util.Map">
+        select a.ORDER_ID, a.PARENT_ORDER_ID, a.ORDER_STATE, a.ORDER_CODE, b.SRC_ORDER_ID
+        from GOM_ORDER a
+        join GOM_ORD_KEY_INFO b on a.ORDER_ID = b.ORDER_ID
+        where 1 = 1
+        <if test="orderId != null and orderId != '' ">
+            and a.order_id = #{orderId}
+        </if>
+    </select>
+    <select id="qryWoInfo" resultType="java.util.Map">
+        select wo_id, order_id, wo_code, WO_STATE, WIID, PS_ID
+        from GOM_WO
+        where ORDER_ID in
+        <foreach collection="orderIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="qrySiblingOrder" resultType="java.util.Map">
+        select
+          a.PARENT_ORDER_ID,
+          a.ORDER_ID,
+          a.ORDER_STATE,
+          pos.ORDER_TYPE,
+          pos.OBJ_TYPE,
+          pos.ACT_TYPE
+        from GOM_ORDER a
+        join GOM_PS_2_ORD_S pos on pos.ID = a.PS_ID
+        where a.PARENT_ORDER_ID in (select b.PARENT_ORDER_ID from GOM_ORDER b where b.ORDER_ID = #{orderId})
+        <if test="state != null and state != '' "></if>
+        and a.order_state = #{state}
+    </select>
+    <select id="qryParentWorkingWoId" resultType="java.util.Map">
+        select order_id, wo_id, WO_STATE, WIID, PS_ID, DISP_OBJ_ID
+        from GOM_WO
+        where ORDER_ID in (select PARENT_ORDER_ID from GOM_ORDER where ORDER_ID = #{orderId})
+        and WO_STATE = #{woState}
+    </select>
+
+    <update id="updateOrderState" parameterType="java.util.List">
+        update gom_order o
+        set o.order_state = '200000004',
+        o.state_date = sysdate
+        WHERE o.order_id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        or o.parent_order_id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateWoState" parameterType="map">
+        update gom_wo w
+        set w.wo_state = #{woState},
+        w.state_date = sysdate,
+        w.comp_user_id = #{dealUserId}
+        WHERE w.wo_id in
+        <foreach collection="woIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateSrcOrderId">
+        update gom_order set src_order_id = #{srcOrderId} where ORDER_ID = #{orderId}
+    </update>
+    <update id="updateChangeOrderState">
+      update GOM_CHANGE_ORDER_LOG_S
+        set state = #{state},
+        state_time = sysdate,
+        remark = #{remark}
+        where 1 = 1
+        <choose>
+            <when test="orderIds != null and orderIds.size > 0">
+                AND CHG_ORDER_ID in
+                <foreach collection="orderIds" item="id" index="index" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </when>
+            <otherwise>
+                AND CHG_ORDER_ID = #{orderId}
+            </otherwise>
+        </choose>
+    </update>
+    <update id="updateChangeOrderState4Listener">
+        update GOM_CHANGE_ORDER_LOG_S
+        set state  = (case state
+                        when '760000001' then '760000006'
+                        when '760000002' then '760000004'
+                        when '760000003' then '760000005'
+                        else state
+            end),
+            REMARK = #{remark},
+            STATE_TIME = sysdate
+        where CHG_ORDER_ID = #{orderId}
+    </update>
+
+
+    <select id="queryChangeOrderInfo" parameterType="java.lang.String" resultType="map">
+        with a as (
+                        select col.CHG_ORDER_ID, col.CHG_VERSION, oki.ORDER_ID order_id, col.SRC_CST_ORDER_ID, col.CHG_TYPE, '01' LEVEL_ID
+                        from GOM_BDW_SRV_ORD_INFO bsoi
+                                 join GOM_ORD_KEY_INFO oki on oki.SRC_ORDER_ID = bsoi.ORDER_ID
+                                 join GOM_CHANGE_ORDER_LOG_S col on col.CHG_ORDER_ID = oki.ORDER_ID
+                        where bsoi.SRV_ORD_ID = #{srvOrdId}
+                          and col.SRC_CST_ORDER_ID = #{cstOrdId}
+                        union all
+                        select col.CHG_ORDER_ID, col.CHG_VERSION, co.ORDER_ID order_id, col.SRC_CST_ORDER_ID, col.CHG_TYPE, '02' LEVEL_ID
+                        from GOM_BDW_SRV_ORD_INFO bsoi
+                                 join GOM_ORD_KEY_INFO oki on oki.SRC_ORDER_ID = bsoi.ORDER_ID
+                                 join GOM_CHANGE_ORDER_LOG_S col on col.CHG_ORDER_ID = oki.ORDER_ID
+                                 join GOM_ORDER co on co.PARENT_ORDER_ID = col.CHG_ORDER_ID
+                        where bsoi.SRV_ORD_ID = #{srvOrdId}
+                          and col.SRC_CST_ORDER_ID = #{cstOrdId}
+
+                        union all
+                        select col.CHG_ORDER_ID, col.CHG_VERSION, co2.ORDER_ID order_id, col.SRC_CST_ORDER_ID, col.CHG_TYPE, '03' LEVEL_ID
+                        from GOM_BDW_SRV_ORD_INFO bsoi
+                                 join GOM_ORD_KEY_INFO oki on oki.SRC_ORDER_ID = bsoi.ORDER_ID
+                                 join GOM_CHANGE_ORDER_LOG_S col on col.CHG_ORDER_ID = oki.ORDER_ID
+                                 join GOM_ORDER co on co.PARENT_ORDER_ID = col.CHG_ORDER_ID
+                                 join GOM_ORDER co2 on co2.PARENT_ORDER_ID = co.ORDER_ID
+                        where bsoi.SRV_ORD_ID = #{srvOrdId}
+                          and col.SRC_CST_ORDER_ID = #{cstOrdId}),
+                c as ( SELECT cst_ord_id, listagg (file_infos, ',') WITHIN GROUP (ORDER BY cst_ord_id)  file_info FROM (SELECT  cst_ord_id, wm_CONCAT('{"fileId":"' || file_id || '","fileName":"' || file_name || '","fileType":"' || file_type || '"}') file_infos
+                                   FROM gom_bdw_attach_info
+                                   WHERE origin = 'YC'
+                                   group by wo_ord_id, ATTACH_INFO_ID,cst_ord_id
+                            )group by cst_ord_id
+                    ),
+             b as (
+                select distinct a.CHG_ORDER_ID,
+                       a.CHG_VERSION,
+                       a.SRC_CST_ORDER_ID,
+                       a.CHG_TYPE,
+                       x.CODE_CONTENT                                                  CHG_TYPE_NAME,
+                       a.LEVEL_ID,
+                       w.WO_STATE,
+                       bco.APPLY_ORD_ID,
+                       gli.track_message,
+
+                       case w.WO_STATE when '290000004' then '' else ut.TACHE_NAME end TACHE_NAME,
+                       case w.WO_STATE when '290000002' then w.DISP_OBJ_ID end         unconfirm_user_id,
+                       case when w.WO_STATE  in  ('290000004','290000110') then  w.COMP_USER_ID   end confirm_user_id,
+                       to_char(o.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss')                 CREATE_DATE
+
+                from a
+                         join gom_wo w on w.ORDER_ID = a.order_id
+                         join gom_order o on o.ORDER_ID = CHG_ORDER_ID
+                         join GOM_PS_2_WO_S pws on pws.id = w.PS_ID
+                         join UOS_TACHE ut on ut.ID = pws.TACHE_ID
+                         join GOM_BDW_CST_ORD bco on a.SRC_CST_ORDER_ID = bco.CST_ORD_ID
+                         left join GOM_BDW_CODE_INFO_SECOND x on a.CHG_TYPE = x.CODE_VALUE and x.CODE_TYPE = 'ITEM_TYPE'
+                         left join gom_bdw_log_info gli on gli.wo_ord_id= W.wo_id
+
+                where w.DISP_OBJ_ID != '-2000'
+                /*add 展示第一个环节无人签收状态下发来的异常单
+                *'CIRCUIT_DISPATCH', 电路调度环节'CHECK_DISPATCH',核查调度环节'DEMAND_DEPART_AUDIT' 需求部门审核环节
+                */
+             union all
+               select distinct a.CHG_ORDER_ID,
+                     a.CHG_VERSION,
+                     a.SRC_CST_ORDER_ID,
+                     a.CHG_TYPE,
+                     x.CODE_CONTENT CHG_TYPE_NAME,
+                     a.LEVEL_ID,
+                     w.WO_STATE,
+                     bco.APPLY_ORD_ID,
+                     gli.track_message,
+
+                     case w.WO_STATE  when '290000004' then   ''  else   ut.TACHE_NAME end TACHE_NAME,
+                     case w.WO_STATE when '290000002' then  w.DISP_OBJ_ID  end unconfirm_user_id,
+                     case w.WO_STATE  When '290000004' then
+                                             case w.COMP_USER_ID When -2000 then 11 else   w.COMP_USER_ID end
+                                      when '290000110'  then w.COMP_USER_ID
+                    end confirm_user_id,
+                     to_char(o.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') CREATE_DATE
+                from a
+                join gom_wo w      on w.ORDER_ID = a.order_id
+                join gom_order o      on o.ORDER_ID = CHG_ORDER_ID
+                join GOM_PS_2_WO_S pws      on pws.id = w.PS_ID
+                join UOS_TACHE ut      on ut.ID = pws.TACHE_ID
+                join GOM_BDW_CST_ORD bco      on a.SRC_CST_ORDER_ID = bco.CST_ORD_ID
+                left join GOM_BDW_CODE_INFO_SECOND x      on a.CHG_TYPE = x.CODE_VALUE     and x.CODE_TYPE = 'ITEM_TYPE'
+                left join gom_bdw_log_info gli on gli.wo_ord_id= W.wo_id
+
+               where w.DISP_OBJ_ID = '-2000' and ut.tache_code in ('CIRCUIT_DISPATCH','CHECK_DISPATCH','DEMAND_DEPART_AUDIT','SIGN_IN')
+
+                )
+        select b.CHG_ORDER_ID,
+               max(c.file_info) file_info,
+               wm_concat(b.TRACK_MESSAGE)     TRACK_MESSAGE,
+               MAX(b.CHG_VERSION)             CHG_VERSION,
+               MAX(b.SRC_CST_ORDER_ID)        SRC_CST_ORDER_ID,
+               MAX(b.CHG_TYPE)                CHG_TYPE,
+               MAX(b.CHG_TYPE_NAME)           CHG_TYPE_NAME,
+               MAX(b.WO_STATE)                WO_STATE,
+               wm_concat(b.TACHE_NAME)        TACHE_NAME,
+               MAX(b.APPLY_ORD_ID)            APPLY_ORD_ID,
+               WM_CONCAT(b.unconfirm_user_id) unconfirm_user_id,
+               WM_CONCAT(b.confirm_user_id)   confirm_user_id,
+               MAX(b.CREATE_DATE)             CREATE_DATE
+        from b
+        left  join c on c.cst_ord_id=b.SRC_CST_ORDER_ID
+        group by CHG_ORDER_ID
+        ORDER BY CREATE_DATE DESC
+    </select>
+    <select id="lstGomUserS" resultType="java.util.Map">
+        select USER_ID, USER_REAL_NAME
+            from GOM_USER_S where USER_ID in
+        <foreach collection="userIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="countUnDispatchToSysExceptionOrd" resultType="java.util.Map">
+        select gw.DISP_OBJ_ID, o.ORDER_STATE, o.ORDER_ID, gw.WO_ID
+        from GOM_WO gw
+               join GOM_ORDER o on o.order_id = gw.ORDER_ID
+               join GOM_PS_2_WO_S gpw on gw.PS_ID = gpw.ID
+               join UOS_TACHE ut on ut.ID = gpw.TACHE_ID
+        where ut.TACHE_CODE in
+        <foreach collection="tacheCodes" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+--           and gw.DISP_OBJ_ID != '-2000'
+          and gw.ORDER_ID in (select CHG_ORDER_ID
+                              from GOM_CHANGE_ORDER_LOG_S
+                              where CHG_VERSION = #{chgVersion}
+                                and CHG_TYPE = #{chgType}
+                                and SRC_CST_ORDER_ID = #{srcCstOrderId} )
+    </select>
+    <select id="qryLocalOrderIdAndPsCodeErGan" resultType="java.util.Map">
+        SELECT
+               GW.ORDER_ID CHG_ORDER_ID,
+               GW.WO_ID CHG_WO_ID,
+               O.PARENT_ORDER_ID,
+               OKI.SRC_ORDER_ID,
+               SLO.ORDER_ID SRC_CLD_ORDER_ID,
+               SLO.AREA_ID,
+               POS.ORDER_TYPE,
+               POS.OBJ_TYPE,
+               POS.ACT_TYPE
+        FROM GOM_WO GW
+                 JOIN GOM_ORDER O ON O.ORDER_ID = GW.ORDER_ID
+                 JOIN GOM_ORD_KEY_INFO OKI ON OKI.ORDER_ID = GW.ORDER_ID
+                 LEFT JOIN GOM_BDW_SEC_LOCAL_RELATE_INFO RL ON RL.PARENT_ORDER_ID = OKI.SRC_ORDER_ID
+                 LEFT JOIN GOM_ORDER SLO ON SLO.ORDER_ID = RL.ORDER_ID
+                 LEFT JOIN GOM_PS_2_ORD_S POS ON POS.ID = SLO.PS_ID
+        where 1 = 1
+        <if test="chgWoIds != null and chgWoIds.size > 0">
+            AND GW.WO_ID in
+            <foreach collection="chgWoIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="chgWoId != null and chgWoId != '' ">
+            AND GW.WO_ID = #{chgWoId}
+        </if>
+    </select>
+
+    <select id="qrySrvInfoByCstOrdId" resultType="java.util.Map">
+        SELECT SRV_ORD_ID, RESOURCES FROM GOM_BDW_SRV_ORD_INFO WHERE CST_ORD_ID=#{cstOrdId}
+    </select>
+    <select id="getResUrlParam" resultType="java.util.Map">
+        select WO.DISP_OBJ_ID
+                , WO.DISP_OBJ_TYE
+                , WO.WO_STATE
+                , UT.ID             TACHE_ID
+                , KI.SPECIALTY_CODE
+                , KI.REGION_ID
+                , srv.CST_ORD_ID
+        <choose>
+            <when test="level != '03' ">
+                , srv.SRV_ORD_ID
+            </when>
+            <otherwise>
+                , srv.RELATE_INFO_ID AS SRV_ORD_ID
+            </otherwise>
+        </choose>
+                , WO.DEAL_USER_ID
+                , WO.ORDER_ID
+                , WO.WO_ID
+                , o.PS_ID
+        from GOM_WO WO
+                 JOIN GOM_ORDER O ON O.ORDER_ID = WO.ORDER_ID
+                 JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+                 JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+                 JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        <choose>
+            <when test="level != '03' ">
+                --二干资源分配和普通的本地
+                LEFT join gom_bdw_srv_ord_info srv on O.PARENT_ORDER_ID = srv.ORDER_ID
+            </when>
+            <otherwise>
+                LEFT join GOM_BDW_SEC_LOCAL_RELATE_INFO srv on  O.PARENT_ORDER_ID = srv.ORDER_ID
+            </otherwise>
+        </choose>
+        WHERE 1=1
+          AND UT.TACHE_CODE = #{tacheCode}
+          AND WO.DEAL_USER_ID = #{dealUser}
+          AND WO.WO_TYPE = '620000001'
+          AND WO.WO_STATE IN (290000002,290000004)
+          <choose>
+              <when test="tacheCode == 'SEC_SOURCE_DISPATCH_CLD' ">
+                  AND O.PARENT_ORDER_ID = (SELECT SRC_ORDER_ID FROM GOM_ORD_KEY_INFO WHERE ORDER_ID = #{orderId})
+              </when>
+              <otherwise>
+                  AND srv.ORDER_ID = (SELECT SRC_ORDER_ID FROM GOM_ORD_KEY_INFO WHERE ORDER_ID = #{orderId})
+              </otherwise>
+          </choose>
+        ORDER BY WO.CREATE_DATE DESC
+    </select>
+
+
+</mapper>

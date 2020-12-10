@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.webservice.data.dao.DDOSDao">
+
+    <!--查询电路信息-->
+    <select id="querySrvOrdId" parameterType="map"   resultType="map">
+        select * from (SELECT SRV.SERVICE_ID,SRV.SYSTEM_RESOURCE,SRV.ORDER_ID,SRV.SRV_ORD_ID,CST.CST_ORD_ID,SRV.ACTIVE_TYPE,SRV.CHANGE_FLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SRV ON CST.CST_ORD_ID=SRV.CST_ORD_ID
+        where 1 = 1
+        <if test = "SERIAL_NUMBER!=null">AND SERIAL_NUMBER=#{SERIAL_NUMBER}</if>
+        <if test = "FLOW_ID!=null">AND FLOW_ID=#{FLOW_ID}</if>
+        <if test = "TRADE_ID!=null">AND TRADE_ID=#{TRADE_ID}</if>
+        <if test = "APPLY_ORD_ID!=null">AND CST.APPLY_ORD_ID=#{APPLY_ORD_ID}</if>
+        order by SRV.CREATE_DATE DESC) t WHERE rownum =1
+    </select>
+
+    <select id="queryWoInfoByOrderAndTacheId" resultType="map" parameterType="String">
+      SELECT W.wo_id,w.wo_state
+            FROM gom_bdw_srv_ord_info srv
+            LEFT JOIN GOM_WO w ON SRV.ORDER_ID = w.order_id
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            WHERE  w.order_id = #{orderId} and ut.tache_code = #{tacheCode}
+    </select>
+
+    <select id="queryWoInfoByDDOS" resultType="map" parameterType="String">
+      SELECT W.wo_id,w.wo_state
+            FROM gom_bdw_srv_ord_info srv
+            LEFT JOIN GOM_WO w ON SRV.ORDER_ID = w.order_id
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            WHERE  w.order_id = #{orderId} and ut.tache_code = #{tacheCode} and w.wo_state = '290000118'
+    </select></mapper>

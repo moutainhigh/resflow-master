@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.TestContactDao">
+
+    <select id="countTestContactList" resultType="int" timeout="3000">
+        SELECT count(1)
+        FROM (
+             <include refid="queryTestContactData"/>
+         )
+
+
+    </select>
+    <select id="queryTestContactInfo" resultType="map" timeout="3000">
+        SELECT Q.*
+        FROM (
+            <include refid="queryTestContactData"/>
+            ) Q
+        <![CDATA[
+            WHERE  Q.ROWINDEX >#{startRow,jdbcType=INTEGER}
+            AND Q.ROWINDEX <=#{endRow,jdbcType=INTEGER}
+        ]]>
+
+    </select>
+    <select id="queryTestContactList" resultType="map" timeout="3000">
+         SELECT * FROM
+            (SELECT ROW_NUMBER() OVER(ORDER BY C.ID) AS ROWINDEX, C.*
+                FROM GOM_BDW_TEST_CONTACT C
+                WHERE C.REGION_ID = #{regionId}
+              ORDER BY C.ID)
+
+    </select>
+
+    <sql id="queryTestContactData">
+        SELECT ROW_NUMBER() OVER(ORDER BY C.ID) AS ROWINDEX, C.*
+        FROM GOM_BDW_TEST_CONTACT C
+        WHERE 1 = 1
+        <if test="regionName != null and regionName != '' ">
+            AND C.ORG LIKE '%'|| #{regionName}||'%'
+        </if>
+        ORDER BY ID
+
+    </sql>
+
+</mapper>

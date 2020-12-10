@@ -1,0 +1,103 @@
+<div id="affairDispatcher-mainPanel">
+    <div style="padding: 15px;">
+        <form class="form-horizontal" id="circuitSummaryList-form">
+            <div class="row" style="margin: 0 !important;">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">电路编号</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="circuitSummaryList-circuitNo" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="circuitSummaryList-serialNumber" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="circuitSummaryList-custNameChinese" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                        <div class="col-md-8 col-sm-8">
+                            <select id="circuitSummaryList-productType" class="chosen-select"
+                                    data-placeholder="--请选择产品类型--" multiple="">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">电路状态</label>
+                        <div class="col-md-8 col-sm-8">
+                            <select id="circuitSummaryList-oprState" class="chosen-select"
+                                    data-placeholder="--请选择电路状态--" multiple="">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">电路租用范围</label>
+                        <div class="col-md-8 col-sm-8">
+                            <select id="circuitSummaryList-cirLeaseRange" class="chosen-select"
+                                    data-placeholder="--请选择电路范围--" multiple="">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">业务动作</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="circuitSummaryList-actType"  class="combobox form-control">
+                            </input>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-8">
+                    <div class="form-group">
+                        <label class="col-md-2 col-sm-2 control-label">开通时间</label>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="input-group">
+                                <input id="circuitSummaryList-startDate" name="circuitSummaryList-startDate" class="form-control" >
+                            </div>
+                        </div>
+                        <label class="col-md-2 col-sm-2 control-context">—</label>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="input-group">
+                                <input id="circuitSummaryList-endDate" name="circuitSummaryList-endDate" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-11">
+                    <div style="float: right">
+                        <button id="circuitSummaryList-queryBtn" type="button" class="btn btn-danger">查询
+                        </button>
+                        <button id="circuitSummaryList-exportBtn" type="button" class="btn btn-danger">导出
+                        </button>
+                        <button type="reset" class="btn btn-default">重置</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="circuitSummaryList-grid"></div>
+    </div>
+</div>

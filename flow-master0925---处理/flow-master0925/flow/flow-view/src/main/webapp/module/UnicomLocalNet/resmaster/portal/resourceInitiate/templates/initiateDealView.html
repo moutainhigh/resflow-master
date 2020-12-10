@@ -1,0 +1,39 @@
+<div class="modal-header">
+    <h4 class="modal-title">资源补录发起</h4>
+</div>
+<div class="modal-body">
+    <div style="padding: 10px;">
+        <label class="control-label" style="padding-right: 0">电路信息：</label>
+        <div id="initiateResourceGrid"></div>
+    </div>
+    <form class="form-horizontal" id="resourceInitiateForm">
+        <div class="row">
+            <label class="control-label" style="padding-left: 19px;">专业区域：</label>
+            <div class="clearfix" style="margin-left: 23px;" id="childSendDiv">
+            </div>
+
+        </div>
+        <div class="row form-group" id="remarkDiv">
+            <div id="remarkGoRoll" class="" style="padding-left: 32px">
+                <label class="col-md-1 control-label" style="padding-right: 0; text-align: left"> 补录说明：</label>
+                <div class="col-md-11 clear-white" style="padding-left: 46px;">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 788px;"
+                                          ></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="clearfix" style="text-align: right;" hidden id="saveBtnDiv">
+        <button type="button" id="saveBtn" class="btn btn-danger" style="margin-right:20px;margin-bottom:15px;">保存
+        </button>
+    </div>
+</div>
+<div class="modal-footer">
+    <div class="col-md-12 col-sm-12" id="BtnDiv">
+        <div style="text-align: center">
+            <!--<button id="saveDraft" type="button" class="btn btn-default">保存草稿</button>-->
+            <button id="submit" type="button" class="btn btn-danger">提交</button>
+            <button id="cancelThisBtn" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        </div>
+    </div>
+</div>

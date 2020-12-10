@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         id="WebApp_1484825366620" version="2.4">
+    <display-name>gom</display-name>
+    <description>gom</description>
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>gom</param-value>
+    </context-param>
+
+    <!--    <filter>
+        <filter-name>RefererFilter</filter-name>
+        <filter-class>
+            com.zres.project.localnet.portal.filter.RefererFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RefererFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>-->
+
+<!--    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>/WEB-INF/classes/conf/log4j.properties</param-value>
+    </context-param>
+    <context-param>
+        <param-name>log4jRefreshInterval</param-name>
+        <param-value>10000</param-value>
+    </context-param>
+
+    <filter>
+        <filter-name>FrameFilterDelegate</filter-name>
+        <filter-class>
+            com.ztesoft.res.frame.filter.FrameFilterDelegate
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>FrameFilterDelegate</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>
+            org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath*:conf/framework/default/applicationContext.xml,&lt;!&ndash; 框架默认配置 &ndash;&gt;
+            classpath*:conf/flow/applicationContext_base.xml,
+            classpath*:conf/flow/applicationContext_flow.xml
+        </param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                classpath*:conf/framework/spring/applicationContext_mvc.xml,
+                classpath*:conf/framework/default/mvc_applicationContext.xml,
+                classpath:conf/flow/applicationContext_base.xml
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>*.spr</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>*.spj</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ActionServlet</servlet-name>
+        <servlet-class>
+            com.ztesoft.res.frame.flow.common.servlet.ActionServlet
+        </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ActionServlet</servlet-name>
+        <url-pattern>/actionService.spr</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>FlowFileServlet</servlet-name>
+        <servlet-class>
+            com.ztesoft.res.frame.flow.common.servlet.FileServlet
+        </servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FlowFileServlet</servlet-name>
+        <url-pattern>/FlowFileService.spr</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>pushlet</servlet-name>
+        <servlet-class>
+            nl.justobjects.pushlet.servlet.Pushlet
+        </servlet-class>
+        <load-on-startup>9</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>pushlet</servlet-name>
+        <url-pattern>/pushlet.srv</url-pattern>
+    </servlet-mapping>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>
+            org.springframework.web.util.Log4jConfigListener
+        </listener-class>
+    </listener>-->
+    <listener>
+        <listener-class>
+            org.springframework.web.util.IntrospectorCleanupListener
+        </listener-class>
+    </listener>
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+
+    <!-- dataSource -->
+<!--    <resource-ref id="ResourceRef_1330354878683">
+        <description>dataSource</description>
+        <res-ref-name>jdbc/RESFLOW</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>-->
+
+    <welcome-file-list>
+        <welcome-file>flowPortal.html</welcome-file>
+        <!--<welcome-file>UnicomLocalNetIndex.html</welcome-file>-->
+    </welcome-file-list>
+</web-app>

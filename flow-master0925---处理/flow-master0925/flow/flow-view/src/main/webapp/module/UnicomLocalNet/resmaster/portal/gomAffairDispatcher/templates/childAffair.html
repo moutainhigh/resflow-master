@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="child-model-title">事务子单</h4>
+</div>
+<div class="modal-body">
+    <div class="panel-body" id="child-body-div">
+        <div id="childAffairGrid" class="affair">
+        </div>
+        <div class="panel panel-default" id="child-reject-div">
+            <div class="panel-heading">
+                <label>事务驳回</label>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="col-md-1 col-sm-1 control-label">驳回原因</label>
+                        <div class="col-md-11 col-sm-11">
+                            <textarea rows="5" class="form-control" placeholder="2000字以内" id="clildAffair-rejectRemark"
+                                      data-rule="required;length[~2000, true]"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="child-commit" type="button" class="btn btn-danger">驳回</button>
+    <button id="child-cancel" type="reset" class="btn btn-default">取消</button>
+</div>
+
+

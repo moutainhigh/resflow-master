@@ -1,0 +1,153 @@
+<div class="modal-header">
+    <h4 class="modal-title">电路详情</h4>
+</div>
+<div class="handle-order-div">
+    <div class="handle-order-content" id="btnDev-resource">
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="touchGet_1" value="get" >签收</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="releaseTouchGet_1" value="free" >释放签收</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resource_initiate" >发起补录</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resStartFlow" >发起流程</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resConfig" >资源配置</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resSubmit" >提交</button>
+    </div>
+</div>
+<div class="modal-body">
+    <div id="isa-route-mainPanel">
+        <div id="tabs-order-b">
+            <!-- 电路信息-->
+            <form class="form-horizontal form-ui-label" id="dianlu-form">
+                <div id="tabsCirNum-pill" class="tabs-pill ui-tabs">
+                    <ul class="ui-tabs-nav">
+                        <li id="tabs-circuitSub"><a href="#tabs-order-bSub">电路属性信息</a></li>
+
+                        <li id="tabs-resourceOrder-sec"><a href="#tabs-order-sec">二干补录资源信息</a></li>
+                        <li id="tabs-resourceOrder-local"><a href="#tabs-order-local">本地补录资源信息</a></li>
+                    </ul>
+                    <div id="tabs-order-bSub">
+                        <!-- 电路信息-->
+                        <form class="form-horizontal form-ui-label" id="route-form">
+
+                            <div class="title_left">
+                                <span class="title_left_span">电路信息：</span>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">客户名称</label>
+                                    <div class="form-order-info" id="CUST_NAME"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">客户联系电话</label>
+                                    <div class="form-order-info" id="LINK_TELE"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">客户地址</label>
+                                    <div class="form-order-info" id="ADDRESS"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">客户联系人</label>
+                                    <div class="form-order-info" id="LINK_MAN"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">客户联系人电话</label>
+                                    <div class="form-order-info" id="LINK_TELE2"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">产品名称</label>
+                                    <div class="form-order-info" id="PRODUCT_NO"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">业务号码</label>
+                                    <div class="form-order-info" id="BUSINESS_IDENTITY"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">电路编号</label>
+                                    <div class="form-order-info" id="CIRCUIT_NO"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">带宽</label>
+                                    <div class="form-order-info" id="CIRCUIT_RATE"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">A端地市</label>
+                                    <div class="form-order-info" id="A_RESISTANCE"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">A端装机地址</label>
+                                    <div class="form-order-info" id="A_ADDRESS"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">A端接口类型</label>
+                                    <div class="form-order-info" id="LONG_INTER_PORT"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">A端联系人</label>
+                                    <div class="form-order-info" id="A_LINK_MAN"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">A端联系人电话</label>
+                                    <div class="form-order-info" id="A_LINK_TELE"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">Z端地市</label>
+                                    <div class="form-order-info" id="SYS_EMS_NAME"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">Z端装机地址</label>
+                                    <div class="form-order-info" id="Z_ADDRESS"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">Z端接口类型</label>
+                                    <div class="form-order-info" id="SYS_NETWORK_GW"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">Z端联系人</label>
+                                    <div class="form-order-info" id="Z_LINK_MAN"></div>
+                                </div>
+                                <div class="col-md-3 pdb-10">
+                                    <label class="control-label">Z端联系人电话</label>
+                                    <div class="form-order-info" id="Z_LINK_TELE"></div>
+                                </div>
+                                <!--                <div class="col-md-3 pdb-10">-->
+                                <!--                    <label class="control-label">Z端装机地址</label>-->
+                                <!--                    <div class="form-order-info"></div>-->
+                                <!--                </div>-->
+                            </div>
+
+                            <div class="title_left col-md-12">
+                                <span class="title_left_span">路由信息：</span>
+                            </div>
+                            <div class="row" style="margin-left: 30px;margin-top: 20px;">
+                            </div>
+                            <div class="col-md-12">
+                                <div id="routeGrid"></div>
+                            </div>
+
+                        </form>
+
+                    </div>
+                    <div id="tabs-order-sec">
+                        <!--二干补录资源信息-->
+                        <div id="resource-grid-sec"></div>
+                    </div>
+                    <div id="tabs-order-local">
+                        <!--本地补录资源信息-->
+                        <div id="resource-grid-local"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-footer" style="text-align: center">
+    <!--<button type="button" class="btn btn-danger" id="close">关闭</button>-->
+</div>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.sdwan.dao.SdwanDealDao">
+    <!--查询枚举值-->
+    <select id="queryEnum"  resultType="map" >
+      SELECT CODE_CONTENT as "name" ,CODE_VALUE as "value"
+      FROM gom_BDW_code_info
+      where CODE_TYPE = #{enumType}
+        <if test="sortNo != null and sortNo != '' ">
+            AND SORT_NO = #{sortNo}
+        </if>
+        <if test="relatedSign != null and relatedSign != '' ">
+            AND RELATED_SIGN = #{relatedSign}
+        </if>
+      ORDER BY SORT_NO asc
+    </select>
+
+
+    <select id="queryCircuitAttr" resultType="java.util.Map">
+        SELECT SO.TRADE_ID,
+        SAO.BSN,
+        sao.DEVICELEVEL,
+        SAO.DEVICEFACTORY,
+        SAO.DEVICEMODEL ,
+        (SELECT code_content FROM gom_bdw_code_info  where code_type = 'deviceLevel' and code_value = sao.DEVICELEVEL) LEVELNAME,
+        (SELECT code_content FROM gom_bdw_code_info  where code_type = 'deviceFactory' and code_value = sao.DEVICEFACTORY) FACTORYNAME,
+        SAO.DEVICEMODEL MODELNAME,
+        (SELECT code_content FROM gom_bdw_code_info  where code_type = 'WANType' and code_value = sao.WANTYPE) WANTYPENAME,
+        SAO.USERACCT, SAO.USERPWD, SAO.WANTYPE, SAO.GATEWAYADDR, SAO.IPADDR
+   FROM GOM_BDW_SRV_ORD_INFO SO
+   left join (select SRV_ORD_ID, ATTR_VALUE, ATTR_CODE
+                FROM GOM_BDW_SRV_ORD_ATTR_INFO) a
+                pivot(MAX(a.attr_value) FOR attr_code IN(
+                      'deviceLevel' deviceLevel,
+                      'deviceFactory' deviceFactory,
+                      'deviceModel' deviceModel,
+                      'BSN' BSN,'userAcct' userAcct,
+                      'userPwd' userPwd,
+                      'WANType' WANType,
+                      'gatewayAddr' gatewayAddr,
+                      'IPAddr' IPAddr)) sao on sao.srv_ord_id = so.srv_ord_id
+  where so.srv_ord_id = #{srvOrdId}
+    and so.srv_ord_stat not in ('10X', '10F', '10C')
+
+    </select>
+    <select id="qryTacheInfo"  resultType="map" parameterType="String">
+        SELECT R.ID, R.TACHE_NAME, R.TACHE_CODE
+        FROM UOS_TACHE R
+        WHERE R.ID = #{tacheId}
+    </select>
+
+    <select id="qryTacheData"  resultType="map" parameterType="String">
+        SELECT WO.WO_ID, WO.ORDER_ID, UT.ID, UT.TACHE_CODE
+        FROM GOM_WO WO
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        WHERE WO.ORDER_ID = #{orderId}
+        AND UT.ID = #{tacheId}
+        AND WO.WO_STATE = '290000002'
+    </select>
+    <select id="qryAttrInfoId"  resultType="map" parameterType="map">
+        SELECT  ATTR_INFO_ID,SOURSE,ATTR_VALUE,CREATE_DATE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO ATTR
+        WHERE ATTR.SRV_ORD_ID = #{srvOrdId}
+        and ATTR.attr_code=#{attrCode}
+    </select>
+
+    <insert id="insertSrvAttrInfo" parameterType="map">
+        <selectKey resultType="int" order="BEFORE" keyProperty="ATTR_INFO_ID_AA">
+            SELECT SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL from dual
+        </selectKey>
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (attr_info_id, srv_ord_id, attr_action, attr_code, attr_name, attr_value, attr_value_name, create_date, sourse)
+        VALUES (SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.nextval,#{srv_ord_id},#{attr_action},#{attr_code},#{attr_name},#{attr_value},#{attr_value_name},sysdate,#{sourse})
+
+    </insert>
+    <update id="updateSrvAttr" parameterType="map">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO ATTR
+        set ATTR.attr_value = #{attrValue}
+        WHERE ATTR.attr_info_id = #{attrId}
+    </update>
+
+</mapper>

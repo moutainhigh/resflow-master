@@ -1,0 +1,3143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.OrderDealDao">
+
+    <select id="querySrvOrdId" resultType="java.lang.String">
+        SELECT MAX(SRV_ORD_ID) FROM GOM_BDW_SRV_ORD_INFO A JOIN GOM_BDW_CST_ORD B ON A.CST_ORD_ID = B.CST_ORD_ID
+        WHERE
+            A.SERIAL_NUMBER= #{serialNumber}
+            and
+            a.trade_id = #{tradeId} AND  A.SRV_ORD_STAT='10N'
+        order by srv_ord_id desc
+    </select>
+
+    <select id="queryTacheInfo" resultType="java.util.Map">
+        SELECT
+            rownum, w.wo_id,w.wo_state,w.deal_user_id,w.comp_user_id,u.user_name, w.create_date,w.state_date,w.deal_date,
+            ws.tache_id,ut.tache_code,ut.tache_name,ws.ord_ps_id,u.user_real_name, u.org_id,u.org_name,u.user_phone,
+            CASE WHEN li.track_content IS NULL THEN '无' WHEN li.track_content IS NOT NULL THEN li.track_content END AS track_content
+        FROM GOM_ORDER o
+            join GOM_BDW_SRV_ORD_INFO_VIEW info  on o.ORDER_ID=info.order_id
+            LEFT JOIN GOM_WO w ON o.order_id = w.order_id
+            LEFT JOIN gom_ps_2_wo_s ws ON WS.id = w.ps_id
+            LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+            LEFT JOIN gom_user_s u ON u.user_id = w.deal_user_id
+            LEFT JOIN GOM_BDW_LOG_INFO li ON li.wo_ord_id = w.wo_id AND li.oper_type = 1
+        where info.trade_id= #{tradeId}
+        ORDER BY rownum
+    </select>
+
+    <select id="queryOrderInfoList" resultType="java.util.Map">
+        SELECT
+            B.SUBSCRIBE_ID, A.PARALLEL_FLAG,B.SUBSCRIBE_ID_RELA,A.SERIAL_NUMBER,A.TRADE_ID,A.FLOW_ID,B.CUST_OPERATOR_TEL,
+            B.CUST_OPERATOR_NAME,to_char(B.CREATE_DATE,'YYYYMMDDHH24MISS')
+            CREATE_DATE,A.SERVICE_OFFER_ID,B.ROUTE_TYPE,B.ROUTE_VALUE,A.ORDER_TYPE,A.SERVICE_ID,A.SRV_ORD_ID
+        FROM  GOM_BDW_SRV_ORD_INFO_DIS_VIEW A
+            JOIN  GOM_BDW_CST_ORD B ON A.CST_ORD_ID=B.CST_ORD_ID
+        WHERE A.SRV_ORD_ID = #{svrOrderId}
+    </select>
+
+    <select id="queryOrderAttrInfoList" resultType="java.util.List">
+        SELECT * FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE ATTR_CODE = #{svrOrderId}
+    </select>
+
+    <select id="queryStaffInfoList" resultType="java.util.Map">
+        SELECT  NAME,PHONE_NO FROM  STAFF WHERE STAFF_ID = #{userId}
+    </select>
+
+    <select id="selectOrderList2" resultType="java.util.Map">
+        SELECT SRV_ORD_ID,ORDER_ID FROM GOM_BDW_SRV_ORD_INFO
+        WHERE TRADE_ID = #{tradeIdReal} and SERIAL_NUMBER = #{serialNumber}
+              and service_offer_id=#{serviceOfferId} and srv_ord_stat='10N'
+        order by create_date desc
+    </select>
+    <select id="selectOrderList" resultType="java.util.Map">
+        SELECT distinct SRV_ORD_ID,ORDER_ID,SRV_ORD_STAT FROM GOM_BDW_SRV_ORD_INFO
+        WHERE TRADE_ID = #{tradeIdReal} and SERIAL_NUMBER = #{serialNumber}
+              /**   结束作废 草稿单不需要异常单操作  */
+              AND SRV_ORD_STAT NOT IN ('10F', '10X', '10C')
+        order by SRV_ORD_ID desc
+    </select>
+
+    <update id="updateOrdInfo">
+        UPDATE GOM_BDW_SRV_ORD_INFO SET SRV_ORD_STAT = #{activeType}
+        WHERE TRADE_ID = #{tradeIdReal}
+              and SERIAL_NUMBER = #{serialNumber}
+    </update>
+
+    <update id="updateFinDate">
+        UPDATE GOM_ORDER SET REQ_FIN_DATE = to_date(#{requireCompleteCate},'yyyymmdd hh24:mi:ss') WHERE ORDER_ID = #{orderId}
+    </update>
+
+    <insert id="addOrderNotice">
+        insert into gom_bdw_order_notice (
+            notice_id, SRV_ORD_ID,REQUIRE_COMPLETE_DATE,DEAL_USER_ID,
+            notice_content,tache_name,wo_state, stat,create_date,active_type)
+        values (
+            SEQ_gom_bdw_order_notice.nextval,#{srvOrdId},to_date(#{requireCompleteCate},'yyyymmdd hh24:mi:ss'),#{DEAL_USER_ID},
+            #{srvOrdDesc},#{TACHE_NAME},#{WO_STATE},'0',sysdate,#{activeType})
+    </insert>
+
+    <select id="queryListDealCurrentUser" resultType="java.util.Map">
+        select wo_state,deal_user_id, tache_name  from (
+            SELECT  distinct
+                case
+                when w.wo_state='290000002' and w.DEAL_USER_ID is not null  then '处理中'
+                when  w.wo_state='290000002'  and w.DEAL_USER_ID is null then '待签收'
+                else '已完成'
+                end as wo_state,
+                deal_user_id, ut.tache_name
+            FROM gom_bdw_srv_ord_info srv
+                LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srv.ORDER_ID OR O.PARENT_ORDER_ID = srv.ORDER_ID
+                LEFT JOIN GOM_WO w ON o.order_id = w.order_id
+                LEFT JOIN gom_ps_2_wo_s ws ON WS.id = w.ps_id
+                LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+                LEFT JOIN gom_user_s u ON u.user_id = w.deal_user_id
+            where srv.order_id =#{orderId}
+            union all
+            select   '待签收' wo_state,nvl(rel.staff_id,vps.USER_ID) deal_user_id,ut.tache_name
+            FROM gom_bdw_srv_ord_info srv
+                LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srv.ORDER_ID OR O.PARENT_ORDER_ID = srv.ORDER_ID
+                LEFT JOIN GOM_WO w ON o.order_id = w.order_id   and  w.wo_state='290000002'
+                LEFT JOIN gom_ps_2_wo_s ws ON WS.id = w.ps_id
+                LEFT JOIN uos_tache ut ON ut.id = ws.tache_id   and ut.TACHE_CODE='CIRCUIT_DISPATCH'
+                left join gom_user_s vps on  vps.ORG_ID = w.disp_obj_id  and w.DISP_OBJ_TYE='260000001'
+                left join gom_staff_group_rela_s  rel on rel.staff_group_id=w.disp_obj_id     and w.DISP_OBJ_TYE='260000002'
+            where srv.order_id =#{orderId}      and w.DEAL_USER_ID is null
+        ) where deal_user_id is not null
+    </select>
+
+    <select id="queryOrderInfo"  resultType="map">
+        SELECT * FROM gom_order
+    </select>
+    <select id="querySpecNetMagPro" resultType="String">
+        select WM_CONCAT(a.name) AS NAME
+        from GOM_SPEC_NETMAG a
+        where 1=1
+        and delete_state='0'
+        <if test="proId != null and proId != ''">
+            and pro_id_ref = #{proId}
+        </if>
+        <if test="type !=null and type != ''">
+            and type = #{type}
+        </if>
+        <if test="specityNetManageStr != '' and specityNetManageStr != null">
+            AND a.ID IN
+            <foreach collection="specityNetManageStr" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findOrderCode" resultType="map">
+        SELECT * FROM gom_ps_2_ord_s WHERE id = #{id}
+    </select>
+    <select id="qryTacheButton" parameterType="map" resultType="map">
+        SELECT ID, TACHE_DEFINE_ID, BUTTON_NAME, BUTTON_CLICK, CONTROL_SQL, CREATE_DATE, STATE, COMMENTS
+        FROM GOM_BDW_TACHE_BUTTON
+        <where>
+            <if test='btnInfo == "100" and btnInfo != null '>
+                <if test='tacheId == "500001144" or tacheId == "500001153"'>
+                    <if test='buttonState == 120 '>
+                        TACHE_DEFINE_ID IN ('100','110',#{tacheId} ,#{buttonState}) AND STATE = '10A'
+                    </if>
+                    <if test="buttonState == null or buttonState == '' ">
+                        TACHE_DEFINE_ID IN ('100','110',#{tacheId}) AND STATE = '10A'
+                    </if>
+                </if>
+                <if test='tacheId != "500001144" and tacheId != "500001153"'>
+                    <if test=' buttonState == 120 '>
+                        TACHE_DEFINE_ID IN ('100','110','102',#{tacheId},#{buttonState}) AND STATE = '10A'
+                    </if>
+                    <if test=" buttonState == null or buttonState == ''  ">
+                        TACHE_DEFINE_ID IN ('100','110','102',#{tacheId}) AND STATE = '10A'
+                    </if>
+                </if>
+            </if>
+            <if test='btnInfo == "200" and finishFlag == null '>
+                <if test=' buttonState == 120 '>
+                    TACHE_DEFINE_ID in ('110','200',#{buttonState}) AND STATE = '10A'
+                </if>
+                <if test=' buttonState == null '>
+                    TACHE_DEFINE_ID in ('110','200') AND STATE = '10A'
+                </if>
+            </if>
+            <if test='btnInfo == "110" and finishFlag == null  and resChangeFlag == null'>
+                TACHE_DEFINE_ID = '110' AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "110" and finishFlag == null  and resChangeFlag != null'>
+                TACHE_DEFINE_ID in ('110', '109') AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "101" and finishFlag != null '>
+                TACHE_DEFINE_ID in ('110','101')  AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "103" and finishFlag != null and resChangeFlag == null' >
+                TACHE_DEFINE_ID in ('110','103')  AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "103" and finishFlag != null and resChangeFlag != null' >
+                TACHE_DEFINE_ID in ('110','103','109')  AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "103" and finishFlag == null'>
+                TACHE_DEFINE_ID = '110' AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "300" and finishFlag == null'>
+                TACHE_DEFINE_ID = '300' AND STATE = '10A'
+            </if>
+            <if test='btnInfo == "402" '>
+                TACHE_DEFINE_ID = '402' AND STATE = '10A'
+            </if>
+
+        </where>
+    </select>
+    <insert id="insertTrackLogInfo" parameterType="map">
+        INSERT INTO GOM_BDW_LOG_INFO (LOG_ID, ORDER_ID, WO_ORD_ID, TRACK_DATE, TRACK_ORG_ID, TRACK_ORG_NAME,
+                                      TRACK_STAFF_ID, TRACK_STAFF_NAME, TRACK_STAFF_PHONE, TRACK_STAFF_EMAIL, TRACK_MESSAGE, TRACK_CONTENT,
+                                      CREATE_DATE, OPER_TYPE) VALUES (SEQ_GOM_BDW_LOG_INFO.NEXTVAL,#{orderId,jdbcType=VARCHAR},#{woOrdId,jdbcType=VARCHAR},
+                                                                                                   #{trackDate},
+                                                                                                   #{trackOrgId,jdbcType=INTEGER}, #{trackOrgName,jdbcType=VARCHAR}, #{trackStaffId,jdbcType=INTEGER},
+                                                                                                   #{trackStaffName,jdbcType=VARCHAR}, #{trackStaffPhone,jdbcType=VARCHAR}, #{trackStaffEmail,jdbcType=VARCHAR},
+                                                                                                   #{trackMessage,jdbcType=VARCHAR}, #{trackContent,jdbcType=VARCHAR},
+                                                                      #{createDate}, #{operType,jdbcType=VARCHAR})
+    </insert>
+    <select id="getOperStaffInfo" resultType="map">
+        SELECT dp.parent_id PARENT_ORG_ID,dp.dept_id ORG_ID, dp.dept_name ORG_NAME,bs.staff_ID,bs.staff_name USER_REAL_NAME,
+               bs.email USER_EMAIL, bs.phone USER_PHONE ,dp.region_id AREA_ID,
+               INFO2.CODE_CONTENT REGIONID,INFO2.IS_SHOW,area.name areaName,
+               bs.staff_code user_name,  info.order_no
+        FROM bfm_staff bs
+            LEFT JOIN department dp ON dp.dept_id = bs.ext_num_01
+            LEFT JOIN gom_area_s area ON area.id = dp.region_id
+            LEFT JOIN gom_bdw_code_info info ON info.code_value = area.id AND info.code_type = 'if_designation_user_or_job'
+            left join gom_bdw_code_info info2 ON info2.code_value = area.id   AND info2.code_type = 'REGION_RELETED'
+        WHERE bs.staff_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getIsBraFiliAle" resultType="map">
+        SELECT o.PARENT_ORG_ID,u.ORG_ID,u.ORG_NAME,u.USER_ID,u.USER_REAL_NAME, u.USER_NAME,u.JOB_ID,u.JOB_NAME,
+            u.USER_EMAIL, u.USER_PHONE ,u.AREA_ID,s.name areaName, u.user_name,g.ISBRAFILIALE
+        FROM gom_user_s u
+            LEFT JOIN gom_org_s o ON o.org_id = u.ORG_ID
+            LEFT JOIN gom_area_s s ON s.id = u.area_id
+            JOIN GOM_CONTAB_AREA_CONFIG g ON g.ID = u.AREA_ID
+        WHERE u.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getParentDepInfo" resultType="map">
+        SELECT a.ORG_ID,a.ORG_NAME FROM gom_org_s a where a.PARENT_ORG_ID in ( SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+        START WITH  a.ORG_ID= (select ORG_ID from gom_user_s where user_id = #{0} )
+        CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+    </select>
+
+    <select id="qryOrderDetailInfoBywoOrderId" resultType="map">
+        SELECT o.order_id,o.ORDER_CODE,o.order_title,o.SYS_CODE,o.CREATE_DATE,o.ORDER_STATE,o.STATE_DATE,
+            o.REMARK,o.PID,o.PS_ID,ut.id
+        FROM GOM_ORDER o
+            LEFT JOIN GOM_WO w ON w.order_id = o.order_id
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE w.wo_id = #{woOrderId}
+    </select>
+    <update id="updateWoOrderStateById" parameterType="map">
+        UPDATE GOM_WO SET
+        <if test="dealDate != null and dealDate == '' ">
+            DEAL_DATE ='',
+        </if>
+        <if test="dealDate == null  ">
+            DEAL_DATE = to_date(to_char(sysdate,'yyyy-MM-dd HH:mi:ss'),'yyyy-MM-dd HH:mi:ss'),
+        </if>
+            DEAL_USER_ID = #{operStaffId,jdbcType=VARCHAR}
+        WHERE WO_ID = #{woOrderId,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateOrderStateById">
+        UPDATE GOM_ORDER SET ORDER_STATE =  #{orderState,jdbcType=VARCHAR}, STATE_DATE = #{stateDate}
+        WHERE ORDER_ID = #{orderId,jdbcType=INTEGER}
+    </update>
+    <select id="getParentOrder" resultType="map">
+        SELECT PARENT_ORDER_ID   AS PARENTORDERID,
+               PARENT_ORDER_CODE AS PARENTORDERCODE
+          FROM GOM_ORDER
+         WHERE ORDER_ID = #{orderId,jdbcType=VARCHAR}
+    </select>
+    <select id="getParentWoOrder" resultType="map">
+        SELECT WO.WO_ID        AS WOID,
+               ORD.ORDER_ID    AS ORDERID,
+               WS.ORD_PS_ID    AS PSID,
+               WS.TACHE_ID,
+               WO.COMP_USER_ID,
+               PS.LOGIN_NAME,
+               PS.PHONE_NO,
+               PS.USER_NAME,
+               PS.EMAIL
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+          LEFT JOIN VW_PUB_STAFF PS
+            ON PS.STAFF_ID = WO.COMP_USER_ID
+          WHERE WO.WO_STATE = #{woState}
+            AND ORD.ORDER_ID = #{orderId}
+            <if test="tacheCode != null">
+                AND UT.TACHE_CODE = #{tacheCode}
+            </if>
+    </select>
+    <update id="updateWoOrderState" parameterType="map">
+        UPDATE GOM_WO SET WO_STATE = #{woState,jdbcType=VARCHAR}, STATE_DATE = #{stateDate},
+            COMP_USER_ID = #{staffId,jdbcType=INTEGER}
+        WHERE WO_ID = #{woID,jdbcType=INTEGER}
+    </update>
+    <update id="updateSrvOrderStateById">
+        UPDATE gom_bdw_srv_ord_info SET SRV_ORD_STAT = #{srvOrderState,jdbcType=VARCHAR}
+        where ORDER_ID = #{orderId,jdbcType=INTEGER}
+    </update>
+    <select id="qryOrderData" resultType="map">
+        SELECT w.wo_id AS woId,o.ORDER_ID AS orderId ,o.order_code AS orderCode,
+               o.order_title AS orderTitle,o.parent_order_id AS parentOrderId,o.req_fin_date,
+               o.parent_order_code AS parentOrderCode,i.cst_ord_id AS cstOrdId,
+               ws.ord_ps_id AS psId,ut.id AS tacheId,ut.tache_name AS tacheName,i.SRV_ORD_ID,
+            i.service_id,info.code_content,info.code_info_id,i.RESOURCES,i.SYSTEM_RESOURCE
+        FROM GOM_ORDER o
+            LEFT JOIN gom_wo w ON w.order_id = o.order_id
+            LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW i ON i.order_id = o.order_id
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            LEFT JOIN gom_BDW_code_info info ON info.code_value = i.service_id AND code_type = 'product_code'
+        WHERE w.wo_id = #{0,jdbcType=VARCHAR}
+    </select>
+    <insert id="insertDispatchOrder" parameterType="map">
+        INSERT INTO GOM_BDW_DISPATCH_ORDER (DISPATCH_ORDER_ID, CST_ORD_ID, DISPATCH_ORDER_NO,
+                                            STAFF_NAME, STAFF_TEL, STAFF_ORG, ISSUER, SEND_DATE, DISPATCH_TYPE, DISPATCH_GRADE,
+                                            DISPATCH_URGENCY, DISPATCH_TITLE, DISPATCH_SEND_ORG, DISPATCH_COPY_ORG, DISPATCH_TEXT,
+                                            CHANGE_BEFORE_TEXT, CHANGE_AFTER_TEXT,REMARK,DISPATCH_SOURCE) VALUES
+            (#{dispatchOrderId,jdbcType=INTEGER},
+                #{cstOrdId,jdbcType=VARCHAR}, #{dispatchOrderNo,jdbcType=VARCHAR}, #{staffName,jdbcType=VARCHAR},
+                #{staffTel,jdbcType=VARCHAR},#{staffOrg,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR},
+                #{sendDate,jdbcType=VARCHAR},#{dispatchType,jdbcType=VARCHAR}, #{dispatchGrade,jdbcType=VARCHAR},
+                #{dispatchUrgency,jdbcType=VARCHAR}, #{dispatchTitle,jdbcType=VARCHAR},
+             #{dispatchSendOrg,jdbcType=VARCHAR}, #{dispatchCopyOrg,jdbcType=VARCHAR},
+             #{dispatchText,jdbcType=VARCHAR}, #{changeBeforeText,jdbcType=VARCHAR},
+             #{changeAfterText,jdbcType=VARCHAR},
+             #{remark,jdbcType=VARCHAR},
+             #{dispatchSource,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertMaster">
+        UPDATE GOM_BDW_SRV_ORD_INFO SET MAINORG_BDW = #{masterName} WHERE SRV_ORD_ID = #{srvOrdId}
+    </insert>
+    <update id="updateRelateInfoMaster">
+        update gom_bdw_sec_local_relate_info set MASTERAREA = #{keyNote} WHERE SRV_ORD_ID = #{srvOrdId} and ORDER_ID = #{orderId}
+    </update>
+
+    <select id="qryProvinceA" parameterType="map" resultType="map">
+        SELECT attr_value FROM  gom_bdw_srv_ord_attr_info where SRV_ORD_ID = #{srvOrdId} and ATTR_CODE in( 'CON0101','20000077')
+    </select>
+    <select id="qryProvinceZ" parameterType="map" resultType="map">
+        SELECT attr_value FROM  gom_bdw_srv_ord_attr_info where SRV_ORD_ID = #{srvOrdId} and ATTR_CODE in( 'CON0101','20000095')
+    </select>
+    <select id="qryProvinceValue" parameterType="map" resultType="map">
+        SELECT  id  from  GOM_AREA_S where name = #{province}
+    </select>
+
+    <select id="qryCstOrderData" resultType="map">
+        SELECT SOI.ACTIVE_TYPE,
+            SOI.QCWOORDERCODE,
+            SOI.MAINORG,
+            SOI.MAINORG_BDW,
+            SOI.MAINORG_EG,
+            O.ORDER_ID,
+            SOI.SRV_ORD_ID,
+            SOI.RESOURCES,
+            CO.HANDLE_DEP_ID,
+            CO.HANDLE_DEP,
+            AREA.PARENT_ID,
+            AREA.DEPT_NAME,
+            INFO.REMARK,
+            CO.APPLY_ORD_ID,
+            SOI.SERIAL_NUMBER,
+            INFO1.CODE_CONTENT ACTIVENAME,
+            SOI.SERVICE_ID,
+            SOI.ORDER_TYPE,
+            SOI.CHANGE_FLAG,
+            SOI.SYSTEM_RESOURCE
+        FROM GOM_ORDER O
+            LEFT JOIN GOM_BDW_SRV_ORD_INFO SOI
+                ON SOI.ORDER_ID = O.ORDER_ID
+            LEFT JOIN GOM_BDW_CST_ORD CO
+                ON CO.CST_ORD_ID = SOI.CST_ORD_ID
+            LEFT JOIN DEPARTMENT AREA
+                ON TO_CHAR(AREA.DEPT_ID) = CO.HANDLE_DEP_ID
+            LEFT JOIN GOM_BDW_CODE_INFO INFO
+                ON INFO.SORT_NO = AREA.PARENT_ID
+                   AND INFO.CODE_TYPE = 'PROVINCE'
+            LEFT JOIN GOM_BDW_CODE_INFO INFO1
+                ON INFO1.CODE_VALUE = SOI.ACTIVE_TYPE
+                   AND INFO1.CODE_TYPE = 'operate_type'
+        WHERE O.ORDER_ID = #{0,jdbcType=VARCHAR}
+    </select>
+    <select id="qryCstOrderDataFromSec" resultType="map">
+        SELECT SOI.ACTIVE_TYPE,
+        SOI.QCWOORDERCODE,
+        SOI.MAINORG,
+        SOI.MAINORG_BDW,
+        SOI.MAINORG_EG,
+        O.ORDER_ID,
+        SOI.SRV_ORD_ID,
+        SOI.RESOURCES,
+        CO.HANDLE_DEP_ID,
+        CO.HANDLE_DEP,
+        AREA.PARENT_ID,
+        AREA.DEPT_ID,
+        AREA.DEPT_NAME,
+        INFO.REMARK,
+        REL.IFMAINORG,
+        REL.RELATE_INFO_ID,
+        CO.APPLY_ORD_ID,
+        SOI.SERIAL_NUMBER,
+        INFO1.CODE_CONTENT ACTIVENAME,
+        SOI.SERVICE_ID,
+        SOI.ORDER_TYPE,
+        SOI.CHANGE_FLAG,
+        SOI.SYSTEM_RESOURCE,
+        REL.REGION_ID,
+        AREAS.ID            AREAID
+        FROM GOM_ORDER O
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SOI
+        ON SOI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_BDW_SEC_LOCAL_RELATE_INFO REL
+        ON REL.PARENT_ORDER_ID = SOI.ORDER_ID
+        LEFT JOIN GOM_BDW_CST_ORD CO
+        ON CO.CST_ORD_ID = SOI.CST_ORD_ID
+        LEFT JOIN DEPARTMENT AREA
+        ON TO_CHAR(AREA.DEPT_ID) = CO.HANDLE_DEP_ID
+        LEFT JOIN GOM_BDW_CODE_INFO INFO
+        ON INFO.SORT_NO = AREA.DEPT_ID
+        AND INFO.CODE_TYPE = 'PROVINCE'
+        LEFT JOIN GOM_BDW_CODE_INFO INFO1
+        ON INFO1.CODE_VALUE = SOI.ACTIVE_TYPE
+        AND INFO1.CODE_TYPE = 'operate_type'
+        LEFT JOIN GOM_AREA_S AREAS
+        ON AREAS.ALIAS = TO_CHAR(REL.REGION_ID)
+        WHERE REL.ORDER_ID = #{0,jdbcType=VARCHAR}
+    </select>
+
+    <!--<select id="qryOrderMainEgRegion" resultType="String">
+        select o.REGION_ID from gom_ord_key_info o where o.ORDER_ID = #{orderId} and o.REGION_ID = #{regionId}
+    </select>-->
+
+    <!--<select id="getDeptInfo" resultType="map">
+        SELECT ORG_ID,ORG_NAME,PARENT_ORG_ID FROM GOM_ORG_S WHERE ORG_ID= #{0}
+    </select>-->
+    <select id="getDeptInfoList" resultType="map">
+        SELECT ORG_ID,ORG_NAME,PARENT_ORG_ID FROM GOM_ORG_S WHERE ORG_ID= #{0} OR PARENT_ORG_ID=#{0}
+    </select>
+    <select id="qryjobId" resultType="map">
+        SELECT JOB_ID FROM UOS_JOB WHERE POST_ID=#{0}  AND LDAP_ID =#{1}
+    </select>
+    <select id="getStaffInfoList" resultType="map">
+        <!--SELECT USER_ID,USER_REAL_NAME,ORG_ID FROM GOM_USER_S WHERE ORG_ID=#{0}-->
+        SELECT USER_ID AS "id",USER_REAL_NAME AS "name",ORG_ID AS "pId",'260000003' AS "objType"
+        FROM GOM_USER_S WHERE ORG_ID=#{deptId} AND USER_ID != #{staffId}
+    </select>
+
+
+    <select id="getStaffInfoDeptListUnit" resultType="map">
+        SELECT s.ORG_ID AS "id",s.ORG_NAME AS "name",s.PARENT_ORG_ID AS "pId",
+        CASE WHEN s.PARENT_ORG_ID = 1 THEN 'true' ELSE 'false' END AS "open",
+        '260000001' AS "objType",'true' AS "isParent"
+        FROM gom_org_s s
+        where parent_org_id=#{deptId}
+        union all
+        SELECT USER_ID AS "id",USER_REAL_NAME AS "name",ORG_ID AS "pId",'' AS "open",
+        '260000003' AS "objType",'' AS "isParent"
+        FROM GOM_USER_S
+        WHERE ORG_ID=#{deptId} AND USER_ID != #{staffId}
+    </select>
+
+    <select id="getStaffInfoListT" resultType="map">
+        <!--SELECT USER_ID,USER_REAL_NAME,ORG_ID FROM GOM_USER_S WHERE ORG_ID=#{0}-->
+        SELECT USER_ID AS "id",USER_REAL_NAME AS "name",ORG_ID AS "pId",'260000003' AS "objType"
+        FROM GOM_USER_S
+        WHERE ORG_ID=#{deptId}
+        AND USER_ID != #{staffId}
+        <if test="searchValue != null and searchValue != '' ">
+            AND USER_REAL_NAME like '%'||#{searchValue}||'%'
+        </if>
+    </select>
+    <select id="getChildDepartInfoList" resultType="map">
+        SELECT s.ORG_ID AS "id",s.ORG_NAME AS "name",s.PARENT_ORG_ID AS "pId",
+        CASE WHEN s.PARENT_ORG_ID = 1 THEN 'true' ELSE 'false' END AS "open",
+        '260000001' AS "objType",'true' AS "isParent" FROM gom_org_s s where parent_org_id=#{deptId}
+    </select>
+
+    <select id="getChildDepartInfoListT" resultType="map">
+        SELECT s.ORG_ID AS "id",s.ORG_NAME AS "name",s.PARENT_ORG_ID AS "pId",
+        CASE WHEN s.PARENT_ORG_ID = 1 THEN 'true' ELSE 'false' END AS "open",
+        '260000001' AS "objType",'true' AS "isParent" FROM gom_org_s s
+        where s.parent_org_id=#{deptId}
+        <if test="searchValue != null and searchValue != '' ">
+            and s.ORG_NAME like '%'||#{searchValue}||'%'
+        </if>
+    </select>
+
+    <update id="updateWoStateByWoId" parameterType="string">
+        update gom_wo set wo_state = #{woState}, STATE_DATE = sysdate where wo_id = #{woId}
+    </update>
+    <update id="updateWoStateAndDateByWoId" parameterType="map">
+        update gom_wo set wo_state = #{woState}, STATE_DATE = sysdate
+         <if test="createDate != null and createDate != ''">
+             , CREATE_DATE = sysdate
+         </if>
+         where wo_id = #{woId}
+
+    </update>
+    <update id="updateWoStateAndUserByWoId" parameterType="string">
+        update gom_wo set wo_state = #{woState},deal_user_id = #{userId}, STATE_DATE = sysdate  where wo_id = #{woId}
+    </update>
+
+    <update id="updateWoDataByWoId" parameterType="string">
+        update gom_wo set wo_state = #{woState}, STATE_DATE = sysdate,
+        comp_user_id = (SELECT comp_user_id FROM ( SELECT  rownum as rn,t.* from (
+        SELECT w.CREATE_DATE,w.wo_id AS woId,o.ORDER_ID AS orderId,
+        w.comp_user_id,w.deal_user_id
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW i ON i.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE  w.order_id = #{orderId} AND ut.id = '500001153' ORDER BY w.CREATE_DATE DESC ) t ) WHERE rn = 2),
+        deal_user_id = (SELECT deal_user_id FROM ( SELECT  rownum as rn,t.* from ( SELECT w.CREATE_DATE,w.wo_id AS woId,o.ORDER_ID AS orderId,
+        w.comp_user_id,w.deal_user_id
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW i ON i.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE  w.order_id = #{orderId} AND ut.id = '500001153' ORDER BY w.CREATE_DATE DESC ) t ) WHERE rn = 2)
+        where wo_id = #{woId}
+    </update>
+
+    <update id="updateDealUserByWoId" parameterType="string">
+        update gom_wo set DEAL_USER_ID = '' where wo_id = #{wo_id}
+    </update>
+    <select id="qryInterLog" resultType="map">
+        SELECT ATTR_CODE FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_ACTION=#{interName} AND SRV_ORD_ID=#{srvOrdId} ORDER BY ATTR_INFO_ID DESC
+    </select>
+    <select id="qryInterResult" resultType="int">
+        SELECT count(ATTR_CODE) FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_ACTION=#{interName} AND SRV_ORD_ID=#{srvOrdId} and ATTR_CODE='1'
+    </select>
+    <select id="qryInterResultBak" resultType="int">
+        SELECT count(ATTR_CODE) FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_ACTION=#{interName} AND SRV_ORD_ID=#{srvOrdId} and ATTR_CODE='1' and ATTR_VALUE = #{flowId}
+    </select>
+    <update id="updateRemarkByLogId" parameterType="string">
+        update GOM_BDW_INTERF_LOG_INFO set remark = '1' where id = #{0}
+    </update>
+    <select id="getCurrentUserBranch" parameterType="string" resultType="map">
+        select gus.area_id from gom_user_s gus where gus.USER_ID = #{operStaffId}
+    </select>
+    <select id="qryCodeInfoBycodeType" resultType="map">
+        SELECT CODE_VALUE FROM gom_BDW_code_info  WHERE CODE_TYPE=#{codeType}
+    </select>
+    <select id="qrysrvOrdIdByorderId" resultType="map">
+        SELECT CASE
+        WHEN EXISTS (
+        SELECT * FROM gom_bdw_sec_local_relate_info WHERE ORDER_ID = #{orderId}
+        ) THEN
+        ( SELECT SRV_ORD_ID FROM gom_bdw_sec_local_relate_info WHERE ORDER_ID = #{orderId} )
+        ELSE
+        ( SELECT SRV_ORD_ID FROM GOM_BDW_SRV_ORD_INFO WHERE ORDER_ID = #{orderId} )
+        END SRV_ORD_ID
+        FROM dual
+    </select>
+
+    <select id="qrysrvOrdIdSecondByorderId" resultType="map">
+        SELECT SRV_ORD_ID,ACTIVE_TYPE FROM GOM_BDW_SRV_ORD_INFO WHERE ORDER_ID=#{orderId}
+    </select>
+
+    <select id="qrySearchContactsSel" resultType="map">
+        select *
+        FROM
+        (SELECT
+        u.USER_ID        AS "id",
+        u.USER_REAL_NAME||'_'||u.USER_NAME AS "name",
+        u.ORG_ID         AS "pId",
+        'false'          AS "open",
+        '260000003'      AS "objType",
+        ''               AS "isParent",
+        ''               AS "nocheck",
+        u.ORG_ID         AS "oid",
+        u.ORG_NAME       AS "oname",
+        ''               AS "opId",
+        'true'           AS "oopen",
+        '260000001'      AS "oobjType",
+        'false'          AS "oisParent",
+        'true'           AS "onocheck"
+        FROM GOM_USER_S u
+        where u.AREA_ID = #{currentAreaId}
+        and not exists (select t.USER_ID from GOM_FRE_CONTACTS_CONFIG t
+        where t.PARENT_USER_ID = #{currentUserId}
+        and t.system_resource = 'flow-schedule-lt'
+        and t.USER_ID = u.USER_ID)
+        ) u
+    </select>
+
+    <select id="qrySearchPartInfoByVal" resultType="map">
+        select * from
+        (SELECT s.ORG_ID  AS "id",
+        s.ORG_NAME       AS "name",
+        s.PARENT_ORG_ID  AS "pId",
+        'true'           AS "open",
+        '260000001'      AS "objType",
+        'false'          AS "isParent",
+        u.USER_ID        AS "perid",
+        u.USER_REAL_NAME AS "pername",
+        u.ORG_ID         AS "perpId",
+        ''               AS "peropen",
+        '260000003'      AS "perobjType",
+        ''               AS "perisParent",
+        p.ORG_ID         AS "ppid",
+        p.ORG_NAME       AS "ppname",
+        p.PARENT_ORG_ID  AS "pppId",
+        'true'           AS "ppopen",
+        '260000001'      AS "ppobjType",
+        'false'          AS "ppisParent"
+        FROM gom_org_s s
+        join GOM_USER_S u on s.ORG_ID = u.ORG_ID and u.AREA_ID = s.AREA_ID and s.AREA_ID = #{currentAreaId}
+        left join gom_org_s p on s.PARENT_ORG_ID = p.ORG_ID) s
+        <if test="searchVal != null and searchVal != '' ">
+            where s."name" like '%'||#{searchVal}||'%'
+        </if>
+        <!-- order by s.ORG_ID -->
+
+    </select>
+
+    <select id="qrySearchPerInfoByVal" resultType="map">
+        select * from
+        (SELECT
+        u.USER_ID        AS "id",
+        u.USER_REAL_NAME||'_'||u.USER_NAME AS "name",
+        u.ORG_ID         AS "pId",
+        'false'          AS "open",
+        '260000003'      AS "objType",
+        ''               AS "isParent",
+        u.ORG_ID         AS "oid",
+        u.ORG_NAME       AS "oname",
+        ''               AS "opId",
+        'true'           AS "oopen",
+        '260000001'      AS "oobjType",
+        'false'          AS "oisParent"
+        FROM GOM_USER_S u
+        where u.AREA_ID = #{currentAreaId}) u
+        <if test="searchVal != null and searchVal != '' ">
+            where u."name" like '%'||#{searchVal}||'%'
+        </if>
+
+    </select>
+
+    <select id="qrySearchPostInfoByVal" resultType="map">
+        select t.*
+        from
+        (select
+        t.id             AS "id",
+        t.NAME           AS "name",
+        ''               AS "pId",
+        'true'           AS "open",
+        '260000002'      AS "objType",
+        'false'          AS "isParent",
+        u.USER_ID         AS "perid",
+        u.USER_REAL_NAME||'_'||u.USER_NAME AS "pername",
+        t.id              AS "perpId",
+        'false'          AS "peropen",
+        '260000003'      AS "perobjType",
+        ''           AS "perisParent"
+        from gom_staff_group_s t
+        join (select r.STAFF_ID, r.STAFF_GROUP_ID from GOM_STAFF_GROUP_RELA_S r group by r.STAFF_ID, r.STAFF_GROUP_ID) r on t.ID = r.STAFF_GROUP_ID and t.AREA_ID = #{currentAreaId}
+        join GOM_USER_S u on r.STAFF_ID = u.USER_ID and t.AREA_ID = u.AREA_ID) t
+        <if test="searchVal != null and searchVal != '' ">
+            where t."name" like '%'||#{searchVal}||'%'
+        </if>
+
+    </select>
+
+    <select id="qrySearchDepPullDown" resultType="map">
+        select *
+        from (
+        select ROW_NUMBER() OVER (ORDER BY s.ID) AS rowindex,s.*
+        from
+        (SELECT s.ORG_ID AS ID,
+        s.ORG_NAME AS NAME,
+        s.PARENT_ORG_ID AS PARENTORGID,
+        s.PARENT_ORG_NAME AS PARENTORGNAME,
+        '260000001' AS OBJTYPE
+        from GOM_USER_ORG_VIEW s
+        where s.AREA_ID = #{currentAreaId}
+        <if test="searchOrgPerName != null and searchOrgPerName != '' ">
+            and s.ORG_NAME like '%'||#{searchOrgPerName}||'%'
+        </if>
+        group by s.ORG_ID,s.ORG_NAME,s.PARENT_ORG_ID,s.PARENT_ORG_NAME
+        ) s) z
+        <![CDATA[
+	        where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	     ]]>
+    </select>
+
+    <select id="qrySearchDepPullDownSub" resultType="map">
+        select u.USER_REAL_NAME||'_'||u.LOGIN_NAME AS NAME,
+        u.USER_ID AS ID,
+        u.USER_REAL_NAME,u.ORG_ID,u.ORG_NAME
+        FROM GOM_USER_ORG_VIEW u
+        where u.AREA_ID = #{currentAreaId}
+        and  u.ORG_ID = #{deptId}
+    </select>
+
+    <select id="qrySearchPostPullDown" resultType="map">
+        select *
+        from (
+        select ROW_NUMBER() OVER (ORDER BY t.ID) AS rowindex, t.*
+        from (
+        select t.id     AS ID,
+        t.NAME      AS NAME,
+        '260000002' AS OBJTYPE
+        from gom_staff_group_s t
+        join (select r.STAFF_GROUP_ID from GOM_STAFF_GROUP_RELA_S r group by r.STAFF_GROUP_ID) r
+        on t.ID = r.STAFF_GROUP_ID and t.AREA_ID IN (SELECT R.DEPT_ID FROM DEPARTMENT R WHERE R.PARENT_ID = #{currentOrgId})
+        <if test="searchOrgPerName != null and searchOrgPerName != '' ">
+            where t.NAME like '%'||#{searchOrgPerName}||'%'
+        </if>
+        ) t) z
+        <![CDATA[
+          where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+        ]]>
+    </select>
+
+    <select id="qrySearchPostPullDownSub" resultType="map">
+        select u.USER_ID as ID,
+        u.USER_REAL_NAME||'_'||u.LOGIN_NAME AS NAME,
+        u.USER_REAL_NAME,u.ORG_ID,u.ORG_NAME
+        from
+        (select r.STAFF_ID,
+        r.STAFF_GROUP_ID
+        from GOM_STAFF_GROUP_RELA_S r
+        where r.STAFF_GROUP_ID = #{postId}
+        group by r.STAFF_ID, r.STAFF_GROUP_ID) r
+        join GOM_USER_ORG_VIEW u on r.STAFF_ID = u.USER_ID and u.AREA_ID = #{currentAreaId}
+    </select>
+
+    <select id="qrySearchPerPullDown" resultType="map">
+        select *
+        from (
+        select ROW_NUMBER() OVER (ORDER BY u.id) AS rowindex,u.*
+        from
+        (SELECT
+        u.USER_ID        AS ID,
+        u.phone          AS PHONE,
+        u.USER_REAL_NAME||'_'||u.LOGIN_NAME AS NAME,
+        u.ORG_ID         AS ORG_ID,
+        u.ORG_NAME       AS ORG_NAME,
+        '260000003' AS OBJTYPE,
+        u.USER_REAL_NAME AS USER_REAL_NAME
+        from GOM_USER_ORG_VIEW u
+        where u.AREA_ID = #{currentAreaId}
+        <if test="searchOrgPerName != null and searchOrgPerName != '' ">
+            and (u.USER_REAL_NAME like '%'||#{searchOrgPerName}||'%' or u.ORG_NAME like '%'||#{searchOrgPerName}||'%')
+        </if>
+        ) u) z
+        <![CDATA[
+          where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+        ]]>
+    </select>
+
+    <select id="qrySearchPerSingleDown" resultType="map">
+        select *
+        from (
+        select ROW_NUMBER() OVER (ORDER BY u.id) AS rowindex,u.*
+        from
+        (SELECT
+        u.USER_ID        AS ID,
+        u.USER_REAL_NAME||'_'||u.LOGIN_NAME AS NAME,
+        u.ORG_ID         AS ORG_ID,
+        u.ORG_NAME       AS ORG_NAME,
+        '260000001' AS OBJTYPE,
+        u.USER_REAL_NAME AS USER_REAL_NAME
+        from GOM_USER_ORG_VIEW u
+        where u.AREA_ID = #{currentAreaId}
+        and not exists (select t.USER_ID from GOM_FRE_CONTACTS_CONFIG t
+        where t.USER_ID = u.USER_ID
+        and t.PARENT_USER_ID = #{currentUserId}
+        and t.system_resource = 'flow-schedule-lt')
+        <if test="searchOrgPerName != null and searchOrgPerName != '' ">
+            and (u.USER_REAL_NAME like '%'||#{searchOrgPerName}||'%' or u.ORG_NAME like '%'||#{searchOrgPerName}||'%')
+        </if>
+        ) u) z
+        <![CDATA[
+          where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+        ]]>
+    </select>
+
+    <!-- 查询常用联系人-->
+    <select id="qrySearchContacts" resultType="map">
+        select f.*
+        from
+        (select f.USER_ID         AS id,
+        u.USER_REAL_NAME||'_'||u.LOGIN_NAME AS USER_REAL_NAME,
+        f.PARENT_USER_ID  AS pId,
+        '260000003'       AS objType,
+        u.ORG_NAME        AS ORG_NAME,
+        f.system_resource AS system_resource
+        from GOM_FRE_CONTACTS_CONFIG f
+        join GOM_USER_ORG_VIEW u on f.USER_ID = u.USER_ID) f
+        where 1=1
+        and f.system_resource = 'flow-schedule-lt'
+        <if test="currentUserId != null and currentUserId != '' ">
+            and f.pId = #{currentUserId}
+        </if>
+        <if test="searchContactsName != null and searchContactsName != '' ">
+            and f.name like '%'||#{searchContactsName}||'%'
+        </if>
+
+    </select>
+
+    <!-- 查询常用联系人总数 -->
+    <select id="qrySearchContactsCount" resultType="int">
+        select count(1)
+        From (
+        select f.* from
+        (select f.USER_ID         AS id,
+        u.USER_REAL_NAME||'_'||u.USER_NAME AS name,
+        f.PARENT_USER_ID  AS pId,
+        '260000003'       AS objType,
+        u.ORG_NAME        AS deptName,
+        f.system_resource AS system_resource
+        from GOM_FRE_CONTACTS_CONFIG f
+        join GOM_USER_S u on f.USER_ID = u.USER_ID) f
+        where 1=1
+        and f.system_resource = 'flow-schedule-lt'
+        <if test="currentUserId != null and currentUserId != '' ">
+            and f.pid = #{currentUserId}
+        </if>
+        <if test="searchContactsName != null and searchContactsName != '' ">
+            and f.name like '%'||#{searchContactsName}||'%'
+        </if>
+        ) q
+    </select>
+
+    <insert id="addSearchContacts" parameterType="java.util.List">
+        insert into GOM_FRE_CONTACTS_CONFIG(
+        USER_ID,
+        PARENT_USER_ID,
+        system_resource)
+        <foreach collection="contactData" item="item" index="index" separator="union all" >
+            SELECT #{item.user_id},#{item.parent_user_id},#{item.system_resource}
+            FROM  dual
+        </foreach>
+
+    </insert>
+
+    <delete id="deleteSearchContacts">
+        delete from GOM_FRE_CONTACTS_CONFIG f
+        where f.USER_ID = #{user_id}
+        and f.PARENT_USER_ID = #{parent_user_id}
+        and f.system_resource = 'flow-schedule-lt'
+    </delete>
+
+    <select id="getDeptInfoListRelUnit" resultType="map">
+        SELECT s.ORG_ID                                                   AS "id",
+        s.ORG_NAME                                                 AS "name",
+        s.PARENT_ORG_ID                                            AS "pId",
+        CASE WHEN s.PARENT_ORG_ID = 1 THEN 'true' ELSE 'false' END AS "open",
+        '260000001'                                                AS "objType"
+        FROM GOM_ORG_S s
+        join
+        (SELECT ORG_ID, ORG_NAME, PARENT_ORG_ID, AREA_ID
+        FROM GOM_ORG_S a
+        where a.PARENT_ORG_ID = 1
+        START WITH a.ORG_ID = #{currentOrgId}
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID) p
+        on s.ORG_ID = p.ORG_ID or s.PARENT_ORG_ID = p.ORG_ID
+        order by s.ORG_ID
+    </select>
+
+    <select id="getDeptInfoListRel" resultType="map">
+        SELECT s.DEPT_ID AS "id",s.DEPT_NAME AS "name",s.PARENT_ID AS "pId",
+        CASE WHEN s.PARENT_ID = 1 THEN 'true'
+        <if test="isBraFiliale = '1' ">
+            WHEN s.DEPT_ID = #{parentId} THEN 'true'
+        </if>
+        ELSE 'false' END AS "open",'260000001' AS "objType"
+        FROM department s
+        WHERE (s.DEPT_ID= #{parentId} OR s.PARENT_ID=#{parentId}) and s.delete_state = '0'
+        <if test="fuzzyRegionName != null and fuzzyRegionName != '' ">
+            and (s.DEPT_NAME like '%'||#{fuzzyRegionName} or s.DEPT_NAME like '%分公司网络建%' or s.DEPT_NAME
+            like '%分公司本部%' or s.DEPT_NAME = '本部' or s.DEPT_NAME like '%濮院经营部' or s.DEPT_NAME like '%分公司网络部'
+            or s.DEPT_NAME like '%分公司网络运营部' or s.DEPT_NAME = '太原市分公司设备维护中心' or s.DEPT_NAME = '太原市分公司网络优化中心' or s.DEPT_NAME = '太原市分公司客户响应中心')
+        </if>
+        <!--SELECT s.ORG_ID,s.ORG_NAME,s.PARENT_ORG_ID FROM GOM_ORG_S s WHERE (s.ORG_ID= #{parentId} OR s.PARENT_ORG_ID=#{parentId})-->
+
+        <!--        <if test=" professionId != null and professionId != '' and parentOrderId != null and parentOrderId != ''">
+                and (
+                  not exists (
+                    select org_id from GOM_PRO_DEP_ORD_REL rel
+                    where rel.org_id = s.ORG_ID
+                      and rel.profession_Id = #{professionId}
+                      and rel.parent_orderId = #{parentOrderId}
+                      and rel.order_state = '200000002')
+                  and
+                  not exists (
+                    select org_id from GOM_PRO_DEP_ORD_REL rel
+                    where rel.org_id = s.PARENT_ORG_ID
+                      and rel.profession_Id = #{professionId}
+                      and rel.parent_orderId = #{parentOrderId}
+                      and rel.order_state = '200000002')
+                    )
+                </if>-->
+    </select>
+    <select id="qryParentOrdIdByorderId" resultType="map">
+        SELECT PARENT_ORDER_ID FROM GOM_ORDER WHERE ORDER_ID=#{orderId}
+    </select>
+
+    <update id="updateScheduNum" parameterType="string">
+        update gom_bdw_schedu_num
+        set schedu_num = #{schedu_num}, update_date = sysdate
+        where action_scope = '2'
+        and org_id = #{deptId}
+    </update>
+
+    <select id="querySpecialtyConfig" parameterType="string" resultType="map">
+        SELECT R.SPECIALTY_NAME, R.SPECIALTY
+          FROM GOM_BDW_SPECIALTY_CONFIG R
+         WHERE R.AREA_ID = #{areaId}
+           AND R.PRODUCT_TYPE = #{serviceId}
+           AND r.ps_id IS NULL
+           <if test="psId != null">
+               UNION ALL
+               SELECT R.SPECIALTY_NAME, R.SPECIALTY
+               FROM GOM_BDW_SPECIALTY_CONFIG R
+               WHERE R.AREA_ID = #{areaId}
+               AND R.PRODUCT_TYPE = #{serviceId}
+               AND R.PS_ID = #{psId}
+           </if>
+    </select>
+
+    <!-- <select id="getProviceOrg" resultType="map">
+        SELECT ORG_ID,ORG_NAME,PARENT_ORG_ID ,AREA_ID FROM GOM_ORG_S a where a.PARENT_ORG_ID =1
+        START WITH  a.ORG_ID=#{0}  CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+    </select>-->
+    <!--优化 by ren.jh at2019-08-15 for 提速-->
+    <select id="getProviceOrg" resultType="map">
+        SELECT
+        DEPT_ID  ORG_ID,
+        DEPT_NAME  ORG_NAME,
+        PARENT_ID  PARENT_ORG_ID ,
+        REGION_ID  AREA_ID
+        FROM  department a
+        WHERE a.PARENT_ID =1 START WITH a.DEPT_ID=#{0} CONNECT BY prior a.PARENT_ID=a.DEPT_ID
+    </select>
+
+    <select id="getProviceOrgByParentId" resultType="map">
+        SELECT ORG_ID, ORG_NAME, PARENT_ORG_ID, AREA_ID
+        FROM GOM_ORG_S a
+        where a.PARENT_ORG_ID = 1
+        START WITH a.ORG_ID = (select u.ORG_ID from gom_user_s u WHERE u.user_id = #{userId,jdbcType=INTEGER})
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID;
+    </select>
+
+    <select id="queryDispatchInfoByCstOrdId" resultType="map" parameterType="map">
+        select a.DISPATCH_ORDER_ID,
+        a.DISPATCH_ORDER_NO,
+        a.DISPATCH_TITLE,
+        a.DISPATCH_TEXT
+        from gom_bdw_dispatch_order a
+        where a.cst_ord_id = #{cstOrdId}
+        order by a.DISPATCH_ORDER_ID desc
+    </select>
+    <update id="updateDispatchOrderState" parameterType="String">
+        update gom_bdw_dispatch_order set state = '10E' where dispatch_order_id = #{dispatchOrderId}
+    </update>
+
+    <select id="qryAZAreaInfo" resultType="map" parameterType="String">
+        SELECT WM_CONCAT(ATTR_VALUE) AS AZINFO from gom_bdw_srv_ord_attr_info WHERE SRV_ORD_ID = #{srvOrdId}
+        AND ATTR_CODE IN ('20000234','20000235')
+    </select>
+    <select id="qryZAreaInfo" resultType="map" parameterType="String">
+        SELECT WM_CONCAT(ATTR_VALUE) AS AZINFO from gom_bdw_srv_ord_attr_info WHERE SRV_ORD_ID = #{srvOrdId}
+        AND ATTR_CODE IN ('20000235')
+    </select>
+
+    <select id="qryCircuitAreaInfo" resultType="map" parameterType="String">
+        SELECT soi.CST_ORD_ID,soi.srv_ord_id,soi.order_id,soi.SYSTEM_RESOURCE AS RESOURCES,
+        a.*,s1.parent_id,s2.dept_name AS AREGIONNAME,s3.dept_name AS ZREGIONNAME,
+        co.HANDLE_CITY, co.HANDLE_DEP_ID AS areaId,co.HANDLE_DEP AS areaName FROM
+        gom_bdw_cst_ord co
+        LEFT JOIN gOm_bdw_srv_Ord_infO soi ON soi.CST_ORD_ID = co.CST_ORD_ID
+        LEFT JOIN (select soi.srv_ord_id srvOrdIdInfo,attr.attr_code,attr.attr_value
+        from  gOm_bdw_srv_Ord_infO soi
+        LEFT JOIN gom_bdw_srv_ord_attr_info attr on attr.srv_ord_id = soi.srv_ord_id
+        WHERE soi.SRV_ORD_ID = #{srvOrdId} AND attr_code IN ('20000234','20000235') ) t
+        pivot(MAX(t.attr_value) FOR attr_code IN ('20000234' AregionId,'20000235' ZregionId)) a
+        ON a.srvOrdIdInfo = soi.SRV_ORD_ID
+        LEFT JOIN department s1 ON to_char(s1.dept_id) = co.HANDLE_DEP_ID
+        LEFT JOIN department s2 ON to_char(s2.dept_id) = a.AregionId
+        LEFT JOIN department s3 ON to_char(s3.dept_id) = a.ZregionId
+        WHERE soi.SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <select id="qrySecondDataMakeList" resultType="map">
+        SELECT KI.SPECIALTY_CODE, PDS.PUB_DATE_NAME, O.ORDER_ID, W.WO_ID
+        FROM GOM_BDW_SRV_ORD_INFO SRV
+        LEFT JOIN GOM_ORDER O
+        ON O.PARENT_ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_WO W
+        ON W.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS
+        ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE
+        AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE SRV.SRV_ORD_ID = #{srvOrdId}
+        AND O.PARENT_ORDER_CODE = 'NETMANAGE'
+        AND W.WO_STATE = '290000002'
+        <if test="spacialtyCode != null">
+            AND KI.SPECIALTY_CODE = #{spacialtyCode}
+        </if>
+    </select>
+
+    <select id="qrySecondResMakeList" resultType="map">
+        SELECT KI.SPECIALTY_CODE, PDS.PUB_DATE_NAME, O.ORDER_ID, W.WO_ID
+        FROM GOM_BDW_SRV_ORD_INFO SRV
+        LEFT JOIN GOM_ORDER O
+        ON O.PARENT_ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_WO W
+        ON W.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS
+        ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE
+        AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE SRV.SRV_ORD_ID = #{srvOrdId}
+        AND O.PARENT_ORDER_CODE = 'RESCONSTRUCTION'
+        AND W.WO_STATE = '290000002'
+        <if test="spacialtyCode != null">
+            AND KI.SPECIALTY_CODE = #{spacialtyCode}
+        </if>
+    </select>
+
+    <select id="qrySecondDataMakeRollBackList" resultType="map">
+        select UT.ID,
+        UT.TACHE_NAME,
+        o.ORDER_ID,
+        pds.PUB_DATE_NAME,
+        o.PARENT_ORDER_ID,
+        KI.SPECIALTY_CODE,
+        O.PS_ID,
+        WO.WO_STATE,
+        WO.WO_ID,
+        WO.DEAL_USER_ID,
+        WO.COMP_USER_ID,
+        f.SRV_ORD_ID
+        from gOm_bdw_srv_Ord_infO f
+        join GOM_ORDER O on f.ORDER_ID = o.ORDER_ID
+        LEFT join gom_ord_key_info KI on KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        where f.SRV_ORD_ID = #{srvOrdId}
+        and WS.TACHE_ID = #{tacheId}
+        and WO.WO_STATE = #{woState}
+    </select>
+
+    <select id="qrySubLocalTestDataList" resultType="map">
+        SELECT KI.REGION_ID, DEPT.DEPT_NAME, O.ORDER_ID, W.WO_ID
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO INFO
+        LEFT JOIN GOM_ORDER O
+        ON O.ORDER_ID = INFO.ORDER_ID
+        LEFT JOIN GOM_WO W
+        ON W.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN DEPARTMENT DEPT
+        ON DEPT.DEPT_ID = KI.REGION_ID
+        WHERE INFO.SRV_ORD_ID = #{srvOrdId}
+        AND W.WO_STATE IN ('290000002', '290000113', '290000111')
+        <if test="regionId != null">
+            AND ki.region_id = #{regionId}
+        </if>
+    </select>
+
+    <select id="qryGomOrderAttrByOrderIds" resultType="int">
+        SELECT count(DISTINCT ATTR_VAL) NUM  FROM  GOM_ORDER_ATTR WHERE ATTR_ID=#{attrId}
+        AND ATTR_VAL IN
+        <foreach collection="resConfig" index="index" item="items" open="(" separator="," close=")">
+            #{items}
+        </foreach>
+        and ORDER_ID in
+        <foreach collection="orderIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <update id="updateSrvOrdState" parameterType="string">
+        update GOM_BDW_SRV_ORD_INFO set SRV_ORD_STAT = #{orderState} where srv_ord_id = #{srvOrdId}
+    </update>
+
+    <insert id="saveSpecialtyConfigInfo" parameterType="map">
+        insert into gom_bdw_ord_SPECIALTY
+        (ID,
+        CST_ORD_ID,
+        SRV_ORD_ID,
+        KEYNOTE,
+        CREATE_DATE,
+        UPDATE_DATE,
+        SPECIALTY_INFO,
+        SPECIALTY_INFO_NAME,
+        ORDER_ID,
+        FLOW_SPECIALTY_DATA,
+        NEW_CREATE_RESOURCE,
+        IF_CONSTRUCT
+        )
+        VALUES
+        (SEQ_GOM_BDW_ORD_SPECIALTY.NEXTVAL,
+        #{cstOrdId},
+        #{srvOrdId},
+        #{keyNote},
+        sysdate,
+        sysdate,
+        #{configInfo},
+        #{configInfoName},
+        #{orderId},
+        #{flowSpecialData},
+        #{newCreateResource},
+        #{constructFlag})
+    </insert>
+
+    <!--<select id="queryConfigInfoBySrvOrdId" parameterType="string" resultType="map">
+       select spe.*,org.org_name from gom_bdw_ord_SPECIALTY spe
+       left join  GOM_ORG_S org on spe.KEYNOTE = org.org_id
+       where
+          spe.srv_ord_id = #{srvOrdId}
+      and
+        spe.cst_ord_id = #{cstOrdId}
+      and
+        spe.order_id = #{orderId}
+    </select>-->
+
+    <select id="queryConfigInfoBySrvOrdIdRes" parameterType="map" resultType="map">
+        select spe.*,org.org_name from gom_bdw_ord_SPECIALTY spe
+        left join  GOM_ORG_S org on spe.KEYNOTE = TO_CHAR(org.org_id)
+        where
+        spe.srv_ord_id = #{srvOrdId}
+        and
+        spe.cst_ord_id = #{cstOrdId}
+        and
+        spe.order_id = #{orderId}
+        and
+        spe.NEW_CREATE_RESOURCE = #{newCreateResource}
+    </select>
+
+
+    <!-- <update id="updateConfigInfoBySrvOrdId" parameterType="map">
+         update GOM_BDW_ORD_SPECIALTY
+            set update_date    = sysdate,
+                keynote        = #{keyNote},
+                SPECIALTY_INFO = #{configInfo},
+                SPECIALTY_INFO_NAME = #{configInfoName},
+                FLOW_SPECIALTY_DATA = #{flowSpecialData},
+                NEW_CREATE_RESOURCE = #{newCreateResource}
+          where CST_ORD_ID = #{cstOrdId}
+            and SRV_ORD_ID = #{srvOrdId}
+            and order_id = #{orderId}
+     </update>-->
+
+    <update id="updateConfigInfoBySrvOrdIdRes" parameterType="map">
+        update GOM_BDW_ORD_SPECIALTY
+        set update_date    = sysdate,
+        keynote        = #{keyNote},
+        SPECIALTY_INFO = #{configInfo},
+        SPECIALTY_INFO_NAME = #{configInfoName},
+        FLOW_SPECIALTY_DATA = #{flowSpecialData},
+        NEW_CREATE_RESOURCE = #{newCreateResource},
+        IF_CONSTRUCT = #{constructFlag}
+        where CST_ORD_ID = #{cstOrdId}
+        and SRV_ORD_ID = #{srvOrdId}
+        and order_id = #{orderId}
+        and NEW_CREATE_RESOURCE = #{newCreateResource}
+    </update>
+
+
+
+    <!--<select id="qryJob" resultType="map" parameterType="map">
+        SELECT gs.id AS "id",gs.name AS "name" FROM gom_staff_group_s gs where area_id IN (
+        select id from gom_area_s where parent_id=#{areaId} OR id=#{areaId}
+        ) AND name LIKE '%'||#{workName}||'%'
+        <if test="searchDataName != null and searchDataName != ''">
+            and name like '%'||#{searchDataName}||'%'
+        </if>
+        ORDER BY gs.area_id
+    </select>-->
+    <select id="qryJob" resultType="map" parameterType="map">
+        SELECT gs.id AS "id",gs.name AS "name" FROM gom_staff_group_s gs where area_id IN
+        (SELECT R.DEPT_ID FROM DEPARTMENT R WHERE R.PARENT_ID = #{orgId})
+        AND name LIKE '%'||#{workName}||'%'
+        <if test="searchDataName != null and searchDataName != ''">
+            and name like '%'||#{searchDataName}||'%'
+        </if>
+        ORDER BY gs.area_id
+    </select>
+
+    <select id="qryUserByJob" resultType="map" parameterType="map">
+        SELECT vps.staff_id "id",vps.user_name "name", rs.staff_group_id "pId" ,wg.name "jobName"
+        FROM gom_staff_group_rela_s rs
+        LEFT JOIN vw_pub_staff vps ON vps.staff_id = rs.staff_id
+        LEFT JOIN Work_Group wg ON wg.work_group_id = rs.STAFF_GROUP_ID
+        WHERE rs.staff_group_id = #{jobId}
+        <if test="searchDataName != null and searchDataName != ''">
+            and vps.user_name like '%'||#{searchDataName}||'%'
+        </if>
+    </select>
+
+    <insert id="insertDispObj" parameterType="map">
+        INSERT INTO GOM_BDW_DISP_OBJ
+        (ID,
+        TACHE_ID,
+        ORDER_ID,
+        DISP_OBJ,
+        DISP_STATE,
+        DISP_OBJ_ID,
+        DISP_OBJ_LIST
+        <if test="tacheName != null and tacheName != ''">
+            ,TACHE_NAME
+        </if>
+        )
+        VALUES
+        (SEQ_GOM_BDW_DISP_OBJ.NEXTVAL,
+        #{tacheId,jdbcType=VARCHAR},
+        #{orderId,jdbcType=VARCHAR},
+        #{dispObj,jdbcType=VARCHAR},
+        #{dispState,jdbcType=VARCHAR},
+        #{dispObjId,jdbcType=VARCHAR},
+        #{dispObjList,jdbcType=VARCHAR}
+        <if test="tacheName != null and tacheName != ''">
+            ,#{tacheName,jdbcType=VARCHAR}
+        </if>
+        )
+    </insert>
+
+    <update id="updateDispObjConfig" parameterType="map">
+        UPDATE GOM_BDW_DISP_OBJ
+        SET DISP_OBJ = #{dispObj,jdbcType=VARCHAR},
+        DISP_OBJ_ID = #{dispObjId,jdbcType=VARCHAR},
+        DISP_STATE = #{dispState,jdbcType=VARCHAR},
+        DISP_OBJ_LIST = #{dispObjList,jdbcType=VARCHAR}
+        WHERE TACHE_ID = #{tacheId}
+        AND ORDER_ID = #{orderId,jdbcType=VARCHAR}
+        <if test="tacheName != null and tacheName != ''">
+            AND TACHE_NAME = #{tacheName,jdbcType=VARCHAR}
+        </if>
+    </update>
+
+    <insert id="updateDispObjState" parameterType="map">
+        UPDATE GOM_BDW_DISP_OBJ SET DISP_STATE ='10X' WHERE order_id = #{orderId,jdbcType=VARCHAR} and disp_state = '10A'
+    </insert>
+
+    <select id="qryDispObjByOrderId" resultType="map" parameterType="String">
+        SELECT TACHE_ID,
+        ORDER_ID,
+        DISP_OBJ,
+        DISP_STATE,
+        DISP_OBJ_ID,
+        DISP_OBJ_LIST,
+        TACHE_NAME
+        FROM GOM_BDW_DISP_OBJ
+        WHERE ORDER_ID = #{orderId,jdbcType=VARCHAR}
+        AND DISP_STATE IN ('10A', '10X')
+    </select>
+
+    <select id="qryDispObjTache" resultType="map" parameterType="String">
+        SELECT TACHE_ID, ORDER_ID, DISP_OBJ, DISP_STATE, DISP_OBJ_ID, DISP_OBJ_LIST
+        FROM GOM_BDW_DISP_OBJ
+        WHERE ORDER_ID = #{orderId}
+        AND TACHE_ID = #{tacheId}
+        <if test="flag == 'AZ'">
+            AND TACHE_NAME = #{tacheName}
+        </if>
+        AND DISP_STATE = '10A'
+    </select>
+
+    <select id="findJobName" resultType="map" parameterType="String">
+        SELECT NAME FROM gom_staff_group_s where id = #{jobId,jdbcType=VARCHAR}
+    </select>
+
+    <!--<select id="getProvinceName" resultType="map" parameterType="String">
+        SELECT * FROM (
+        select attr_value,attr_value_name from GOM_BDW_SRV_ORD_ATTR_INFO
+        where SRV_ORD_ID = #{srvOrdId,jdbcType=VARCHAR} and attr_value_name in ('provincea','provincez')
+        ) pivot(MIN(attr_value) FOR attr_value_name IN ('provincea' provincea,'provincez' provincez))
+    </select>-->
+    <select id="getProvinceName" resultType="map" parameterType="String">
+        SELECT ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID = #{srvOrdId,jdbcType=VARCHAR} and ATTR_VALUE_NAME = 'sendDepartment'
+    </select>
+
+    <select id="getDispatchTitleInfo" parameterType="map" resultType="map">
+        select distinct *
+        from (select a.cust_name_chinese,
+        d.code_content as operate_type,
+        c.code_content as product_type
+        from gom_bdw_cst_ord a
+        left join GOM_BDW_SRV_ORD_INFO_DIS_VIEW b on a.cst_ord_id = b.cst_ord_id
+        left join gom_BDW_code_info c on b.service_id = c.code_value
+        and c.code_type = 'product_code'
+        left join gom_BDW_code_info d on b.active_type = d.code_value
+        and d.code_type = 'operate_type'
+        where a.cst_ord_id = #{cstOrdId})
+    </select>
+    <select id="queryNumToAppendTitle" resultType="map" parameterType="map">
+        select count(srv_ord_id) num, listagg(srv_ord_id, ',') WITHIN
+        GROUP(
+        order by srv_ord_id) IDLIST
+        from gom_bdw_ord_SPECIALTY
+        where cst_ord_id = #{cstOrdId} and NEW_CREATE_RESOURCE = #{newCreateResource}
+    </select>
+    <select id="getCircuitInfo" parameterType="map" resultType="map">
+        select *
+        from (select a.SERIAL_NUMBER, a.TRADE_ID, b.ATTR_CODE, b.ATTR_VALUE
+        from GOM_BDW_SRV_ORD_INFO_DIS_VIEW a
+        left join gom_bdw_srv_ord_attr_info b on a.srv_ord_id =
+        b.srv_ord_id
+        where 1=1
+        <if test="srvOrdIds != '' and srvOrdIds != null">
+            AND a.SRV_ORD_ID IN
+            <foreach collection="srvOrdIds" item="srvOrdId" index="index" open="(" close=")" separator = ",">
+                #{srvOrdId}
+            </foreach>
+        </if>
+        ) c pivot(MAX(c.attr_value) FOR attr_code IN ('20000064' circuitCode, '20000080' Aregion, '20000098' Zregion)) a
+    </select>
+
+    <update id="updateStateBySrvOrdId" parameterType="map">
+        update gom_bdw_srv_ord_info set state = '10A' where srv_ord_id = #{srvOrdId} and cst_ord_id = #{cstOrdId}
+    </update>
+
+    <update id="updateStateRelateBySrvOrdId" parameterType="map">
+        update gom_bdw_sec_local_relate_info set configstate = '10A' where order_id = #{orderId}
+    </update>
+
+    <select id="getDispSpecialtyObj" resultType="map">
+        SELECT OS.SRV_ORD_ID,
+               OS.CST_ORD_ID,
+               OS.KEYNOTE,
+               OS.SPECIALTY_INFO,
+               OS.SPECIALTY_INFO_NAME,
+               OS.FLOW_SPECIALTY_DATA,
+               OS.NEW_CREATE_RESOURCE,
+               OS.IF_CONSTRUCT,
+               OS.DELETE_STATE
+          FROM GOM_BDW_ORD_SPECIALTY OS
+         WHERE 1 = 1
+           AND OS.ORDER_ID = #{orderId}
+         <if test="srvOrdId != null">
+             AND OS.SRV_ORD_ID = #{srvOrdId}
+         </if>
+           AND OS.DELETE_STATE = '2'
+       </select>
+
+    <select id="getDispSpecialtyObjByRes" resultType="map">
+        SELECT srv_ord_id,cst_ord_id,keynote,flow_specialty_data FROM gom_bdw_ord_specialty WHERE srv_ord_id = #{srvOrdId} and order_Id = #{orderId} and NEW_CREATE_RESOURCE = #{newCreateResource}
+    </select>
+
+    <select id="qryChildFlowNumAtLast" resultType="map">
+        SELECT COUNT(*) as childLastNum FROM gom_order o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE o.parent_order_id = #{orderId} AND ut.tache_code = 'CHILDFLOWWAIT' AND w.wo_state = '290000002'
+    </select>
+
+    <select id="qryChildFlowNum" resultType="map">
+        SELECT COUNT(*) as childNum FROM gom_order WHERE parent_order_id = #{orderId} AND order_state != '200000005'
+    </select>
+
+    <select id="getAllChildFlowData" resultType="map">
+        SELECT o.order_id orderId,w.wo_id woId,ut.id tacheId,o.order_state orderState FROM gom_order o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE o.parent_order_id = #{orderId}
+        AND w.wo_state = #{woState}
+    </select>
+    <select id="qryChildFlowState" resultType="map">
+        SELECT * FROM gom_order o
+        WHERE o.parent_order_id = #{orderId}
+        AND o.order_state = #{orderState}
+    </select>
+
+    <select id="qryBrotherOrdId" resultType="map">
+        SELECT wo.WO_ID,o.ORDER_ID,o.ORDER_STATE,wo.WO_STATE FROM gom_wo wo
+        LEFT JOIN gom_order o ON o.order_id = wo.order_id
+        WHERE wo.wo_state = #{woState} AND wo.order_id = #{orderId} AND wo.wo_id != #{woId}
+    </select>
+
+    <select id="getListChildFlow" resultType="map">
+        SELECT o.order_id orderId,rk.region_id areaId,s.DEPT_NAME areaName,sk.specialty_code specialtyCode,
+        p.pub_date_name specialtyName,w.wo_id woId,ut.id tacheId
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id AND w.wo_state = '290000002'
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        LEFT JOIN gom_ord_key_info rk ON rk.order_id = o.order_id
+        LEFT JOIN gom_ord_key_info sk ON sk.order_id = o.order_id
+        LEFT JOIN department s ON to_char(s.DEPT_ID) = rk.region_id
+        LEFT JOIN GOM_PUB_DATE_S p ON p.pub_date_id = sk.specialty_code AND DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE o.parent_order_id = #{orderId} AND o.order_state != '200000005'
+    </select>
+
+    <select id="qryAttrParams" resultType="map">
+        SELECT id,order_id,wo_id,attr_id,attr_val FROM gom_wo_oper_attr where order_id = #{orderId}
+        and attr_id in ('isTestRollback','isLocaltestRollback') and rec_state = '170000001'
+    </select>
+
+    <select id="qryCrossWholeAttrParams" resultType="map">
+        SELECT old_wo_id,priv_forward_wo_id,is_ze_fan FROM gom_wo WHERE wo_id = #{woId}
+    </select>
+
+    <!--<select id="qryAttrSummaryCompleteParams" resultType="Map">
+      SELECT a.ATTR_VAL, ROW_NUMBER() OVER (ORDER BY a.CREATE_DATE desc) AS rowindex
+              FROM gom_wo_oper_attr a
+                       join gom_bdw_sec_local_relate_info r on a.ORDER_ID = r.PARENT_ORDER_ID
+              where r.ORDER_ID = #{orderId}
+                and a.ATTR_ID = 'SUMMARY_OF_COMPLETION_REVIEW'
+    </select>-->
+
+    <select id="getMainFlowPsId" resultType="map">
+        SELECT o.order_id orderId,oo.order_id parentOrderId,os.id psId FROM gom_order o
+        LEFT JOIN gom_order oo ON oo.order_id = o.parent_order_id
+        LEFT JOIN GOM_PS_2_ORD_S os ON os.id = oo.ps_id
+        WHERE o.order_id = #{orderId}
+    </select>
+    <update id="updateSrvOrdInfo" parameterType="map">
+        update gom_bdw_srv_ord_info set dispatch_order_id = #{dispatchOrderId} where 1= 1
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <select id="getTacheIds" resultType="map">
+        SELECT WM_CONCAT(ut.id) tacheIds FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE  w.order_id = #{orderId}
+    </select>
+
+    <select id="queryListByWoId" resultType="map">
+        select * from gom_wo
+        where order_id = (select order_id from gom_wo where wo_id = #{woId}) and wo_state = '290000002'
+        order by CREATE_DATE desc
+    </select>
+
+    <select id="queryWoIdByWoId" resultType="map" parameterType="String">
+        select wo_id from gom_wo
+        where order_id = (select order_id from gom_wo where wo_id = #{woId}) and wo_state = '290000004'
+        order by CREATE_DATE desc
+    </select>
+
+    <select id="getOperActType" resultType="map" parameterType="String">
+        SELECT ACT_TYPE,PRODUCT_TYPE,REGION_ID,SPECIALTY_CODE FROM GOM_ORD_KEY_INFO WHERE order_id = #{orderId}
+    </select>
+
+    <select id="qryLastSrvOrder" resultType="map" parameterType="String">
+        select CST_ORD_ID, SRV_ORD_ID,ORDER_ID
+        from (select gbsoi.CST_ORD_ID, gbsoi.SRV_ORD_ID,GBSOI.ORDER_ID
+        from GOM_BDW_SRV_ORD_INFO gbsoi
+        where gbsoi.instance_id IN
+        (SELECT INSTANCE_ID
+        frOm GOM_BDW_SRV_ORD_INFO a
+        where a.CST_ORD_ID = #{cstOrdId}
+        AND a.SRV_ORD_ID = #{srvOrdId})
+        and gbsoi.ACTIVE_TYPE NOT IN ('102','104','105')
+        order by create_date desc)
+        where rownum = 1
+    </select>
+
+    <select id="qrySecLocalRelateInfo" resultType="map" parameterType="String">
+        SELECT r.cst_ord_id,r.srv_ord_id,r.order_id FROM gom_bdw_sec_local_relate_info r
+        WHERE r.parent_order_id = #{parentOrderId} AND r.instance_id = #{instanceId}
+    </select>
+
+    <select id="qryWoOrderDispObj" resultType="map" parameterType="String">
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,w.REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW srv ON srv.order_id = o.ORDER_ID OR srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE
+        <if test="typeFlag == 'ORDERID'">
+            w.ORDER_ID = #{woId}
+        </if>
+        <if test="typeFlag == 'WOID'">
+            w.WO_ID = #{woId}
+        </if>
+    </select>
+
+    <!--<select id="qryWoOrderDispObjList" resultType="map" parameterType="list">
+        select
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName)
+        as staffLoginName from(
+        select distinct
+        t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,us.USER_NAME as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW srv ON srv.order_id = o.ORDER_ID OR srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW srv ON srv.order_id = o.ORDER_ID OR srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW srv ON srv.order_id = o.ORDER_ID OR srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.disp_obj_id
+        where w.disp_obj_tye = '260000003'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>-->
+
+    <select id="qryExpWoOrderDispObjList" resultType="map" parameterType="string">
+        select t2.REQ_FIN_DATE,
+        t2.APPLY_ORD_ID,
+        t2.APPLY_ORD_NAME,
+        t2.tache_id,
+        t2.tache_name,
+        t2.CUST_NAME_CHINESE,
+        wm_concat(t2.staffLoginName) as staffLoginName
+        from (select distinct t.REQ_FIN_DATE,
+        t.APPLY_ORD_ID,
+        t.APPLY_ORD_NAME,
+        t.tache_id,
+        t.tache_name,
+        t.CUST_NAME_CHINESE,
+        t.staffLoginName
+        from (
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        us.USER_NAME                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000003' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        ) t) t2
+        group by t2.REQ_FIN_DATE, t2.APPLY_ORD_ID, t2.APPLY_ORD_NAME, t2.tache_id, t2.tache_name, t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryExpWoOrderChildDispObjList" resultType="map" parameterType="string">
+        select t2.REQ_FIN_DATE,
+        t2.APPLY_ORD_ID,
+        t2.APPLY_ORD_NAME,
+        t2.tache_id,
+        t2.tache_name,
+        t2.CUST_NAME_CHINESE,
+        wm_concat(t2.staffLoginName) as staffLoginName
+        from (select distinct t.REQ_FIN_DATE,
+        t.APPLY_ORD_ID,
+        t.APPLY_ORD_NAME,
+        t.tache_id,
+        t.tache_name,
+        t.CUST_NAME_CHINESE,
+        t.staffLoginName
+        from (
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        us.USER_NAME                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'  and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000003' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        ) t) t2
+        group by t2.REQ_FIN_DATE, t2.APPLY_ORD_ID, t2.APPLY_ORD_NAME, t2.tache_id, t2.tache_name, t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryExpWoOrderChildDispObjListByParentOrderId" resultType="map" parameterType="string">
+        select t2.REQ_FIN_DATE,
+        t2.APPLY_ORD_ID,
+        t2.APPLY_ORD_NAME,
+        t2.tache_id,
+        t2.tache_name,
+        t2.CUST_NAME_CHINESE,
+        wm_concat(t2.staffLoginName) as staffLoginName
+        from (select distinct t.REQ_FIN_DATE,
+        t.APPLY_ORD_ID,
+        t.APPLY_ORD_NAME,
+        t.tache_id,
+        t.tache_name,
+        t.CUST_NAME_CHINESE,
+        t.staffLoginName
+        from (
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        us.USER_NAME                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'  and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.PARENT_ORDER_ID
+        join gom_wo w on O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000003' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and l.CHG_ORDER_ID = #{orderId}
+        ) t) t2
+        group by t2.REQ_FIN_DATE, t2.APPLY_ORD_ID, t2.APPLY_ORD_NAME, t2.tache_id, t2.tache_name, t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryExpWoOrderDispObjListByChildOrderId" resultType="map" parameterType="string">
+        select t2.REQ_FIN_DATE,
+        t2.APPLY_ORD_ID,
+        t2.APPLY_ORD_NAME,
+        t2.tache_id,
+        t2.tache_name,
+        t2.CUST_NAME_CHINESE,
+        wm_concat(t2.staffLoginName) as staffLoginName
+        from (select distinct t.REQ_FIN_DATE,
+        t.APPLY_ORD_ID,
+        t.APPLY_ORD_NAME,
+        t.tache_id,
+        t.tache_name,
+        t.CUST_NAME_CHINESE,
+        t.staffLoginName
+        from (
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        us.USER_NAME                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = O.PARENT_ORDER_ID
+        join gom_wo w on O.PARENT_ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = PARENT_ORDER_ID
+        join gom_wo w on O.PARENT_ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        union all
+        select w.DISP_OBJ_TYE,
+        w.DISP_OBJ_ID,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        ws.tache_id,
+        ut.tache_name,
+        w.ORDER_ID,
+        w.WO_ID,
+        cst.CUST_NAME_CHINESE,
+        s.login_name                          as staffLoginName
+        from gom_change_order_log_s l
+        join GOM_ORDER O on l.CHG_ORDER_ID = PARENT_ORDER_ID
+        join gom_wo w on O.PARENT_ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        join gom_bdw_cst_ord cst on l.SRC_CST_ORDER_ID = cst.CST_ORD_ID
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000003' and w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        and O.ORDER_ID = #{orderId}
+        ) t) t2
+        group by t2.REQ_FIN_DATE, t2.APPLY_ORD_ID, t2.APPLY_ORD_NAME, t2.tache_id, t2.tache_name, t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="gryIsExpWoOrderChild" resultType="map" parameterType="string">
+        SELECT chg.* FROM GOM_CHANGE_ORDER_LOG_S chg WHERE chg.chg_order_id = #{orderId}
+    </select>
+
+    <select id="qryUserByDept" resultType="map" parameterType="String">
+        SELECT us.USER_ID staffId,us.USER_REAL_NAME staffName,us.USER_NAME staffLoginName
+        FROM gom_user_s us WHERE us.ORG_ID = #{dispObjId}
+    </select>
+
+    <select id="qryUserByGroup" resultType="map" parameterType="String">
+        SELECT s.STAFF_ID staffId,s.USER_NAME staffName,s.LOGIN_NAME staffLoginName
+        FROM gom_staff_group_rela_s gs
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID WHERE gs.staff_group_id = #{dispObjId}
+    </select>
+
+    <select id="qryUserById" resultType="map" parameterType="String">
+        SELECT s.STAFF_ID staffId,s.USER_NAME staffName,s.LOGIN_NAME staffLoginName
+        FROM vw_pub_staff s WHERE s.staff_id = #{dispObjId}
+    </select>
+
+    <select id="qryMsmSwitchByArea" resultType="map" parameterType="String">
+        SELECT g.id,g.name,g.issend,g.AREA_ID,g.ISBRAFILIALE,g.CRM_REGION,g.IS_PRODCTION_ENVIRONMENT
+        FROM GOM_CONTAB_AREA_CONFIG g WHERE g.ID = #{areaId}
+    </select>
+
+    <select id="qryMsmSwitchByAreaAtOne" resultType="map" parameterType="String">
+        SELECT g.id,g.name,g.issend,g.AREA_ID,g.ISBRAFILIALE,g.CRM_REGION,g.is_prodction_environment
+        FROM GOM_CONTAB_AREA_CONFIG g WHERE g.AREA_ID = #{areaId}
+    </select>
+
+    <select id="qryOrderArea" resultType="map" parameterType="String">
+        SELECT i.REGION_ID,s.area_id FROM GOM_ORDER o
+        LEFT JOIN gom_ord_key_info i ON i.ORDER_ID = o.ORDER_ID
+        LEFT JOIN GOM_ORG_S s ON s.org_id = i.REGION_ID
+        WHERE o.order_id = #{orderId}
+    </select>
+    <select id="qryRollBackResult" resultType="int">
+        SELECT count(ATTR_CODE) FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_ACTION=#{interName} AND SRV_ORD_ID=#{srvOrdId} and ATTR_CODE='1' and attr_value=#{orderId}
+    </select>
+
+    <select id="qryWoOrderState" resultType="map" parameterType="String">
+        SELECT WO_STATE FROM GOM_WO WHERE wo_id = #{woId}
+    </select>
+    <select id="qryWoStateByOrderId" resultType="map" parameterType="String">
+        SELECT * FROM (SELECT w.WO_STATE FROM GOM_WO w
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE w.order_id = #{orderId} and tache_code in ('CIRCUIT_DISPATCH','RES_ALLOCATE', 'FIBER_RES_ALLOCATE')  order by w.create_date desc) WHERE  rownum = 1
+    </select>
+
+
+    <select id="qryOrderIdByWoId" resultType="String" parameterType="String">
+        SELECT ORDER_ID FROM GOM_WO WHERE wo_id = #{woId}
+    </select>
+
+    <select id="qryAreaDeptData" resultType="map" parameterType="String">
+        select dept_id AS "id",dept_name AS "name",parent_id AS "parent_id" from department where parent_id = #{deptId} ORDER BY dept_id
+    </select>
+
+    <select id="qryAreaDeptListData" resultType="map">
+        select to_char(dept_id) AS "id",dept_name AS "name",to_char(parent_id) AS "parent_id"
+        from department
+        where 1=1
+        <if test="regionIds != '' and regionIds != null">
+            AND dept_id IN
+            <foreach collection="regionIds" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY dept_id
+    </select>
+
+    <select id="queryDispatchInfoByDispatchIds" parameterType="list" resultType="map">
+        select * from( select a.DISPATCH_TITLE,
+        a.DISPATCH_ORDER_ID,
+        a.DISPATCH_TEXT,
+        a.DISPATCH_ORDER_NO,
+        a.SEND_DATE,
+        a.STAFF_ORG,
+        a.STAFF_NAME,
+        a.STAFF_TEL,
+        a.DISPATCH_GRADE,
+        a.DISPATCH_URGENCY,
+        a.DISPATCH_SEND_ORG,
+        a.DISPATCH_COPY_ORG,
+        b.code_content as DISPATCH_TYPE,
+        a.REMARK,
+        c.code_content as state
+        from gom_bdw_dispatch_order a
+        left join GOM_BDW_CODE_INFO b on a.dispatch_type = b.code_value
+        and b.code_type = 'dispatch_type'
+        left join GOM_BDW_CODE_INFO c on a.state = c.code_value
+        and c.code_type = 'dispatch_state'
+        where 1=1
+        <if test="disPatchIds != null and disPatchIds.length > 0">
+            and  a.DISPATCH_ORDER_ID in
+            <foreach collection="disPatchIds" item="dispatchOrderId" index="index" open="(" close=")" separator=",">
+                #{dispatchOrderId}
+            </foreach>
+        </if>
+        order by a.send_date desc) where rownum = 1
+    </select>
+    <select id="queryDispatchInfoByDispatchNum" resultType="map" parameterType="string">
+        select * from gom_bdw_dispatch_order where DISPATCH_ORDER_NO = #{dispatchNum}
+    </select>
+
+    <select id="queryAlreadyChildFlowList" resultType="java.util.Map">
+        select b.order_id ,b.REGION_ID,b.SPECIALTY_CODE
+        from GOM_ORD_KEY_INFO b
+        left join GOM_ORDER a on  a.order_id = b.order_id
+        where a.parent_order_id = #{orderId} and a.ORDER_STATE  in ('200000004','200000002')
+    </select>
+
+    <update id="updateDispatchOrderInfo" parameterType="map">
+        update gom_bdw_dispatch_order set dispatch_title = #{dispatchTitle},dispatch_text = #{dispatchText},remark = #{remark} where dispatch_order_id = #{dispatchId}
+    </update>
+    <insert id="insertDispatchInfo" parameterType="map">
+        insert into gom_bdw_dispatch_order_his
+        (DISPATCH_ORDER_ID,
+        DISPATCH_ORDER_NO,
+        CREATE_DATE,
+        DISPATCH_TITLE,
+        DISPATCH_TEXT,
+        REMARK)
+        values
+        (#{dispatchId},
+        #{dispatchNum},
+        sysdate,
+        #{dispatchTitle},
+        #{dispatchText},
+        #{remark})
+    </insert>
+
+    <select id="judgeIsSecondDra" parameterType="string" resultType="boolean">
+        select decode(i.RESOURCES,'secondary','true','false') from gom_wo w
+        left join gom_bdw_sec_local_relate_info i on w.order_id = i.order_id
+        where w.wo_id=#{0}
+    </select>
+    <select id="getOrgNameByOrgId" parameterType="string" resultType="string">
+        select org_name from gom_org_s where ORG_ID =#{0}
+    </select>
+    <select id="getSecondCheckWoId" parameterType="map" resultType="string">
+        select gw.WO_ID
+        from gom_order o
+        left join GOM_WO gw on o.order_id = gw.order_id
+        left join GOM_PS_2_WO_S ws on gw.ps_id = ws.id
+        left join UOS_TACHE ut on ws.tache_id = ut.id
+        where o.order_id in (select PARENT_ORDER_ID from gom_bdw_sec_local_relate_info where order_id=#{orderId})
+        and ut.id=#{tacheId} AND gw.wo_state = #{woState}
+    </select>
+
+    <select id="qryDispAreaBySpec" resultType="map" parameterType="String">
+        SELECT SPECIALTY_INFO FROM GOM_BDW_ORD_SPECIALTY  SPEC
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SRV ON SPEC.SRV_ORD_ID=SRV.SRV_ORD_ID
+        WHERE SPEC.ORDER_ID=#{orderId} AND
+        SPECIALTY_INFO LIKE'%'||#{specialCode} ||'%'
+    </select>
+    <select id="qryNoRentNum" resultType="int">
+        SELECT count(*) FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID=#{srvOrdId} AND ATTR_CODE='NO_RENT'
+    </select>
+
+    <select id="querySrvOrdIdsByDispatchOrderId" parameterType="string" resultType="map">
+        select listagg(srv_ord_id, ',') WITHIN
+        GROUP(
+        order by srv_ord_id) srvOrdIds from gom_bdw_srv_ord_info where dispatch_order_id = #{dispatchOrderId}
+    </select>
+
+    <select id="qryDispAreaFromSecondBySpec" resultType="map" parameterType="String">
+        SELECT SPECIALTY_INFO FROM GOM_BDW_ORD_SPECIALTY  SPEC
+        LEFT JOIN gom_bdw_sec_local_relate_info r ON SPEC.ORDER_ID=r.ORDER_ID
+        WHERE SPEC.ORDER_ID=#{orderId} AND SPEC.SPECIALTY_INFO LIKE'%'||#{specialCode} ||'%'
+    </select>
+
+    <select id="qrySrvOrdStat" resultType="String">
+        SELECT SRV_ORD_STAT FROM GOM_BDW_SRV_ORD_INFO WHERE SRV_ORD_ID=#{srvOrdId}
+    </select>
+
+    <!--异常通知确认-->
+    <update id="affirmExceptionBySrvOrdId" parameterType="map">
+        update gom_bdw_order_notice set STAT = '1',UPDATE_DATE=sysdate WHERE SRV_ORD_ID = #{srvOrdId} and DEAL_USER_ID = #{dealUserId}
+    </update>
+    <!-- 更新电路调度环节状态-->
+    <update id="updateWoStateBySrvOrdId" parameterType="map">
+        UPDATE GOM_WO SET WO_STATE = #{woStateAfter,jdbcType=VARCHAR}, STATE_DATE = #{stateDate}
+        WHERE WO_ID = (
+        SELECT w.wo_id
+        FROM GOM_BDW_SRV_ORD_INFO o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        WHERE w.WO_STATE = #{woStateBefore} AND o.SRV_ORD_ID = #{srvOrdId}
+        )
+    </update>
+
+    <!-- 根据流程定单ID查询流程定单 -->
+    <select id="getFlowOrderById" resultType="map">
+        select t.order_id,t.order_code,t.order_title,t.create_date,t.order_state,a.pub_date_name as order_state_value from gom_order t
+        left join gom_pub_date_s a on a.DF_TYPE = 'ORDER_STATE' and a.pub_date_id = t.order_state
+        left join gom_bdw_srv_ord_info b on b.order_id = t.order_id
+        where b.srv_ord_id = #{srvOrdId}
+    </select>
+
+    <!-- 根据父流程定单ID查询子流程定单 -->
+    <select id="getFlowOrderByParentId" resultType="map">
+        select t.order_id,t.order_code,t.order_title,t.create_date,t.order_state,a.pub_date_name as order_state_value from gom_order t
+        left join GOM_PUB_DATE_S a on a.DF_TYPE = 'ORDER_STATE' and a.pub_date_id = t.order_state
+        left join gom_bdw_srv_ord_info b on b.order_id = t.parent_order_id
+        where b.srv_ord_id = #{srvOrdId}
+    </select>
+
+    <select id="getFLowTacheCodeById" resultType="String">
+        select u.TACHE_CODE from UOS_TACHE u where u.ID = #{tacheId}
+    </select>
+
+    <select id="queryDeptIdByParentDeptId" parameterType="String" resultType="map">
+        select  DEPT_NAME,DEPT_ID,REGION_ID,PARENT_ID,DEPT_LEVEL_ID  from department where dept_id = #{deptId}
+    </select>
+
+    <select id="querySrvInfoBySrvOrdId" parameterType="string" resultType="map">
+        select * from gom_bdw_srv_ord_info where srv_ord_id = #{srvOrdId}
+    </select>
+
+    <select id="queryHandleDeptId" parameterType="string" resultType="map">
+        select * from gom_bdw_cst_ord where cst_ord_id = #{cstOrdId}
+    </select>
+    <select id="getDeptInfoByDeptId" parameterType="String" resultType="map">
+        select * from gom_org_s where org_id = #{deptId}
+    </select>
+    <select id="queryDisInfoByDeptId" parameterType="string" resultType="map">
+        select gbsn.org_name as sign,
+        gbsn.schedu_num,
+        to_char(gbsn.update_date, 'yyyy-MM-dd hh24:mi:ss') as update_date,
+        gbsn.org_id
+        from gom_bdw_schedu_num gbsn
+        where gbsn.action_scope = '2'
+        and gbsn.org_id = #{deptId}
+    </select>
+    <select id="queryRegionId" parameterType="string" resultType="map">
+        select * from gom_bdw_sec_local_relate_info WHERE cst_ord_id = #{cstOrdId} and srv_ord_id = #{srvOrdId} and order_id = #{orderId}
+    </select>
+    <update id="updateDispatchOrderIdToRelateTable" parameterType="map">
+        update gom_bdw_sec_local_relate_info set dispatch_order_id = #{dispatchOrderId} where cst_ord_id = #{cstOrdId}
+        and srv_ord_id = #{srvOrdId} and order_id = #{orderId}
+    </update>
+    <select id="queryDispatchOrderIdFromRelateTable" parameterType="map" resultType="map">
+        select * from gom_bdw_sec_local_relate_info where cst_ord_id = #{cstOrdId} and srv_ord_id = #{srvOrdId} and order_id = #{orderId}
+    </select>
+    <select id="qryDispInfoBySrvordInfo" parameterType="string" resultType="map">
+        SELECT a.SPECIALTY_INFO,a.SPECIALTY_INFO_NAME,a.FLOW_SPECIALTY_DATA,a.ID
+        FROM GOM_BDW_ORD_SPECIALTY a
+        left join GOM_ORDER b on b.parent_order_id = a.ORDER_ID
+        WHERE a.SRV_ORD_ID= #{srvOrdId} and b.ORDER_ID=#{orderId} AND a.NEW_CREATE_RESOURCE='1'
+    </select>
+    <select id="qryChildOrdDispInfo" parameterType="string" resultType="map">
+        SELECT KI.REGION_ID,KI.SPECIALTY_CODE FROM GOM_ORD_KEY_INFO KI
+        LEFT JOIN GOM_WO WO ON KI.ORDER_ID = WO.ORDER_ID WHERE WO.WO_ID=#{woId}
+    </select>
+    <delete id="deleteConfigById">
+        DELETE FROM GOM_BDW_ORD_SPECIALTY  WHERE ID= #{id}
+    </delete>
+    <update id="updateConfigById" parameterType="map">
+        UPDATE GOM_BDW_ORD_SPECIALTY SET SPECIALTY_INFO=#{SPECIALTY_INFO},SPECIALTY_INFO_NAME=#{SPECIALTY_INFO_NAME}
+        ,FLOW_SPECIALTY_DATA=#{FLOW_SPECIALTY_DATA}
+        WHERE ID=#{ID}
+    </update>
+    <!-- 子流程回退后更新电路编号-->
+    <update id="updateCircuitCode" parameterType="map">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO SET ATTR_VALUE = '', SOURSE='res',CREATE_DATE=sysdate
+        WHERE SRV_ORD_ID =#{srvOrdId} AND ATTR_CODE='20000064' and SOURSE='res' and
+        SRV_ORD_ID in (
+        select srv_ord_id from (
+        select srv_ord_id,RESNAME,compid from gom_bdw_srv_ord_res_info
+        where RESOURCES='newResource' and SRV_ORD_ID = #{srvOrdId}
+        ) pivot(max(RESNAME) for compid in('20000001' as trans ,'20000007' as optical) )
+        group  by srv_ord_id having count(nvl(trans,optical))=0
+        )
+    </update>
+    <!-- 查询已派发并且没有走到等待环节的子流程数量 -->
+    <select id="qryAllChildIsEnd" resultType="int">
+        SELECT COUNT(*) as num FROM gom_order o
+        LEFT JOIN (
+        select * from gom_wo where wo_id in(
+        SELECT max(wo_id) FROM gom_wo w join gom_order o on w.order_id = o.order_id and o.order_state != '200000005'
+        where o.parent_order_id = #{orderId}
+        group by w.order_id
+        )
+        ) w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE o.parent_order_id = #{orderId} AND  ut.tache_code != 'CHILDFLOWWAIT'
+    </select>
+    <!--查询存活的子流程-->
+    <select id="qrySurviveChildFlowNum" resultType="int" parameterType="map">
+        select count(1) as counts from GOM_ORDER a  where a.parent_order_id = #{orderId} and a.ORDER_STATE in('200000002','200000003','200000004')
+    </select>
+    <select id="qryCreatePageHandleDep" resultType="map">
+        SELECT s.DEPT_ID AS "id",s.DEPT_NAME AS "name",s.PARENT_ID AS "pId",
+        CASE
+        WHEN s.DEPT_ID = #{provienceOrgId} THEN 'true'
+        ELSE 'false' END AS "open",'260000001' AS "objType"
+        FROM department s
+        WHERE (s.DEPT_NAME like '%分公司' or s.DEPT_NAME like '%分公司网络建%' or s.DEPT_NAME like '%分公司本部%')
+        and s.DEPT_ID = #{provienceOrgId}  and s.delete_state='0'
+        union all
+        SELECT s.DEPT_ID AS "id",s.DEPT_NAME AS "name",s.PARENT_ID AS "pId",
+        CASE
+        WHEN s.DEPT_ID = #{belongOrgId} THEN 'true'
+        ELSE 'false' END AS "open",'260000001' AS "objType"
+        FROM department s
+        WHERE (s.DEPT_NAME like '%分公司' or s.DEPT_NAME like '%分公司网络建%' or s.DEPT_NAME like '%分公司本部%')
+        and s.DEPT_ID in (select DEPT_ID from department where PARENT_ID= #{provienceOrgId})  and s.delete_state='0'
+        union all
+        SELECT s.DEPT_ID AS "id",s.DEPT_NAME AS "name",s.PARENT_ID AS "pId",
+        CASE
+        WHEN s.DEPT_ID = #{belongOrgId} THEN 'true'
+        ELSE 'false' END AS "open",'260000001' AS "objType"
+        FROM department s
+        WHERE (s.DEPT_NAME like '%分公司' or s.DEPT_NAME like '%分公司网络建%' or s.DEPT_NAME like '%分公司本部%' or s.DEPT_NAME like '%濮院经营部'
+        or s.DEPT_NAME like '%分公司网络部' or s.DEPT_NAME like '%分公司网络运营部' or s.DEPT_NAME = '太原市分公司设备维护中心' or s.DEPT_NAME = '太原市分公司网络优化中心' or s.DEPT_NAME = '太原市分公司客户响应中心')
+        and s.DEPT_ID in (select DEPT_ID from department where  PARENT_ID in (select DEPT_ID from department where PARENT_ID= #{provienceOrgId}))  and s.delete_state='0'
+    </select>
+    <!--更新订单业务表中的状态 -->
+    <update id="updateSrvStateBySrvOrdId" parameterType="map">
+        update gom_bdw_srv_ord_info set state = #{state} where srv_ord_id = #{srvOrdId}
+    </update>
+    <!--更新二干订单业务关联关系表中的状态 -->
+    <update id="updateSecondSrvStateById" parameterType="map">
+        update GOM_BDW_SEC_LOCAL_RELATE_INFO set CONFIGSTATE = #{state} where RELATE_INFO_ID = #{srvOrdId}
+    </update>
+
+    <select id="queryDispatchInfoByDisNumAndSource" parameterType="string" resultType="map">
+        select * from gom_bdw_dispatch_order where dispatch_order_no = #{dispatchNum} and dispatch_source = #{dispatchSource} and cst_ord_id = #{cstOrdId}
+    </select>
+
+    <select id="qryParentSubStatusByOrderId" resultType="map" parameterType="map">
+        select O.ORDER_STATE,O.ORDER_ID,UT.TACHE_CODE,UT.TACHE_NAME,WO.WO_STATE
+        FROM GOM_ORDER O
+        JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        where O.PARENT_ORDER_ID = #{orderId}
+        or O.ORDER_ID = #{orderId}
+        <if test="psId != '10101303' ">
+            and WO.DISP_OBJ_ID != '-2000'
+        </if>
+
+        order by wo.create_date DESC
+    </select>
+
+    <!-- 二干下发本地的电路，更新电路调度环节状态-->
+    <update id="updateSecondWoStateBySrvOrdId" parameterType="map">
+        UPDATE GOM_WO SET WO_STATE = #{woStateAfter,jdbcType=VARCHAR}, STATE_DATE = #{stateDate}
+        WHERE WO_ID = (
+        SELECT w.wo_id
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        WHERE w.WO_STATE = #{woStateBefore} AND o.RELATE_INFO_ID = #{srvOrdId}
+        )
+    </update>
+
+    <select id="qryAreaDeptDataParent"  resultType="map" parameterType="String">
+        select a.dept_id AS "id",
+        a.dept_name AS "name",
+        a.parent_id AS "parent_id"
+        from department a
+        where a.parent_id is not null
+        and a.DELETE_STATE = '0'
+        start with a.DEPT_ID = #{deptId} connect by prior a.parent_id=a.dept_id
+        order by a.DEPT_LEVEL_ID desc
+    </select>
+
+    <select id="qryCrossTest"  resultType="map" parameterType="String">
+        SELECT w.wo_id AS woId,o.ORDER_ID AS orderId,ut.id AS tacheId,ut.tache_code,
+        ut.tache_name AS tacheName, w.wo_state
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE w.order_id = #{orderId}
+        AND ut.tache_code = 'CROSS_WHOLE_COURDER_TEST'
+        AND w.wo_state = '290000004'
+        ORDER BY w.CREATE_DATE DESC
+    </select>
+
+    <select id="qryTacheName"  resultType="String" parameterType="String">
+        SELECT r.tache_name FROM uos_tache r WHERE r.id = #{tacheId}
+    </select>
+
+    <select id="queryAdminInfo" resultType="int" parameterType="String">
+        SELECT COUNT(1) as adminCount
+        FROM  GOM_BDW_MANAGE
+        WHERE STAFF_ID = #{staffId}
+        AND DELETE_STAT = 0
+        AND IS_SHOW = 0
+    </select>
+
+    <select id="qryManualFullCompleteTime" resultType="map" parameterType="String">
+        SELECT ord.order_id,srv.srv_ord_id,srvattr.attr_value FROM gom_order ord
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.order_id = ord.order_id
+        LEFT JOIN gom_bdw_srv_ord_attr_info srvattr
+        ON srvattr.srv_ord_id = srv.srv_ord_id AND srvattr.attr_code = 'REC_30004'
+        WHERE ord.order_id = #{orderId}
+    </select>
+
+    <select id="queryIfSupplementOrder" resultType="string" parameterType="list">
+        SELECT wo.wo_state FROM gom_wo wo
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ut.tache_code = 'CIRCUIT_DISPATCH' AND
+        wo.order_id IN
+        <foreach collection="orderIdList" item="orderId" index="index" open="(" close=")" separator=",">
+            #{orderId}
+        </foreach>
+    </select>
+
+    <select id="queryPurviewBystaffId" parameterType="map" resultType="map">
+        select * from gom_bdw_manage where staff_id = #{staffId} and delete_stat = '0' and system_resouce = 'LOCAL_NET'
+    </select>
+
+    <select id="qryDealUserTacheConfig" parameterType="map" resultType="map">
+        SELECT BSC.TACHE_ID, BSC.TACHE_NAME, BSC.PS_ID, BSC.PRODUCT_TYPE
+        FROM GOM_BDW_SPECIALTY_CONFIG BSC
+        WHERE BSC.ORG_NAME = 'tacheDealUserConfig'
+        AND BSC.PRODUCT_TYPE = #{serviceId}
+        AND BSC.PS_ID = #{psId}
+    </select>
+
+    <select id="qryCrossTestDoing" parameterType="string" resultType="map">
+        SELECT O.ORDER_ID, W.WO_ID, UT.TACHE_NAME, UT.TACHE_CODE
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO INFO
+        LEFT JOIN GOM_ORDER O
+        ON O.ORDER_ID = INFO.ORDER_ID
+        LEFT JOIN GOM_WO W
+        ON W.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = W.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        WHERE INFO.SRV_ORD_ID = #{srvOrdId}
+        AND UT.TACHE_CODE = 'CROSS_WHOLE_COURDER_TEST'
+        AND W.WO_STATE = '290000002'
+    </select>
+    <select id="qryInterResultByAttrValue" resultType="int">
+        SELECT count(ATTR_CODE) FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_ACTION=#{interName} AND ATTR_VALUE=#{srvOrdId} and ATTR_CODE='1'
+    </select>
+    <select id="qryProNumByUserId" resultType="int">
+        SELECT count(1) FROM gom_user_s gus
+        join gom_BDW_code_info info on info.code_value=gus.area_id and   info.code_type=#{codeType}
+        WHERE gus.USER_ID  =#{userId}
+    </select>
+
+    <select id="queryRouteInfoUrl" resultType="map">
+        SELECT CODE_TYPE,CODE_VALUE,CODE_CONTENT,REMARK FROM gom_BDW_code_info
+        WHERE 1=1
+        and CODE_TYPE = #{codeType}
+        <if test="codeValue != null and  codeValue != '' ">
+            and CODE_VALUE = #{codeValue}
+        </if>
+
+    </select>
+    <select id="qryResCheckInfo" resultType="map">
+        SELECT COMPID,SRV_ORD_ID,ATTR_CODE,ATTR_NAME,
+        LISTAGG(ATTR_VALUE,';')  WITHIN GROUP( ORDER BY ATTR_CODE,COMPID) AS ATTR_VALUE
+        FROM GOM_BDW_SRV_ORD_RES_ROUTE
+        WHERE RESOURCES='newResource' AND POSITION =#{position} AND SRV_ORD_ID=#{srvOrdId}
+        GROUP BY ATTR_CODE,SRV_ORD_ID,COMPID,ATTR_NAME
+    </select>
+    <select id="qryReqFinDate" parameterType="string" resultType="java.util.Date">
+        SELECT R.REQ_FIN_DATE FROM GOM_WO R WHERE R.WO_ID = #{woId}
+    </select>
+    <!--<select id="qryWoOrderInfo" parameterType="string" resultType="map">
+        SELECT UT.TACHE_NAME,
+               UT.ID,
+               RI.CODE_VALUE TACHE_CODE,
+               WO.DEAL_USER_ID,
+               WO.DEAL_DATE,
+               WO.REQ_FIN_DATE,
+               WO.STATE_DATE,
+               WO.CREATE_DATE,
+               WO.DISP_OBJ_TYE,
+               WO.DISP_OBJ_ID,
+               WO.WO_STATE,
+               PDSW.PUB_DATE_NAME WO_STATE_NAME,
+               ORD.ORDER_STATE,
+               PDSO.PUB_DATE_NAME ORDER_STATE_NAME,
+               KI.REGION_ID,
+               DEPT.DEPT_NAME
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+          LEFT JOIN GOM_BDW_RELATION_INFO RI
+            ON RI.CODE_NAME = UT.TACHE_NAME
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = WO.ORDER_ID
+          LEFT JOIN DEPARTMENT DEPT
+            ON DEPT.DEPT_ID = KI.REGION_ID
+          LEFT JOIN GOM_ORDER ORD
+            ON ORD.ORDER_ID = WO.ORDER_ID
+          LEFT JOIN GOM_PUB_DATE_S PDSW
+            ON PDSW.PUB_DATE_ID = WO.WO_STATE
+           AND PDSW.DF_TYPE = 'WO_STATE'
+          LEFT JOIN GOM_PUB_DATE_S PDSO
+            ON PDSO.PUB_DATE_ID = ORD.ORDER_STATE
+           AND PDSO.DF_TYPE = 'ORDER_STATE'
+         WHERE WO.WO_ID = #{woId}
+    </select>-->
+    <select id="qryProvinceData" parameterType="string" resultType="map">
+        SELECT GAS.CRM_REGION, GAS.NAME
+        FROM GOM_ORG_S A
+        JOIN GOM_AREA_S GAS
+        ON GAS.ID = A.AREA_ID
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID = #{areaId}
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID
+    </select>
+    <select id="qryAZPortInfo" parameterType="string" resultType="map">
+        SELECT *
+        FROM(
+        SELECT AI.ATTR_CODE,
+        CASE
+        WHEN AI.ATTR_CODE = '20000234' THEN 'A'
+        WHEN AI.ATTR_CODE = '20000235' THEN 'Z'
+        WHEN AI.ATTR_CODE = 'CON0101' THEN 'A'
+        WHEN AI.ATTR_CODE = 'CON0102' THEN 'Z'
+        WHEN AI.ATTR_CODE = '20003617' THEN 'A'
+        WHEN AI.ATTR_CODE = '20003618' THEN 'Z'
+        END AZPORT
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO AI
+        WHERE AI.SRV_ORD_ID = #{srvOrdId}
+        AND AI.ATTR_VALUE = #{areaId}
+        AND AI.ATTR_CODE IN ('20000234', '20000235', 'CON0101', 'CON0102','20003617','20003618')
+        ) WHERE ROWNUM = 1
+    </select>
+    <select id="qryCityData" parameterType="string" resultType="map">
+        SELECT R.NAME, R.CRM_REGION
+        FROM GOM_AREA_S R
+        WHERE R.ALIAS = (SELECT to_char(R.DEPT_ID)
+        FROM DEPARTMENT R
+        WHERE R.DEPT_LEVEL_ID = 2
+        START WITH R.DEPT_ID = #{areaId}
+        CONNECT BY PRIOR R.PARENT_ID = R.DEPT_ID)
+    </select>
+    <select id="qryServiceId" parameterType="string" resultType="map">
+        SELECT R.CODE_INFO, R.CODE_NAME
+        FROM GOM_BDW_RELATION_INFO R
+        WHERE R.CODE_VALUE = #{serviceId}
+        AND R.CODE_TYPE = 'product_type'
+    </select>
+    <select id="qryBelongCompany" parameterType="string" resultType="string">
+        SELECT DEPT.DEPT_ID
+        FROM DEPARTMENT DEPT
+        WHERE DEPT.PARENT_ID IN
+        (SELECT DEPT_ID FROM DEPARTMENT WHERE PARENT_ID = '0')
+        START WITH DEPT.DEPT_ID = #{orgId}
+        CONNECT BY PRIOR DEPT.PARENT_ID = DEPT.DEPT_ID
+    </select>
+
+    <update id="updWoOrder" parameterType="string">
+        UPDATE GOM_WO SET WO_STATE = #{woState}  WHERE WO_ID = #{woId}
+    </update>
+
+    <insert id="insertCreateChildFlow" parameterType="map">
+        INSERT INTO GOM_BDW_CREATE_CHILD_FLOW (WO_ID, SRV_ORD_ID, ORDER_ID, CREATE_DATE, STATE_DATE, STATE)
+        VALUES
+        (#{woId}, #{srvOrdId}, #{orderId}, sysdate, sysdate, '10A')
+    </insert>
+
+    <select id="qryCreateChildFlow" resultType="map">
+        SELECT * FROM (  SELECT R.WO_ID, R.SRV_ORD_ID, R.ORDER_ID
+            FROM GOM_BDW_CREATE_CHILD_FLOW R
+            WHERE R.STATE = '10A'
+            ORDER BY CREATE_DATE DESC)
+        WHERE ROWNUM  <![CDATA[ <= ]]> 10
+    </select>
+
+    <update id="updCreateChildFlowState" parameterType="map" >
+        UPDATE GOM_BDW_CREATE_CHILD_FLOW R SET R.STATE = #{state} WHERE R.ORDER_ID = #{orderId}
+    </update>
+
+    <insert id="copyToCreateChildFlowHis" parameterType="string">
+        INSERT INTO GOM_BDW_CREATE_CHILD_FLOW_HIS
+        (WO_ID, SRV_ORD_ID, ORDER_ID, CREATE_DATE, STATE_DATE, STATE)
+            SELECT R.WO_ID,
+                R.SRV_ORD_ID,
+                R.ORDER_ID,
+                R.CREATE_DATE,
+                R.STATE_DATE,
+                R.STATE
+            FROM GOM_BDW_CREATE_CHILD_FLOW R
+            WHERE R.ORDER_ID = #{orderId}
+    </insert>
+
+    <delete id="deleteCreateChildFlow" parameterType="string">
+        DELETE FROM GOM_BDW_CREATE_CHILD_FLOW r WHERE r.order_id = #{orderId}
+    </delete>
+
+    <update id="updOperLog" parameterType="string">
+        UPDATE GOM_BDW_LOG_INFO R
+        SET R.TRACK_MESSAGE = CONCAT(R.TRACK_MESSAGE, #{childSpecials})
+        WHERE R.WO_ORD_ID = #{woId}
+              AND R.OPER_TYPE = '10'
+    </update>
+
+    <select id="queryIfMainOrg" resultType="map">
+        SELECT ifmainOrg FROM gom_bdw_sec_local_relate_info
+        where srv_ord_id = #{srvOrdId}
+              and order_id= #{orderId}
+    </select>
+    <!-- 根据orderId查询流程订单信息 -->
+    <select id="qryOrderInfoByOrderId" resultType="map">
+        SELECT PS_ID FROM GOM_ORDER WHERE ORDER_ID=#{orderId}
+    </select>
+
+
+   <select id="resExistence" resultType="map">
+       SELECT ARESEXIST,ZRESEXIST,O2CLOG
+          FROM (SELECT ATTR.ATTR_CODE, ATTR.ATTR_VALUE
+                  FROM GOM_BDW_SRV_ORD_ATTR_INFO ATTR
+                 WHERE ATTR.SRV_ORD_ID = #{srvOrdId}
+                 and ATTR.ATTR_CODE IN ('ORD10171', 'ORD10172','O2CORDERSEND')) t
+        PIVOT(MAX(T.ATTR_VALUE)
+           FOR ATTR_CODE IN('ORD10171' ARESEXIST, 'ORD10172' ZRESEXIST, 'O2CORDERSEND' O2CLOG))
+    </select>
+   <select id="queryAssessResult" resultType="map">
+       SELECT attr.attr_value
+          FROM GOM_BDW_SRV_ORD_ATTR_INFO ATTR
+         WHERE ATTR.ATTR_CODE = 'ASSESS_RESULT'
+         AND ATTR.SRV_ORD_ID =(SELECT SRV_ORD_ID
+           FROM GOM_BDW_SRV_ORD_INFO SO1
+           JOIN (SELECT SO.TRADE_ID, SO.SERIAL_NUMBER
+                        FROM GOM_BDW_SRV_ORD_INFO SO
+                       WHERE SO.SRV_ORD_ID = #{srvOrdId}
+                         ) SO2
+             ON SO2.SERIAL_NUMBER = SO1.SERIAL_NUMBER
+            AND SO2.TRADE_ID = SO1.TRADE_ID
+            WHERE SO1.TRADE_TYPE_CODE = '2009'
+             AND SO1.SRV_ORD_STAT NOT IN ('10X', '10C'))
+    </select>
+
+    <select id="queryConstructConf" resultType="map">
+         SELECT * FROM GOM_BDW_CODE_INFO
+            WHERE CODE_TYPE = #{CODE_TYPE}
+            AND CODE_VALUE = #{CODE_VALUE}
+    </select>
+    <select id="qryIfPopConfig" parameterType="string" resultType="int">
+        SELECT COUNT(1)
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = ORD.PARENT_ORDER_ID
+          JOIN (SELECT R.CODE_VALUE, R.CODE_CONTENT
+                       FROM GOM_BDW_CODE_INFO R
+                      WHERE R.CODE_TYPE = 'POP_AREA') AREA
+            ON AREA.CODE_VALUE = KI.REGION_ID
+         WHERE ORD.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryIfPopConfigView" parameterType="string" resultType="int">
+        SELECT COUNT(1)
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = ORD.ORDER_ID
+          JOIN (SELECT R.CODE_VALUE, R.CODE_CONTENT
+                       FROM GOM_BDW_CODE_INFO R
+                      WHERE R.CODE_TYPE = 'POP_AREA') AREA
+            ON AREA.CODE_VALUE = KI.REGION_ID
+         WHERE ORD.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryPopDeptId" parameterType="string" resultType="string">
+        SELECT LISTAGG(DEPT.DEPT_ID, ',') WITHIN GROUP(ORDER BY DEPT.PARENT_ID) deptIds
+          FROM DEPARTMENT DEPT
+         WHERE DEPT.PARENT_ID = 888888
+    </select>
+
+    <update id="updateOrdInfoById">
+        UPDATE gom_bdw_srv_ord_info
+        SET SRV_ORD_STAT = #{srvOrderState,jdbcType=VARCHAR}
+        where SRV_ORD_ID = #{srvOrdId,jdbcType=INTEGER}
+
+    </update>
+    <select id="queryParallelRelated" parameterType="string" resultType="map">
+       SELECT SOI.SRV_ORD_ID,SOI.ORDER_ID
+          FROM GOM_BDW_SRV_ORD_INFO SOI
+          JOIN (SELECT SO.SERIAL_NUMBER, SO.TRADE_ID
+                  FROM GOM_BDW_SRV_ORD_INFO SO
+                 WHERE SO.SRV_ORD_ID = #{srvOrdId} ) SRV
+            ON SRV.SERIAL_NUMBER = SOI.SERIAL_NUMBER
+           AND SRV.TRADE_ID = SOI.TRADE_ID
+         WHERE SOI.SRV_ORD_STAT = '10N'
+         ORDER BY SOI.CREATE_DATE DESC
+
+     </select>
+    <select id="qryAutoDetails" resultType="map" parameterType="String">
+        SELECT CODE.CODE_CONTENT CHK_CODE,A.CHK_MESS,A.CHK_LIMIT_TIME,A.CHK_RES_TXT
+        FROM  GOM_BDW_SRV_ORD_INFO SOI
+        LEFT JOIN (SELECT SOI.SRV_ORD_ID SRVORDIDINFO,ROUTE.ATTR_CODE,
+         CAST(ATTR_VALUE as varchar2(4000)) as ATTR_VALUE
+        FROM  GOM_BDW_SRV_ORD_INFO SOI
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE ROUTE ON ROUTE.SRV_ORD_ID = SOI.SRV_ORD_ID
+        WHERE SOI.SRV_ORD_ID = #{srvOrdId} AND ATTR_CODE IN ('CHK_MESS','CHK_LIMIT_TIME','CHK_RES_TXT') ) T
+        PIVOT(MAX(T.ATTR_VALUE) FOR ATTR_CODE IN ('CHK_MESS' CHK_MESS,'CHK_LIMIT_TIME' CHK_LIMIT_TIME,'CHK_RES_TXT' CHK_RES_TXT)) A
+        ON A.SRVORDIDINFO = SOI.SRV_ORD_ID
+        LEFT JOIN GOM_BDW_CODE_INFO CODE ON  CODE.CODE_TYPE='CHK_CODE'  AND SOI.CHK_CODE=CODE.CODE_VALUE
+        WHERE SOI.SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <select id="qryAutoChkList" resultType="map">
+        SELECT SRV_ORD_ID,RESNAME RES_NAME,RESTYPE RES_TYPE,STD_ADDRESS,STD_ADDRESS_FULLNAME,WGS84_X,WGS84_Y
+        ,LENGTH,CORE_NUM,CORE_FREE_NUM,TERM_NUM,TERM_FREE_NUM,PORT_NUM,PORT_FREE_NUM,PORT_MAX_RATE
+        FROM GOM_BDW_SRV_ORD_RES_INFO
+        WHERE RESOURCES='autoCheck'  AND SRV_ORD_ID=#{srvOrdId} AND STATE='10A'
+    </select>
+    <select id="queryComplateInfo" resultType="map" parameterType="string">
+        SELECT IS_COMPLATE_PERSON,COMPLATE_PERSON_ID
+        FROM GOM_BDW_DISPATCH_DEPT
+        WHERE CST_ORD_ID = (SELECT CST_ORD_ID FROM GOM_BDW_SRV_ORD_INFO WHERE ORDER_ID = #{orderId})
+        AND SRV_ORD_ID = (SELECT SRV_ORD_ID FROM GOM_BDW_SRV_ORD_INFO WHERE ORDER_ID = #{orderId})
+    </select>
+
+    <insert id="writeOrderMessage" parameterType="java.lang.String">
+        insert into GOM_ORDER_MESSAGE(message_id,
+                message_state,
+                message_alias,
+                order_id,
+                wo_id,
+                prod_type,
+                prod_id,
+                apply_order,
+                order_no,
+                spec_name,
+                user_name,
+                serial_number,
+                user_id,
+                disp_obj_tye,
+                disp_obj_id
+                )
+                values
+        (lpad(SEQ_GOM_ORDER_MESSAGE.NEXTVAL, 24, 0), #{messageState}, #{messageAlias}, #{orderId}, #{woId},
+        #{prodType}, #{prodId}, #{applyOrder}, #{oedreNo}, #{specName}, #{userName}, #{serialNumber}, #{userId}, #{dispObjTye}, #{dispObjId})
+    </insert>
+
+    <select id="queryChildFlow" resultType="java.util.Map">
+        select mid.* from (
+        SELECT o.order_id,
+        o.wo_id,
+        info.code_content as prod_type,
+        info.code_value as prod_id,
+        cst.apply_ord_id,
+        srv.trade_id,
+        srv.serial_number,
+        case
+        when o.deal_user_id is null and o.disp_obj_tye = '260000002' then
+        '260000002'
+        else
+        '260000003'
+        end as disp_obj_tye,
+        case
+        when o.deal_user_id is null then
+        o.disp_obj_id
+        else
+        o.deal_user_id
+        end as disp_obj_id,
+        p.pub_date_name as spec_name
+        from gom_wo o
+        left join gom_order ord
+        on ord.order_id = o.order_id
+        left join gom_ps_2_wo_s ws
+        on ws.id = o.ps_id
+        left join uos_tache ut
+        on ut.id = ws.tache_id
+        left join gom_bdw_srv_ord_info srv
+        on srv.order_id = ord.parent_order_id
+        left join gom_bdw_code_info info
+        on srv.service_id = info.code_value
+        and info.code_type = 'product_code'
+        left join gom_bdw_cst_ord cst
+        on srv.cst_ord_id = cst.cst_ord_id
+        left join gom_ord_key_info sk
+        on sk.order_id = o.order_id
+        left join gom_pub_date_s p
+        on p.pub_date_id = sk.specialty_code
+        and p.df_type = 'SPECIALTY_TYPE'
+        where
+        ord.parent_order_id = (select parent_order_id from gom_order where order_id = #{orderId})
+        and o.wo_id not in (#{woId})
+        and o.wo_state = '290000002'
+        and o.disp_obj_id not in ('-2000')
+        and ut.tache_code in ('RES_ALLOCATE', 'FIBER_RES_ALLOCATE')
+        ) mid
+        where mid.disp_obj_id is not null
+        and mid.prod_type is not null
+        and mid.apply_ord_id is not null
+        and mid.trade_id is not null
+        and mid.spec_name is not null
+    </select>
+    <select id="queryDealFlow" resultType="java.util.Map">
+    select mid.* from (
+        SELECT o.ORDER_ID,w.wo_id,info.code_content as prod_type,info.code_value as prod_id,cst.APPLY_ORD_ID,
+            srv.TRADE_ID,srv.SERIAL_NUMBER,
+            case when w.DEAL_USER_ID is null and w.disp_obj_tye = '260000002'
+            then '260000002'else '260000003'
+            end as DISP_OBJ_TYE,
+            case when w.deal_user_id is null
+            then w.disp_obj_id else w.DEAL_USER_ID
+            end as DISP_OBJ_ID
+            FROM GOM_ORDER o
+            LEFT JOIN gom_wo w ON w.order_id = o.order_id
+            LEFT JOIN gom_bdw_srv_ord_info srv ON srv.order_id = o.order_id
+            left join gom_bdw_code_info info on srv.service_id = info.code_value
+            and info.code_type = 'product_code'
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            left join gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+            WHERE w.order_id = #{orderId}
+            and w.disp_obj_id not in ('-2000')
+            and w.wo_state = '290000002'
+        UNION ALL
+        SELECT o.ORDER_ID,w.wo_id,info.code_content as prod_type,info.code_value as prod_id,cst.APPLY_ORD_ID,
+            srv.TRADE_ID,srv.SERIAL_NUMBER,
+            case when w.DEAL_USER_ID is null and w.disp_obj_tye = '260000002'
+            then '260000002'else '260000003'
+            end as DISP_OBJ_TYE,
+            case when w.deal_user_id is null
+            then w.disp_obj_id else w.DEAL_USER_ID
+            end as DISP_OBJ_ID
+            FROM GOM_ORDER o
+            LEFT JOIN gom_wo w ON w.order_id = o.order_id
+            LEFT JOIN gom_bdw_srv_ord_info srv ON srv.order_id = o.parent_order_id
+            left join gom_bdw_code_info info on srv.service_id = info.code_value
+            and info.code_type = 'product_code'
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            left join gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+            WHERE w.order_id in
+            (SELECT order_id FROM GOM_ORDER WHERE PARENT_ORDER_ID = #{orderId})
+            and w.wo_state = '290000002'
+            and w.disp_obj_id not in '-2000'
+             )mid where mid.disp_obj_id is not null
+    </select>
+
+
+
+    <select id="queryMessageList" resultType="map">
+        select z.*
+        FROM (
+        SELECT distinct ROW_NUMBER() OVER (ORDER BY y.rowid desc) AS rowindex, y.*
+        From (
+        select
+        a.message_id,
+        a.prod_type,
+        a.prod_id,
+        a.apply_order,
+        a.order_no,
+        a.serial_number,
+        a.order_id,
+        a.wo_id,
+        a.spec_name,
+       /* case a.disp_obj_tye when '260000003' then
+        (select us.user_name from bfm_user us where us.user_id=a.disp_obj_id)
+        when '260000002' then
+        (select sw.name from work_group sw where sw.work_group_id=a.disp_obj_id)
+        end as user_name,*/
+        a.user_name,
+        a.message_alias
+        from GOM_ORDER_MESSAGE a
+        where  1=1 and a.delete_state = '0'
+        and a.message_state not in ('已处理')
+        <if test="orderNo != null and  orderNo != '' ">
+            and a.order_no = #{orderNo}
+        </if>
+        <if test="prodType != null and  prodType != '' ">
+            and a.prod_id = #{prodType}
+        </if>
+        <if test="applyOrder != null and  applyOrder != '' ">
+            and a.apply_order = #{applyOrder}
+        </if>
+        <if test="userId != null and  userId != '' ">
+            and (a.disp_obj_id = #{userId} or a.disp_obj_id in (select sw.work_group_id from staff_workgrp sw where sw.staff_id=#{userId}))
+        </if>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <select id="countMessageList" parameterType="java.util.Map" resultType="int" timeout="10000">
+        select count(1)
+        from GOM_ORDER_MESSAGE a
+        where  1=1 and a.delete_state = '0' and a.message_state not in ('已处理')
+        <if test="orderNo != null and  orderNo != '' ">
+            and a.order_no = #{orderNo}
+        </if>
+        <if test="prodType != null and  prodType != '' ">
+            and a.prod_id = #{prodType}
+        </if>
+        <if test="userId != null and  userId != '' ">
+            and (a.disp_obj_id = #{userId} or a.disp_obj_id in (select sw.work_group_id from staff_workgrp sw where sw.staff_id=#{userId}))
+        </if>
+    </select>
+
+    <select id="isSendMessage" resultType="int">
+        SELECT count(1)
+        FROM GOM_ORDER_MESSAGE gus
+        WHERE gus.message_state not in ('已处理')
+           and gus.order_id = #{orderId}
+           and gus.wo_id = #{woId}
+    </select>
+
+
+    <update id="updateMessage" parameterType="string">
+        UPDATE GOM_ORDER_MESSAGE R
+        SET R.modify_date=sysdate,R.message_state = #{isDeal}
+        WHERE R.order_id = #{orderId} and R.wo_id = #{woId}
+    </update>
+
+    <select id="getActivateInfo" resultType="map">
+        select a.wo_id,a.feed_system,a.spec_name,a.activate_code,a.activate_desc,to_char(a.activate_date,'yyyy-MM-dd hh24:mi:ss') activate_date
+          from GOM_ORDER_ACTIVATE a,gom_wo b,gom_order ord
+         where b.wo_state in ('290000002','290000004')
+         and ord.parent_order_id = #{orderId}
+         and a.wo_id=b.wo_id
+         and ord.order_id = b.order_id
+    </select>
+
+    <select id="queryOrderByWoId" resultType="String">
+        select a.order_id from gom_wo a where a.wo_id= #{woId}
+    </select>
+
+    <select id="queryProdId" resultType="map">
+          select a.srv_ord_id,a.service_id,a.change_flag,a.active_type from gom_bdw_srv_ord_info a,gom_order b where a.order_id=b.parent_order_id and b.order_id=#{orderId}
+    </select>
+
+    <select id="queryTacheCode" resultType="String">
+        select ut.tache_code
+        from  gom_wo w,gom_ps_2_wo_s ws,uos_tache ut
+        where  w.order_id =#{orderId}
+         and ws.id = w.ps_id and ut.id = ws.tache_id
+    </select>
+
+    <select id="querySpecName" resultType="String">
+        select b.pub_date_name as spec_name from gom_wo gw, gom_ord_key_info sk, gom_pub_date_s b
+        where gw.wo_id = #{woId} and sk.order_id = gw.order_id
+        and b.pub_date_id = sk.specialty_code and b.df_type = 'SPECIALTY_TYPE'
+    </select>
+
+    <select id="queryWoInfo" resultType="map">
+        select a.srv_ord_id,
+               a.order_id,
+               a.active_type,
+               a.serial_number,
+               a.trade_id,
+               a.service_id,
+               c.subscribe_id,
+               b.wo_id,c.HANDLE_DEP_ID
+        from gom_bdw_srv_ord_info a
+        left join gom_order d on d.parent_order_id=a.order_id
+        left join gom_wo b on d.order_id = b.order_id
+        left join  gom_bdw_cst_ord c on a.cst_ord_id = c.cst_ord_id
+        where b.wo_id = #{woId}
+    </select>
+
+    <select id="queryCustInfo" resultType="map">
+       SELECT B.CUST_ADDRESS,B.CUST_CONTACT_MAN_NAME,B.CUST_CONTACT_MAN_TEL,B.CUST_NAME_CHINESE
+        FROM  GOM_BDW_SRV_ORD_INFO_DIS_VIEW A
+            JOIN  GOM_BDW_CST_ORD B ON A.CST_ORD_ID=B.CST_ORD_ID
+        WHERE A.SRV_ORD_ID = #{srvOrderId}
+    </select>
+
+    <select id="queryJikeInfo" resultType="String">
+          select a.attr_value from gom_bdw_srv_ord_attr_info a
+          where a.attr_code = #{attrCode} and a.srv_ord_id= #{srvOrderId}
+    </select>
+
+    <select id="queryJikeInfoEnumValue" resultType="String">
+          select c.code_content from gom_bdw_srv_ord_attr_info a
+          left join gom_bdw_code_info c on c.code_type = a.attr_code and c.code_value = a.attr_value
+          where a.attr_code = #{attrCode} and a.srv_ord_id= #{srvOrderId}
+    </select>
+
+    <select id="queryResInfo" resultType="String">
+      select a.attr_value from gom_bdw_srv_ord_res_route a
+      where a.attr_code = #{attrCode} and a.srv_ord_id= #{srvOrderId}
+    </select>
+
+    <select id="queryIplistInfo" resultType="map">
+        select a.attr_value from gom_bdw_srv_ord_res_route a
+            where a.srv_ord_id= #{srvOrderId}
+    </select>
+
+    <select id="queryHaoxInfo" resultType="map">
+     select a.attr_value from gom_bdw_srv_ord_res_route a
+          where a.attr_code = #{attrCode} and a.srv_ord_id= #{srvOrderId}
+    </select>
+
+    <select id="queryWoState" resultType="String">
+      select a.wo_state from gom_wo a where a.wo_id=#{woId}
+    </select>
+
+    <select id="qrySubType" parameterType="string" resultType="string">
+       SELECT info.attr_value FROM gom_bdw_srv_ord_attr_info info
+         where info.SRV_ORD_ID = #{srvOrdId} AND info.ATTR_CODE = '10002111'
+    </select>
+
+    <select id="querySrvInfoByWoId" parameterType="string" resultType="map">
+      SELECT ut.id as tache_id,i.service_id,i.TRADE_TYPE_CODE,i.active_type,i.srv_ord_id,i.CST_ORD_ID,sk.specialty_code
+        FROM gom_wo w
+        LEFT JOIN GOM_ORDER o ON w.order_id = o.order_id
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO_VIEW i ON i.order_id = o.parent_order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        LEFT JOIN gom_ord_key_info sk ON sk.order_id = w.order_id
+        WHERE w.wo_id = #{woId}  ORDER BY w.CREATE_DATE DESC
+    </select>
+
+    <select id="qryDateMakeWoId" parameterType="string" resultType="map">
+    SELECT w.wo_state,w.wo_id,w.order_id
+        FROM gom_wo w
+        left join gom_order ord on ord.order_id = w.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        LEFT JOIN gom_ord_key_info sk ON sk.order_id = w.order_id
+        WHERE   ut.id = '500001158' and sk.specialty_code = 'ACCESS_6' and ord.parent_order_id = #{orderId}
+
+    </select>
+
+    <update id="updateDealUserIdByWoId" parameterType="string">
+        update gom_wo set DEAL_USER_ID = #{dealUserId} where wo_id = #{wo_id}
+    </update>
+
+    <select id="qryIsDataMakeAuto" parameterType="string" resultType="int">
+       SELECT COUNT(1)
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = ORD.PARENT_ORDER_ID
+          left join department d on d.dept_id = KI.Region_Id
+          JOIN (SELECT R.CODE_VALUE, R.CODE_CONTENT
+                  FROM GOM_BDW_CODE_INFO R
+                 WHERE R.CODE_TYPE = 'DATAMAKE_AUTO_ACTIVE') AREA on AREA.CODE_CONTENT =
+                                                                     d.Region_Id
+        WHERE ORD.ORDER_ID = #{orderId}
+    </select>
+    <select id="qryAccessAutoConfig" parameterType="string" resultType="int">
+       SELECT COUNT(1)
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = ORD.PARENT_ORDER_ID OR KI.ORDER_ID = ORD.ORDER_ID
+          left join department d on d.dept_id = KI.Region_Id
+          JOIN (SELECT R.CODE_VALUE, R.CODE_CONTENT
+                  FROM GOM_BDW_CODE_INFO R
+                 WHERE R.CODE_TYPE = 'ACCESS_AUTO_CONFIG') AREA on AREA.CODE_CONTENT =
+                                                                     d.Region_Id
+        WHERE ORD.ORDER_ID = #{orderId}
+    </select>
+
+    <select id = "qryAttrValue" parameterType="string" resultType="string">
+        SELECT ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID = #{srvOrdId} AND ATTR_CODE = #{attrCode}  AND ATTR_NAME = #{attrName}
+    </select>
+    <select id="queryWoAndSpecialtyInfoByOrderId" resultType="java.util.Map">
+        SELECT W.WO_ID,KI.SPECIALTY_CODE,W.WO_STATE,PS.TACHE_ID
+        FROM GOM_ORDER O
+        LEFT JOIN  GOM_ORD_KEY_INFO KI ON O.ORDER_ID = KI.ORDER_ID
+        LEFT JOIN GOM_WO W ON KI.ORDER_ID = W.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S PS ON W.PS_ID = PS.ID
+        WHERE O.PARENT_ORDER_ID IN ( SELECT PARENT_ORDER_ID FROM GOM_ORDER WHERE ORDER_ID = #{orderId})
+        AND W.WO_STATE NOT IN ('290000004') AND PS.TACHE_ID IN ('500001157','500001158')
+    </select>
+
+    <!--根据流程id,环节编码，工单状态查询需要的工单信息 -->
+    <select id="queryWoInfoByOrderId"  resultType="map" parameterType="map">
+        SELECT w.wo_id ,o.ORDER_ID ,ut.id ,ut.tache_code,   ut.tache_name , w.wo_state
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE w.order_id = #{orderId}
+        <if test="tacheCode != null and tacheCode != ''">
+            AND ut.tache_code = #{tacheCode}</if>
+        <if test="woState != null and woState != ''">
+            AND w.wo_state = #{woState}</if>
+        ORDER BY w.CREATE_DATE DESC
+    </select>
+
+    <select id="qryIsSendOneDry" resultType="int">
+        SELECT count(ATTR_CODE) FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_CODE='sendOneDry' AND SRV_ORD_ID=#{srvOrdId}
+    </select>
+
+    <select id="querydealUserInfo" resultType="java.util.Map">
+        SELECT DISTINCT
+               W.COMP_USER_ID,
+               W.DISP_OBJ_TYE,
+               W.DISP_OBJ_ID,
+               W.DEAL_USER_ID
+          FROM GOM_BDW_SRV_ORD_INFO SO
+          LEFT JOIN GOM_ORDER O ON SO.ORDER_ID=O.ORDER_ID
+          LEFT JOIN GOM_WO W  ON W.ORDER_ID = O.ORDER_ID
+          LEFT JOIN GOM_BDW_SRV_ORD_INFO I ON I.ORDER_ID = O.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS  ON WS.ID = W.PS_ID
+          LEFT JOIN UOS_TACHE UT  ON UT.ID = WS.TACHE_ID
+         WHERE SO.CST_ORD_ID = #{cstOrdId}
+         AND  UT.TACHE_CODE = #{tacheCode}
+    </select>
+    <insert id="insertPostponementApply" parameterType="map"  keyColumn="ID" keyProperty="ID">
+        <selectKey resultType="int" order="BEFORE" keyProperty="ID">
+            SELECT SEQ_GOM_BDW_POSTPONEMENT_APPLY.NEXTVAL from dual
+        </selectKey>
+        insert into GOM_BDW_POSTPONEMENT_APPLY
+                    (ID,
+                    SRV_ORD_ID,
+                    CST_ORD_ID,
+                    WO_ID,
+                    <if test="#{newTime}!=null">POSTPONEMENT,</if>
+                    <if test="#{oldTime}!=null">OLD_DATE,</if>
+                    <if test="#{saveState}!=null">SAVE_STATE,</if>
+                    <if test="#{applyState}!=null">APPLY_STATE,</if>
+                    <if test="#{reason}!=null">REMARK,</if>
+                    <if test="#{applyType}!=null">APPLY_TYPE,</if>
+                    <if test="#{dealUser}!=null">DEAL_USER,</if>
+                    CREATE_DATE
+                    )
+            values (#{ID},
+                    #{srvOrdId},
+                    #{cstOrdId},
+                    #{woId},
+                    <if test="#{newTime}!=null">to_date( #{newTime},'yyyy-MM-dd HH24:Mi:ss'),</if>
+                    <if test="#{oldTime}!=null">to_date(#{oldTime},'yyyy-MM-dd HH24:Mi:ss'),</if>
+                    <if test="#{saveState}!=null"> #{saveState},</if>
+                    <if test="#{applyState}!=null"> #{applyState},</if>
+                    <if test="#{reason}!=null"> #{reason},</if>
+                    <if test="#{applyType}!=null"> #{applyType},</if>
+                    <if test="#{dealUser}!=null"> #{dealUser},</if>
+                    sysdate
+                    )
+    </insert>
+    <update id="updatePostponementApply">
+        UPDATE GOM_BDW_POSTPONEMENT_APPLY
+        <trim prefix="set" suffixOverrides=",">
+            <if test="applyState !=null "> APPLY_STATE = #{applyState},</if>
+            <if test="applyBack !=null "> EXC_1 = #{applyBack},</if>
+            <if test="updateState !=null"> SAVE_STATE = #{updateState},</if>
+            <if test="newTime !=null"> POSTPONEMENT = to_date(#{newTime},'yyyy-MM-dd HH24:Mi:ss'),</if>
+            <if test="reason !=null"> REMARK = #{reason},</if>
+            <if test="auditOpinion !=null"> AUDIT_OPINION = #{auditOpinion},</if>
+            <if test="applyType!=null"> APPLY_TYPE = #{applyType},</if>
+        </trim>
+        WHERE  WO_ID = #{woId}
+        <if test="cstOrdId !=null">
+            AND CST_ORD_ID = #{cstOrdId}
+        </if>
+        <if test="saveState !=null">
+          AND SAVE_STATE = #{saveState}
+        </if>
+
+    </update>
+    <select id="queryPostponementApply" resultType="java.util.Map">
+        SELECT  ID,
+                POSTPONEMENT,
+                SRV_ORD_ID,
+                OLD_DATE,
+                WO_ID,
+                APPLY_STATE,
+                AUDIT_OPINION,
+                REMARK,
+                SAVE_STATE,
+                APPLY_TYPE
+              FROM GOM_BDW_POSTPONEMENT_APPLY
+             WHERE 1=1
+                <if test="cstOrdId !=null">
+                    AND CST_ORD_ID = #{cstOrdId}
+                </if>
+                <if test="woId !=null">
+                    AND WO_ID = #{woId}
+                </if>
+                <if test="applyState !=null">
+                    AND APPLY_STATE = #{applyState}
+                </if>
+                <if test="saveState !=null">
+                       AND SAVE_STATE = #{saveState}
+                </if>
+               ORDER BY CREATE_DATE DESC, APPLY_VERSION DESC
+    </select>
+
+    <select id="getAttachInfo"  resultType="map">
+        SELECT info.ATTACH_INFO_ID,info.FILE_ID,info.FILE_NAME,info.FILE_SIZE,info.FILE_TYPE,info.FILE_PATH from
+        GOM_BDW_ATTACH_INFO info
+        LEFT JOIN gom_wo wo ON wo.wo_id = info.wo_ord_id
+        LEFT JOIN gom_order oo ON oo.order_id = wo.order_id
+        where info.WO_ORD_ID = #{woId}
+        AND info.ORIGIN = #{origin}
+        <if test="fileState !=null">
+            AND info.FILE_STATE = #{fileState}
+        </if>
+        <if test="applyId !=null">
+            AND DISPATCH_ORDER_ID = #{applyId}
+        </if>
+        AND oo.ORDER_STATE NOT IN ('200000005', '200000003')
+    </select>
+
+
+    <!--删除附件信息-->
+    <delete id="deleteAttachFile" parameterType="java.util.Map" >
+        delete from GOM_BDW_ATTACH_INFO
+        where  WO_ORD_ID = #{woId}
+        <if test="fileState != null">
+           AND FILE_STATE =  #{fileState}
+        </if>
+        <if test="origin != null">
+            AND ORIGIN = #{origin}
+        </if>
+           AND CST_ORD_ID = #{cstOrdId}
+        <if test="srvOrdId != null">
+           AND SRV_ORD_ID = #{srvOrdId}
+        </if>
+    </delete>
+    <delete id="deleteMessageList">
+        DELETE GOM_ORDER_MESSAGE WHERE message_ID = #{messageId} AND ORDER_ID = #{orderId} AND WO_ID = #{woId}
+    </delete>
+    <!-- 更新附件信息-->
+    <update id="updateFileState">
+        UPDATE GOM_BDW_ATTACH_INFO
+        set FILE_STATE = #{updateState}
+        WHERE WO_ORD_ID = #{woId}
+        AND FILE_STATE = #{fileState}
+        AND ORIGIN='YQ'
+    </update>
+
+    <update id="updataCircuitInfo">
+
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO
+            SET ATTR_VALUE = #{attrValue}
+          WHERE ATTR_CODE = #{attrCode}
+            AND SRV_ORD_ID = #{srvOrdId}
+
+    </update>
+
+    <select id="querySpecialtyNameByOrderId" resultType="java.lang.String">
+          select b.pub_date_name as spec_name
+          from gom_ord_key_info sk
+          left join gom_pub_date_s b on sk.specialty_code = b.pub_date_id and b.df_type = 'SPECIALTY_TYPE'
+          where sk.order_id = #{orderId}
+
+    </select>
+    <select id="querySwitchCode" resultType="java.lang.String">
+          SELECT OUTSIDE_CODE
+          FROM GOM_BDW_DEPARTMENT_CODE_SWITCH
+         WHERE LOCAL_CODE = #{code}
+           AND TYPE = #{type}
+    </select>
+
+</mapper>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetworkFlow.dao.CloudNetWorkResCheckDao">
+
+    <select id="qrycircuitInfo" parameterType="map" resultType="map">
+        SELECT
+            SOI.SERIAL_NUMBER,
+            SOI.TRADE_ID,
+            O.ORDER_ID,
+            SOI.SRV_ORD_ID,
+            CO.CST_ORD_ID,
+            WO.WO_ID,
+            WS.TACHE_ID,
+            CASE WHEN DEPT.NUM > 0 THEN '已配置' ELSE '未配置' END AS STATE,
+            CASE WHEN BB.NUM > 0 THEN '已保存' ELSE '未保存' END AS CHECK_STATE,
+            B.*
+        FROM GOM_BDW_CST_ORD CO
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SOI ON CO.CST_ORD_ID = SOI.CST_ORD_ID
+        LEFT JOIN (
+            SELECT DISTINCT SRV_ORD_ID, COUNT(SRV_ORD_ID) NUM FROM GOM_BDW_ORD_SPECIALTY WHERE CST_ORD_ID = #{cstOrdId} GROUP BY SRV_ORD_ID
+        )DEPT ON DEPT.SRV_ORD_ID = SOI.SRV_ORD_ID
+        LEFT JOIN (
+            SELECT A.* FROM(
+                SELECT
+                    OI.SRV_ORD_ID,
+                    AI.ATTR_VALUE,
+                    AI.ATTR_CODE
+                FROM GOM_BDW_CST_ORD RD
+                LEFT JOIN GOM_BDW_SRV_ORD_INFO OI ON RD.CST_ORD_ID = OI.CST_ORD_ID
+                LEFT JOIN GOM_BDW_SRV_ORD_ATTR_INFO AI ON OI.SRV_ORD_ID = AI.SRV_ORD_ID
+                WHERE RD.CST_ORD_ID = #{cstOrdId}
+            )A PIVOT(MAX(A.ATTR_VALUE) FOR ATTR_CODE IN ('20000078' ACITYNAME, '20000096' ZCITYNAME, '20003617' ACITYID, '20003618' ZCITYID,
+                '20000064' CIRCUITCODE, '20000234' AREGIONID, '20000235' ZREGIONID, '20000080' AREGIONNAME, '20000098' ZREGIONNAME,
+                '20000082' A_installed_add, '20000100' Z_installed_add)) A
+        )B ON SOI.SRV_ORD_ID = B.SRV_ORD_ID
+        LEFT JOIN GOM_ORDER O ON SOI.ORDER_ID = O.ORDER_ID OR O.PARENT_ORDER_ID = SOI.ORDER_ID
+        LEFT JOIN GOM_WO WO ON O.ORDER_ID = WO.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN (SELECT WO_ID, COUNT(1) AS NUM FROM GOM_BDW_CHECK_FEEDBACK WHERE TACHE_ID = #{tacheId} GROUP BY WO_ID)BB ON WO.WO_ID = BB.WO_ID
+        WHERE CO.CST_ORD_ID = #{cstOrdId}
+        AND WO.WO_STATE = '290000002'
+        AND WO.DEAL_USER_ID = #{userId}
+        AND WS.TACHE_ID = #{tacheId}
+    </select>
+
+    <select id="querySpecialAreaInfo" parameterType="map" resultType="map">
+        SELECT SPECIALTY_INFO, SPECIALTY_INFO_NAME, FLOW_SPECIALTY_DATA, NEW_CREATE_RESOURCE FROM GOM_BDW_ORD_SPECIALTY WHERE CST_ORD_ID = #{cstOrdId} AND SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <insert id="saveSpecialArea" parameterType="map">
+        INSERT INTO GOM_BDW_ORD_SPECIALTY (
+            ID,
+            CST_ORD_ID,
+            SRV_ORD_ID,
+            CREATE_DATE,
+            UPDATE_DATE,
+            SPECIALTY_INFO, --IPRAN专业
+            SPECIALTY_INFO_NAME, --光纤专业
+            FLOW_SPECIALTY_DATA, --终端盒专业
+            NEW_CREATE_RESOURCE --是否直接到核查汇总
+        )
+        VALUES(
+            SEQ_GOM_BDW_ORD_SPECIALTY.NEXTVAL,
+            #{cstOrdId},
+            #{srvOrdId},
+            SYSDATE,
+            SYSDATE,
+            #{ipRan},
+            #{fiber},
+            #{terminalBox},
+            #{isDirctCheckSum}
+        )
+    </insert>
+
+    <select id="querySrvOrdInfo" parameterType="string" resultType="map">
+        SELECT SRV_ORD_ID, CST_ORD_ID FROM GOM_BDW_SRV_ORD_INFO WHERE ORDER_ID =#{orderId}
+    </select>
+
+    <update id="updateWoState" parameterType="string">
+        UPDATE GOM_WO SET WO_STATE = #{state} WHERE WO_ID =#{woId}
+    </update>
+    <select id="queryCheckChildWoOrder" parameterType="string" resultType="int">
+        SELECT COUNT(1) FROM GOM_ORDER O
+        LEFT JOIN GOM_WO WO ON O.ORDER_ID = WO.ORDER_ID
+        WHERE O.PARENT_ORDER_ID = (
+            SELECT PARENT_ORDER_ID FROM GOM_ORDER WHERE ORDER_ID = #{orderId}
+        ) AND WO.WO_STATE = '290000002'
+    </select>
+    <select id="queryMainWoId" parameterType="string" resultType="string">
+        SELECT WO_ID FROM GOM_WO
+        WHERE ORDER_ID = (
+            SELECT PARENT_ORDER_ID FROM GOM_ORDER WHERE ORDER_ID = #{orderId}
+        ) AND WO_STATE = '290000110'
+    </select>
+    <update id="updateWoStateByWoId" parameterType="string">
+        UPDATE GOM_WO SET WO_STATE = #{state} WHERE WO_ID = #{woId}
+    </update>
+    <update id="updateSpecialArea" parameterType="map">
+        UPDATE GOM_BDW_ORD_SPECIALTY
+            SET
+            SPECIALTY_INFO = #{ipRan},
+            SPECIALTY_INFO_NAME = #{fiber},
+            FLOW_SPECIALTY_DATA = #{terminalBox},
+            NEW_CREATE_RESOURCE = #{isDirctCheckSum}
+        WHERE CST_ORD_ID = #{cstOrdId} AND SRV_ORD_ID = #{srvOrdId}
+    </update>
+    <select id="queryCheckInfo" parameterType="string" resultType="map">
+        SELECT
+            A_RES_SATISFY,
+            A_OTHER_TYPE,
+            Z_RES_SATISFY,
+            Z_OTHER_TYPE,
+            A_OPTICALCABLE_TEXT
+        FROM GOM_BDW_CHECK_FEEDBACK
+        WHERE SRV_ORD_ID = #{srvOrdId}
+        AND WO_ID = #{woId}
+        AND TACHE_ID = #{tacheId}
+    </select>
+
+    <update id="updateCheckInfo" parameterType="map">
+        UPDATE GOM_BDW_CHECK_FEEDBACK SET
+           A_RES_SATISFY = #{resSatisfyA}, --A端IPRAN资源是否具备
+           A_OTHER_TYPE = #{upDeviceTypeA}, --A端上联设备类型
+           Z_RES_SATISFY = #{resSatisfyZ}, --Z端IPRAN资源是否具备
+           Z_OTHER_TYPE = #{upDeviceTypeZ} --Z端上联设备类型
+           <if test="resDesc != null and resDesc != ''">
+               ,A_OPTICALCABLE_TEXT = #{resDesc} --资源描述
+           </if>
+        WHERE SRV_ORD_ID = #{srvOrdId}
+            AND WO_ID = #{woId}
+            AND TACHE_ID = #{tacheId}
+    </update>
+
+    <insert id="insertIntoCheckInfo" parameterType="map" >
+        INSERT INTO GOM_BDW_CHECK_FEEDBACK(
+            ID,
+            SRV_ORD_ID,
+            WO_ID,
+            <if test="resSatisfyA != null and resSatisfyA != ''">
+                A_RES_SATISFY, --A端IPRAN资源是否具备
+            </if>
+            <if test="upDeviceTypeA != null and upDeviceTypeA != ''">
+                A_OTHER_TYPE,  --A端上联设备类型
+            </if>
+            <if test="resSatisfyZ != null and resSatisfyZ != ''">
+                Z_RES_SATISFY, --Z端IPRAN资源是否具备
+            </if>
+            <if test="upDeviceTypeZ != null and upDeviceTypeZ != ''">
+                Z_OTHER_TYPE,  --Z端上联设备类型
+            </if>
+            <if test="resDesc != null and resDesc != ''">
+                A_OPTICALCABLE_TEXT, --资源描述
+            </if>
+            TACHE_ID
+        )
+        VALUES(
+            SEQ_GOM_BDW_CHECK_FEEDBACK.NEXTVAL,
+            #{srvOrdId},
+            #{woId},
+            <if test="resSatisfyA != null and resSatisfyA != ''">
+                #{resSatisfyA},
+            </if>
+            <if test="upDeviceTypeA != null and upDeviceTypeA != ''">
+                #{upDeviceTypeA},
+            </if>
+            <if test="resSatisfyZ != null and resSatisfyZ != ''">
+                #{resSatisfyZ},
+            </if>
+            <if test="upDeviceTypeZ != null and upDeviceTypeZ != ''">
+                #{upDeviceTypeZ},
+            </if>
+            <if test="resDesc != null and resDesc != ''">
+                #{resDesc},
+            </if>
+            #{tacheId}
+        )
+    </insert>
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetworkFlow.dao.WoOrderDealDao">
+
+    <select id="getCloudTacheButton" parameterType="map" resultType="map">
+        SELECT TB.ID,
+        TB.TACHE_DEFINE_ID,
+        TB.BUTTON_NAME,
+        TB.BUTTON_CLICK,
+        TB.CONTROL_SQL,
+        TB.CREATE_DATE,
+        TB.STATE,
+        TB.COMMENTS
+        FROM GOM_BDW_TACHE_BUTTON TB
+        <where>
+            TB.STATE = '10A'
+            AND TB.TACHE_DEFINE_ID = #{tacheId}
+            <if test='btnInfo == "100"'>
+                AND TB.SHOW_TYPE = '10N' /** 处理中 */
+            </if>
+            <if test='btnInfo == "200"'>
+                AND TB.SHOW_TYPE = '10T' /** 待签收 */
+            </if>
+            <if test='btnInfo == "110"'>
+                AND TB.SHOW_TYPE = '10F' /** 已完成 */
+            </if>
+        </where>
+        ORDER BY CREATE_DATE ASC
+    </select>
+
+    <select id="qryCompanyAreaId" parameterType="map" resultType="map">
+        SELECT S.DEPT_ID AS "id",
+               S.DEPT_NAME AS "name",
+               S.PARENT_ID AS "pId",
+               'true' AS "open",
+               '260000001' AS "objType"
+          FROM DEPARTMENT S
+         WHERE S.DEPT_ID = #{deptId}
+           AND S.DELETE_STATE = '0'
+        UNION ALL
+        SELECT S.DEPT_ID AS "id",
+               S.DEPT_NAME AS "name",
+               S.PARENT_ID AS "pId",
+               'false' AS "open",
+               '260000001' AS "objType"
+          FROM DEPARTMENT S
+         WHERE S.PARENT_ID = #{deptId}
+           AND S.DELETE_STATE = '0'
+           AND (S.DEPT_NAME LIKE '%分公司' OR S.DEPT_NAME LIKE '%分公司网络建%' OR
+               S.DEPT_NAME LIKE '%分公司本部%' OR S.DEPT_NAME = '本部' OR
+               S.DEPT_NAME LIKE '%濮院经营部' OR S.DEPT_NAME LIKE '%分公司网络部' OR
+               S.DEPT_NAME LIKE '%分公司网络运营部' OR S.DEPT_NAME = '太原市分公司设备维护中心' OR
+               S.DEPT_NAME = '太原市分公司网络优化中心' OR S.DEPT_NAME = '太原市分公司客户响应中心')
+    </select>
+
+    <select id="qryCityAreaId" parameterType="map" resultType="map">
+        SELECT DEPT_ID   ORG_ID,
+               DEPT_NAME ORG_NAME,
+               PARENT_ID PARENT_ORG_ID,
+               REGION_ID AREA_ID
+          FROM DEPARTMENT A
+         WHERE A.PARENT_ID = #{parentId}
+         START WITH A.DEPT_ID = #{deptId}
+        CONNECT BY PRIOR A.PARENT_ID = A.DEPT_ID
+    </select>
+
+    <select id="qrySrvOrdDataByOrderId" resultType="map" parameterType="string">
+        SELECT SRV.SRV_ORD_ID,
+               SRV.SERVICE_ID,
+               SRV.ACTIVE_TYPE,
+               SRV.RE_ACTIVE_TYPE,
+               SRV.SERIAL_NUMBER,
+               SRV.STATE,
+               SRV.CST_ORD_ID,
+               srv.RESOURCES
+          FROM GOM_BDW_SRV_ORD_INFO SRV
+         WHERE SRV.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryParentOrderAndRegion" resultType="map" parameterType="string">
+        SELECT ORD.PARENT_ORDER_ID, KI.REGION_ID
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = ORD.ORDER_ID
+         WHERE ORD.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryPrivTacheCode" parameterType="string" resultType="string">
+        SELECT UT.TACHE_CODE
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.WO_ID =
+               (SELECT R.PRIV_TASK_ID FROM GOM_WO R WHERE R.WO_ID = #{woId})
+    </select>
+
+    <select id="qryMcpeInstallBackOrderData" parameterType="map" resultType="map">
+        SELECT KI.SPECIALTY_CODE,
+               SP.PUB_DATE_NAME SPECIALTY_NAME,
+               KI.REGION_ID,
+               DEPT.DEPT_NAME,
+               SP.PUB_DATE_NAME || '专业_' || DEPT.DEPT_NAME NAMEVALUE,
+               KI.SPECIALTY_CODE || ',' || KI.REGION_ID IDVALUE
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN DEPARTMENT DEPT
+            ON DEPT.DEPT_ID = KI.REGION_ID
+          LEFT JOIN (SELECT PUB.PUB_DATE_ID, PUB.PUB_DATE_NAME
+                       FROM GOM_PUB_DATE_S PUB
+                      WHERE PUB.DF_TYPE = 'SPECIALTY_TYPE') SP
+            ON SP.PUB_DATE_ID = KI.SPECIALTY_CODE
+         WHERE ORD.PARENT_ORDER_ID = #{orderId}
+           AND ORD.PARENT_ORDER_CODE = #{tacheCode}
+    </select>
+
+    <select id="qryWoOrderDataByThis" resultType="map" parameterType="string">
+        SELECT SRV.SRV_ORD_ID, ORD.ORDER_ID, WO.WO_ID, WO.WO_STATE,WS.TACHE_ID,WO.DISP_OBJ_ID
+          FROM GOM_BDW_SRV_ORD_INFO SRV
+          LEFT JOIN GOM_ORDER ORD
+            ON ORD.ORDER_ID = SRV.ORDER_ID
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE SRV.SERIAL_NUMBER = #{serialNumber}
+         <if test="tacheCode != null">
+             AND UT.TACHE_CODE = #{tacheCode}
+         </if>
+           AND WO.WO_STATE = #{woState}
+    </select>
+
+</mapper>

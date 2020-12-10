@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.localStanbdyInfo.data.dao.OrderStandbyDao">
+    <select id="qryCustInfo" parameterType="String" resultType="map">
+           SELECT distinct CO.APPLY_ORD_ID,
+                   SIO.CODE_CONTENT as ORDER_TYPE,
+                   CO.APPLY_ORD_NAME,
+                   CO.HANDLE_MAN_NAME,
+                   CO.HANDLE_DEP,
+                   CO.CUST_NAME,
+                   CO.CUST_NAME_CHINESE,
+                   CO.COOPERATION_MODE,
+                   CO.OTHER_OPERA_SER_NUM,
+                   CO.HANDLE_TIME,
+                   CO.HANDLE_MAN_TEL,
+                   CO.REMARK,
+                   CO.BATCH,
+                   CO.GROUP_PM_NAME,
+                   CO.PROVINCE_PM_NAME,
+                   CO.CUST_ID,
+                   CO.CUST_NAME_CHINESE,
+                   CO.CONTRACT_ID,
+                   CO.INIT_AM_NAME,
+                   CO.INIT_AM_TEL,
+                   CO.CUST_ADDRESS,
+                   co.IS_GROUP_CUST,
+                   CO.CUST_INDUSTRY,
+                   CO.CUST_CONTACT_MAN_NAME,
+                   CO.CUST_CONTACT_MAN_TEL,
+                   CO.CUST_OPERATOR_EMAIL
+      FROM GOM_BDW_CST_ORD CO
+      LEFT JOIN (SELECT SO.CST_ORD_ID, GCO.CODE_CONTENT
+               FROM GOM_BDW_SRV_ORD_INFO SO
+               LEFT JOIN GOM_BDW_CODE_INFO GCO
+                 ON SO.ACTIVE_TYPE = GCO.CODE_VALUE
+                AND GCO.CODE_TYPE = 'operate_type'
+              group by SO.CST_ORD_ID, GCO.CODE_CONTENT) SIO
+     ON CO.CST_ORD_ID = SIO.CST_ORD_ID
+     WHERE 1 = 1
+       AND CO.CST_ORD_ID = #{cstOrdId}
+    </select>
+    <select id="qrySrvOrderInfo" parameterType="String" resultType="map">
+           SELECT distinct SO.SRV_ORD_ID, SO.SERVICE_ID,so.serial_number
+              FROM GOM_BDW_CST_ORD CO
+              LEFT JOIN GOM_BDW_SRV_ORD_INFO_DIS_VIEW SO
+                ON CO.CST_ORD_ID = SO.CST_ORD_ID
+             WHERE CO.CST_ORD_ID = #{cstOrdId}
+             order by so.serial_number
+    </select>
+    <select id="qryDispatchOrderInfo" parameterType="String" resultType="map">
+           SELECT (SELECT CO.CODE_CONTENT
+                     FROM gom_BDW_code_info CO
+                    WHERE CO.CODE_TYPE = 'dispatch_type'
+                      AND CO.CODE_VALUE = DO.DISPATCH_TYPE ) as DISPATCH_TYPE,
+                   DO.STAFF_NAME,
+                   DO.STAFF_TEL,
+                   DO.STAFF_ORG,
+                   DO.DISPATCH_ORDER_ID,
+                   DO.ISSUER,
+                   DO.SEND_DATE,
+                   DO.DISPATCH_ORDER_NO,
+                   DO.DISPATCH_GRADE,
+                   DO.DISPATCH_URGENCY,
+                   nvl(DO.DISPATCH_SEND_ORG_NAME,DO.DISPATCH_SEND_ORG) DISPATCH_SEND_ORG,
+                   nvl(DO.DISPATCH_COPY_ORG_NAME,DO.DISPATCH_COPY_ORG) DISPATCH_COPY_ORG,
+                   DO.DISPATCH_TITLE,
+                   DO.DISPATCH_TEXT,
+                   d.code_content as dispatch_source
+           FROM GOM_BDW_DISPATCH_ORDER DO
+           LEFT JOIN GOM_BDW_CODE_INFO d
+            on DO.dispatch_source = d.code_value
+           and d.code_type = 'dispatch_source'
+           WHERE DO.CST_ORD_ID = #{cstOrdId}
+           AND DO.STATE = '10A'
+    </select>
+ <select id="queryOrderCircuitInfo" parameterType="java.util.Map" resultType="map">
+          SELECT A.ATTR_NAME,
+               CASE
+               WHEN B.SELECTSTAT = 1 THEN
+                  (SELECT CODE_CONTENT
+                     FROM gom_BDW_code_info
+                    WHERE CODE_TYPE = A.ATTR_CODE
+                      AND CODE_VALUE = A.ATTR_VALUE)
+                WHEN B.SELECTSTAT IS NULL THEN
+                  A.ATTR_VALUE
+                END AS ATTR_VALUE
+          FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+          LEFT JOIN GOM_BDW_PROPERTY_INFO B
+          ON A.ATTR_CODE = B.PROPERTY_ID AND B.IS_SHOW = 'Y'
+         WHERE A.SRV_ORD_ID = #{srvOrdId}
+           AND B.SRV_ID = #{serviceId}
+         order by A.ATTR_CODE
+    </select>
+
+
+</mapper>

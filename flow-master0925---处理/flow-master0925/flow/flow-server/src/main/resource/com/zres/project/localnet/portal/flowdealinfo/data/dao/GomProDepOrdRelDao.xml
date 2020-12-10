@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.GomProDepOrdRelDao">
+
+    <insert id="insertGomProDepOrdRel" parameterType="java.util.List">
+        insert into GOM_PRO_DEP_ORD_REL(
+                                        proDepOrdRel_id,
+                                        org_id,
+                                        profession_Id,
+                                        order_Id,
+                                        parent_orderId,
+                                        order_state)
+        <foreach collection="proDepOrdlist" item="item" index="index" separator="union all" >
+            SELECT GET_SEQ_NEXT('SEQ_GOM_PRO_DEP_ORD_REL'),#{item.orgId},#{item.professionId},#{item.orderId},#{item.parentOrderId},#{item.orderState}
+            FROM  dual
+        </foreach>
+
+    </insert>
+
+    <update id="updateSupOrderState">
+          update GOM_PRO_DEP_ORD_REL
+          set order_state = #{orderState}
+          where order_Id = #{orderId}
+          <if test="parentOrderId != null and parentOrderId != ''">
+              and parent_orderId = #{parentOrderId}
+          </if>
+    </update>
+
+
+</mapper>

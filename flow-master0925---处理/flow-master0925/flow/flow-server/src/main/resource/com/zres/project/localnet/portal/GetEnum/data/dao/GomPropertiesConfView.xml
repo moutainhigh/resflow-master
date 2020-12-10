@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.GomPropertiesConfDao">
+
+    <insert id="insertGomPropertiesConfView" parameterType="java.util.List">
+        insert into GOM_PROPERTIES_CONF_VIEW(
+        SRV_ID,
+        SRV_NAME,
+        PROPERTY_ID,
+        PROPERTY_NAME,
+        SELECTSTAT,
+        ONEDRY_CODE,
+        LOCAL_CODE,
+        IS_SHOW,
+        columSort,
+        STATE,
+        SOURSE)
+        <foreach collection="proPertiesConflist" item="item" index="index" separator="union all" >
+            SELECT #{item.SRV_ID},
+                   #{item.SRV_NAME},
+                   #{item.PROPERTY_ID},
+                   #{item.PROPERTY_NAME},
+                   #{item.SELECTSTAT},
+                   #{item.ONEDRY_CODE},
+                   #{item.LOCAL_CODE},
+                   #{item.IS_SHOW},
+                   #{item.columSort},
+                   #{item.STATE},
+                   #{item.SOURCEDATA}
+            FROM  dual
+        </foreach>
+
+    </insert>
+
+    <select id="srvIdGroup" resultType="map">
+        select p.srv_id from gom_bdw_property_info p group by p.srv_id
+    </select>
+
+    <select id="selectProperConfItem" resultType="map">
+        select p.srv_id,
+            p.srv_name,
+            p.property_id,
+            p.property_name,
+            p.selectstat,
+            p.onedry_code,
+            p.local_code,
+            p.is_show,
+            #{peCeAz} as state,
+            #{sourceData} as sourceData
+        from gom_bdw_property_info p
+        where 1=1
+            and p.srv_id = #{srvId}
+            and p.property_name like  '%'||#{peCeAz}||'端%'
+            and not exists (select v.srv_id
+                          from GOM_PROPERTIES_CONF_VIEW v
+                          where v.srv_id = p.srv_id
+                            and v.sourse = #{sourceData}
+                            and v.STATE = #{peCeAz})
+    </select>
+
+    <select id="selectPCAZColumnSortMax" resultType="int">
+        select nvl(max(v.columsort),0) as columsort
+        from GOM_PROPERTIES_CONF_VIEW v
+        where v.srv_id = #{srvId}
+          and v.sourse = #{sourceData}
+          and v.property_name like '%'||#{peCeAz}||'端%'
+    </select>
+
+    <select id="selectProperConfPuItem" resultType="map">
+        select p.srv_id,
+               p.srv_name,
+               p.property_id,
+               p.property_name,
+               p.selectstat,
+               p.onedry_code,
+               p.local_code,
+               p.is_show,
+               #{peCeAz} as state,
+               #{sourceData} as sourceData
+        from gom_bdw_property_info p
+        where 1 = 1
+          and p.srv_id = #{srvId}
+          and p.property_name not like '%PE端%'
+          and p.property_name not like '%CE端%'
+          and p.property_name not like '%A端%'
+          and p.property_name not like '%Z端%'
+          and not exists (select v.srv_id
+                          from GOM_PROPERTIES_CONF_VIEW v
+                          where v.srv_id = p.srv_id
+                            and v.sourse = #{sourceData}
+                            and v.STATE = #{peCeAz})
+    </select>
+
+    <select id="selectProperConfPuItemMax" resultType="int">
+        select nvl(max(v.columsort),0) as columsort
+        from GOM_PROPERTIES_CONF_VIEW v
+        where v.srv_id = #{srvId}
+          and v.sourse = #{sourceData}
+          and v.STATE = #{peCeAz}
+    </select>
+
+
+</mapper>

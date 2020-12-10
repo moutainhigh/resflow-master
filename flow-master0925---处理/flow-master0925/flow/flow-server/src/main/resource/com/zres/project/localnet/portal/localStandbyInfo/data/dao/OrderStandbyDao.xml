@@ -1,0 +1,2809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.localStanbdyInfo.data.dao.OrderStandbyDao">
+    <select id="querySysDictData"  resultType="com.zres.project.localnet.portal.local.domain.BaseObject">
+        SELECT CODE_VALUE as value,
+        CODE_CONTENT as name
+        FROM gom_BDW_code_info
+        where 1=1
+        <if test="codeType != null and codeType != '' ">
+            and CODE_TYPE = #{codeType}
+        </if>
+        <if test="codeTypeName != null and codeTypeName != '' ">
+            and CODE_TYPE_NAME = #{codeTypeName}
+        </if>
+        order by CODE_INFO_ID
+
+    </select>
+    <!-- 查询客户订单-->
+    <select id="qryCstOrdList" resultType="map" timeout="3000">
+      select z.cst_ord_id,
+                z.sender,
+                z.SUBSCRIBE_ID,
+                z.CUST_NAME_CHINESE,
+                z.APPLY_ORD_ID,
+                z.APPLY_ORD_NAME,
+                z.DISPATCH_ORDER_NO,
+                z.DISPATCH_TITLE,
+                z.DISPATCH_ORDER_ID,
+                z.ORDER_TYPE,
+                z.ACTIVE_TYPE,
+                z.SERVICE_ID,
+                z.SERVICETYPE,
+                z.RESOURCES,
+                z.PS_ID,
+                z.ALARM_DATE,
+                z.REQ_FIN_DATE,
+                z.WO_COMPLETE_STATE,
+                z.COUNTS,
+                z.TACHE_ID,
+                z.TACHE_NAME,
+                z.REGION_ID,
+                z.SPECIALTY_CODE,
+                z.PUB_DATE_NAME,
+                z.SPC_TAC_NAME,
+                z.DISPOBJTYEVALUE,
+                z.DISPOBJTYE,
+                z.WOORDERBACKFLAGS,
+                z.WO_IDS,
+                z.ORDER_IDS,
+                z.SRV_ORD_IDS,
+                z.WO_STATES,
+                z.SRV_ORD_STATS,
+                z.ORDER_STATES
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.cst_ord_id desc) AS rowindex,
+                y.cst_ord_id,
+                y.sender,
+                y.SUBSCRIBE_ID,
+                y.CUST_NAME_CHINESE,
+                y.APPLY_ORD_ID,
+                y.APPLY_ORD_NAME,
+                y.DISPATCH_ORDER_NO,
+                y.DISPATCH_TITLE,
+                y.DISPATCH_ORDER_ID,
+                y.ORDER_TYPE,
+                y.ACTIVE_TYPE,
+                y.SERVICE_ID,
+                y.SERVICETYPE,
+                y.RESOURCES,
+                y.PS_ID,
+                y.ALARM_DATE,
+                y.REQ_FIN_DATE,
+                y.WO_COMPLETE_STATE,
+                y.COUNTS,
+                y.TACHE_ID,
+                y.TACHE_NAME,
+                y.REGION_ID,
+                y.SPECIALTY_CODE,
+                y.PUB_DATE_NAME,
+                y.SPC_TAC_NAME,
+                y.DISPOBJTYEVALUE,
+                y.DISPOBJTYE,
+                y.WOORDERBACKFLAGS,
+                y.WO_IDS,
+                y.ORDER_IDS,
+                y.SRV_ORD_IDS,
+                y.WO_STATES,
+                y.SRV_ORD_STATS,
+                y.ORDER_STATES
+        From (
+        <include refid="qryCstOrdData"/>
+        ) y
+      )z
+        <![CDATA[
+	        where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <!-- 查询客户订单-->
+    <select id="qryCstOrdCompleteList" resultType="map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.cst_ord_id desc) AS rowindex, y.*
+        From (
+        <include refid="qryCstOrdCompleteData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <select id="qryCstOrdCcList" resultType="map" timeout="3000">
+        select z.cst_ord_id,
+        z.SUBSCRIBE_ID,
+        z.CUST_NAME_CHINESE,
+        z.APPLY_ORD_ID,
+        z.APPLY_ORD_NAME,
+        z.DISPATCH_ORDER_NO,
+        z.DISPATCH_TITLE,
+        z.DISPATCH_ORDER_ID,
+        z.ORDER_TYPE,
+        z.ACTIVE_TYPE,
+        z.SERVICE_ID,
+        z.RESOURCES,
+        z.PS_ID,
+        z.WO_COMPLETE_STATE,
+        z.TACHE_ID,
+        z.TACHE_NAME,
+        z.REGION_ID,
+        z.SPECIALTY_CODE,
+        z.PUB_DATE_NAME,
+        z.SPC_TAC_NAME,
+        z.DISPOBJTYEVALUE,
+        z.DISPOBJTYE,
+        z.WOORDERBACKFLAGS,
+        z.WO_IDS,
+        z.ORDER_IDS,
+        z.SRV_ORD_IDS,
+        Z.WO_STATES,
+        Z.SRV_ORD_STATS,
+        Z.ORDER_STATES
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.cst_ord_id desc) AS rowindex,
+        y.cst_ord_id,
+        y.SUBSCRIBE_ID,
+        y.CUST_NAME_CHINESE,
+        y.APPLY_ORD_ID,
+        y.APPLY_ORD_NAME,
+        y.DISPATCH_ORDER_NO,
+        y.DISPATCH_TITLE,
+        y.DISPATCH_ORDER_ID,
+        y.ORDER_TYPE,
+        y.ACTIVE_TYPE,
+        y.SERVICE_ID,
+        y.RESOURCES,
+        y.PS_ID,
+        y.WO_COMPLETE_STATE,
+        y.TACHE_ID,
+        y.TACHE_NAME,
+        y.REGION_ID,
+        y.SPECIALTY_CODE,
+        y.PUB_DATE_NAME,
+        y.SPC_TAC_NAME,
+        y.DISPOBJTYEVALUE,
+        y.DISPOBJTYE,
+        y.WOORDERBACKFLAGS,
+        y.WO_IDS,
+        y.ORDER_IDS,
+        y.SRV_ORD_IDS,
+        y.WO_STATES,
+        y.SRV_ORD_STATS,
+        y.ORDER_STATES
+        From (
+        <include refid="qryCstOrdCcData"/>
+        ) y
+        )z
+        <![CDATA[
+	        where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <!-- 抄送 总数 -->
+    <select id="queryStandbyCcOrderCount" resultType="int" timeout="3000">
+        select count(1)
+        From (
+        <include refid="qryCstOrdCcData"/>
+        ) q
+    </select>
+
+    <sql id="qryCstOrdCcData">
+        SELECT Q.CST_ORD_ID,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        max(q.ALARM_DATE) ALARM_DATE,
+        max(q.REQ_FIN_DATE) REQ_FIN_DATE,
+        Q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.REGION_ID,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        LISTAGG(Q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY Q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        LISTAGG(Q.WO_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS WO_IDS,
+        LISTAGG(Q.ORDER_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS ORDER_IDS,
+        LISTAGG(Q.SRV_ORD_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT SRV.ORDER_ID, srv.req_fin_time,
+        SRV.SRV_ORD_ID,
+        WO.WO_ID,
+        WO.WO_STATE,
+        SRV.TRADE_ID,
+        SRV.SERIAL_NUMBER,
+        SRV.SRV_ORD_STAT,
+        SRV.ORDER_CODE,
+        SRV.ORDER_STATE,
+        SRV.CST_ORD_ID,
+        CST.SUBSCRIBE_ID,
+        CST.CUST_NAME_CHINESE,
+        CST.APPLY_ORD_ID,
+        CST.APPLY_ORD_NAME,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        DO.SRV.DISPATCH_ORDER_ID,
+        SRV.ORDER_TYPE,
+        SRV.ACTIVE_TYPE,
+        SRV.SERVICE_ID,
+        SRV.RESOURCES,
+        SRV.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+                        CASE
+                        WHEN WO.REQ_FIN_DATE <= sysdate then '超时单'
+                        WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then '预警单'
+                        WHEN WO.ALARM_DATE > sysdate then '正常单'
+                        ELSE '正常单'
+                        END WO_COMPLETE_STATE,
+                      ]]>
+        wo.create_date,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN
+        UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        bwa.back_flag AS WOORDERBACKFLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN (SELECT SOI.CST_ORD_ID, soi.req_fin_time,
+        SOI.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        SOI.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SRV_ORD_INFO SOI
+        JOIN GOM_ORDER O
+        ON SOI.ORDER_ID = O.ORDER_ID or SOI.ORDER_ID = O.PARENT_ORDER_ID
+        WHERE soi.system_resource = 'flow-schedule-lt' ) SRV
+        ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO
+        ON DO.DISPATCH_ORDER_ID = SRV.DISPATCH_ORDER_ID
+        AND DO.STATE = '10A'
+        LEFT JOIN GOM_WO WO
+        ON WO.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_BDW_CC CC ON WO.WO_ID = CC.WO_ID AND CC.STATE = '0'
+        LEFT JOIN gom_bdw_wo_attr bwa ON bwa.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS
+        ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE
+        AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE CC.DISP_OBJ_ID = #{staffId}
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and srv.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND srv.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and srv.order_type = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss')  BETWEEN to_date( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.state_date BETWEEN to_date( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            and wo.wo_state='290000004'
+            and ws.tache_id in('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and bwa.back_flag like '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY wo.create_date desc) Q
+        GROUP BY Q.CST_ORD_ID,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.REGION_ID,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        Q.WO_COMPLETE_STATE
+        UNION ALL
+        SELECT Q.CST_ORD_ID,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        max(q.ALARM_DATE) ALARM_DATE,
+        max(q.REQ_FIN_DATE) REQ_FIN_DATE,
+        Q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.REGION_ID,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        LISTAGG(Q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY Q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        LISTAGG(Q.WO_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS WO_IDS,
+        LISTAGG(Q.ORDER_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS ORDER_IDS,
+        LISTAGG(Q.SRV_ORD_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT SRV.ORDER_ID, srv.req_fin_time,
+        SRV.SRV_ORD_ID,
+        WO.WO_ID,
+        WO.WO_STATE,
+        SRV.TRADE_ID,
+        SRV.SERIAL_NUMBER,
+        SRV.SRV_ORD_STAT,
+        SRV.ORDER_CODE,
+        SRV.ORDER_STATE,
+        SRV.CST_ORD_ID,
+        CST.SUBSCRIBE_ID,
+        CST.CUST_NAME_CHINESE,
+        CST.APPLY_ORD_ID,
+        CST.APPLY_ORD_NAME,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        DO.SRV.DISPATCH_ORDER_ID,
+        SRV.ORDER_TYPE,
+        SRV.ACTIVE_TYPE,
+        SRV.SERVICE_ID,
+        SRV.RESOURCES,
+        SRV.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+                        CASE
+                        WHEN WO.REQ_FIN_DATE <= sysdate then '超时单'
+                        WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then '预警单'
+                        WHEN WO.ALARM_DATE > sysdate then '正常单'
+                        ELSE '正常单'
+                        END WO_COMPLETE_STATE,
+                      ]]>
+        wo.create_date,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN
+        UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        bwa.back_flag AS WOORDERBACKFLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN (
+        SELECT SOI.CST_ORD_ID, soi.req_fin_time,
+        GDSLR.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        GDSLR.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO GDSLR
+        JOIN GOM_BDW_SRV_ORD_INFO SOI
+        ON GDSLR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        JOIN GOM_ORDER O
+        ON GDSLR.ORDER_ID = O.ORDER_ID or GDSLR.ORDER_ID = O.PARENT_ORDER_ID) SRV
+        ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO
+        ON DO.DISPATCH_ORDER_ID = SRV.DISPATCH_ORDER_ID
+        AND DO.STATE = '10A'
+        LEFT JOIN GOM_WO WO
+        ON WO.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_BDW_CC CC ON WO.WO_ID = CC.WO_ID AND CC.STATE = '0'
+        LEFT JOIN gom_bdw_wo_attr bwa ON bwa.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS
+        ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE
+        AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE CC.DISP_OBJ_ID = #{staffId}
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and srv.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND srv.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and srv.order_type = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss')  BETWEEN to_date( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.state_date BETWEEN to_date( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            and wo.wo_state='290000004'
+            and ws.tache_id in('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and bwa.back_flag like '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY wo.create_date desc) Q
+        GROUP BY Q.CST_ORD_ID,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.REGION_ID,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        Q.WO_COMPLETE_STATE
+    </sql>
+
+    <!-- 查询业务电路单 核查流程时（特殊：核查调度不选专业） -->
+    <select id="qrySrvOrdListCheck" resultType="map">
+        SELECT T.*,
+        (ACITY || '' || a1.dept_name)        AS AREGIONNAME,
+        (ZCITY || '' || a2.dept_name)        AS ZREGIONNAME,
+         A3.dept_name AS AREA
+        ,CASE WHEN NUM>0 THEN '已保存' ELSE '未保存' END CHECK_STATE
+        ,CASE WHEN WOAREA=AREGION AND WOAREA=ZREGION THEN 'ALL'  WHEN WOAREA=AREGION THEN 'A' WHEN WOAREA=ZREGION THEN 'Z' ELSE 'ALL' END FEEDBACKSIGN
+        FROM (
+        select cst.cst_ord_id,serial_number,trade_id,srv.service_id,O.ORDER_ID,WO.WO_ID,O.PS_ID,WS.TACHE_ID,UT.TACHE_NAME, c.* ,
+        KI.SPECIALTY_CODE,KI.REGION_ID
+        ,NVL(WD.DEPT_ID,TMP.AREA_ID) WOAREA,CK.NUM
+        from gom_bdw_cst_ord  cst
+        join GOM_BDW_SRV_ORD_INFO_VIEW  srv on  cst.cst_ord_id= srv.cst_ord_id
+        join (
+        SELECT a.* FROM (select d.code_content as state,a.srv_ord_id,attr_code,attr_value ,co.HANDLE_CITY,co.HANDLE_DEP_ID AS areaId,co.HANDLE_DEP AS areaName
+        from  GOM_BDW_SRV_ORD_INFO_VIEW  a
+        LEFT JOIN gom_BDW_code_info d on d.code_value = a.state and d.code_type = 'order_state'
+        join  gom_bdw_srv_ord_attr_info  b  on a.srv_ord_id=b.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = a.CST_ORD_ID  where co.cst_ord_id = #{cstOrdId}
+        ) a pivot(MAX(a.attr_value) FOR attr_code IN ('20000078' ACITY, '20000096' ZCITY,'20000064' circuitCode ,'20000234' Aregion,'20000235' Zregion, '20000082' A_installed_add,'20000100' Z_installed_add) )a
+        ) c on srv.srv_ord_id=c.srv_ord_id
+        LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srv.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN department gas ON to_char(gas.dept_id) = KI.REGION_ID
+        LEFT JOIN (SELECT DISTINCT DDS.DISP_OBJ_ID,DDS.DISP_OBJ_TYPE,DS.TACHE_CODE,DS.AREA_ID
+        FROM GOM_DISP_SRV_S DS LEFT JOIN GOM_DISP_DETAIL_SRV_S DDS ON DDS.DISP_SRV_ID = DS.ID ) TMP
+        ON TO_CHAR(WO.DISP_OBJ_ID)=TMP.DISP_OBJ_ID AND WO.DISP_OBJ_TYE =TMP.DISP_OBJ_TYPE
+        AND TMP.TACHE_CODE = UT.TACHE_CODE
+        LEFT JOIN GOM_BDW_WO_DEPT WD ON WD.WO_ID=WO.WO_ID
+        LEFT JOIN (SELECT DISTINCT WO_ID,COUNT(WO_ID) NUM FROM GOM_BDW_CHECK_FEEDBACK GROUP BY WO_ID ) CK ON CK.WO_ID=WO.WO_ID
+        where cst.cst_ord_id = #{cstOrdId}
+        <if test="dealUserId != null and dealUserId != '' ">
+            AND WO.deal_user_id = #{dealUserId}
+        </if>
+        and WO.WO_STATE = #{woState}
+        and UT.ID = #{tacheId}
+        ORDER BY serial_number
+        ) T
+        LEFT JOIN department a1 ON to_char(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON to_char(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON to_char(a3.dept_id) = T.AREAID
+    </select>
+    <!-- 查询业务电路单 核查流程时（特殊：核查调度不选专业）核查多工单改造后，重新修改查询sql -->
+    <select id="qrySrvOrdListCheckNew" resultType="map">
+        SELECT T.*,
+        (ACITY || '' || a1.dept_name)        AS AREGIONNAME,
+        (ZCITY || '' || a2.dept_name)        AS ZREGIONNAME,
+        A3.dept_name AS AREA
+        ,CASE WHEN NUM>0 THEN '已保存' ELSE '未保存' END CHECK_STATE
+        ,CASE WHEN WOAREA=AREGION AND WOAREA=ZREGION THEN 'ALL'  WHEN WOAREA=AREGION THEN 'A' WHEN WOAREA=ZREGION THEN 'Z' ELSE 'ALL' END FEEDBACKSIGN
+        FROM (
+        select cst.cst_ord_id,serial_number,trade_id,srv.service_id,O.ORDER_ID,WO.WO_ID,O.PS_ID,WS.TACHE_ID,UT.TACHE_NAME, c.* ,
+        KI.SPECIALTY_CODE,KI.REGION_ID
+        ,WOA.ATTR_VAL WOAREA,CK.NUM
+        from gom_bdw_cst_ord  cst
+        join GOM_BDW_SRV_ORD_INFO_VIEW  srv on  cst.cst_ord_id= srv.cst_ord_id
+        join (
+        SELECT a.* FROM (select d.code_content as state,a.srv_ord_id,attr_code,attr_value ,co.HANDLE_CITY,co.HANDLE_DEP_ID AS areaId,co.HANDLE_DEP AS areaName
+        from  GOM_BDW_SRV_ORD_INFO_VIEW  a
+        LEFT JOIN gom_BDW_code_info d on d.code_value = a.state and d.code_type = 'order_state'
+        join  gom_bdw_srv_ord_attr_info  b  on a.srv_ord_id=b.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = a.CST_ORD_ID where co.cst_ord_id = #{cstOrdId}
+        ) a pivot(MAX(a.attr_value) FOR attr_code IN ('20000078' ACITY, '20000096' ZCITY,'20000064' circuitCode ,'20000234' Aregion,'20000235' Zregion, '20000082' A_installed_add,'20000100' Z_installed_add) )a
+        ) c on srv.srv_ord_id=c.srv_ord_id
+        LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srv.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN gom_wo_oper_attr WOA ON WO.WO_ID = WOA.WO_ID and WOA.ATTR_ID='areaId'
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN department gas ON to_char(gas.dept_id) = KI.REGION_ID
+        LEFT JOIN (SELECT DISTINCT WO_ID,COUNT(WO_ID) NUM FROM GOM_BDW_CHECK_FEEDBACK GROUP BY WO_ID ) CK ON CK.WO_ID=WO.WO_ID
+        where cst.cst_ord_id = #{cstOrdId}
+        <if test="dealUserId != null and dealUserId != '' ">
+            AND WO.deal_user_id = #{dealUserId}
+        </if>
+        and WO.WO_STATE = #{woState}
+        and UT.ID = #{tacheId}
+        ORDER BY serial_number
+        ) T
+        LEFT JOIN department a1 ON to_char(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON to_char(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON to_char(a3.dept_id) = T.AREAID
+    </select>
+    <!--二干下单在本地网业务电路查询-->
+    <select id="qrySecondSrvOrdListCheck" resultType="map">
+        SELECT
+        T .*,
+        (ACITY || '' || a1.dept_name)        AS AREGIONNAME,
+        (ZCITY || '' || a2.dept_name)        AS ZREGIONNAME,
+        A3.dept_name AS AREA,
+        CASE WHEN NUM > 0 THEN  '已保存' ELSE '未保存' END CHECK_STATE,
+        'Z' as FEEDBACKSIGN  --二干发往本地只需要展示一端，默认给个Z
+        FROM
+        (
+        SELECT
+        srv.dispatch_order_id,
+        srvi.RELATE_INFO_ID,
+        cst.cst_ord_id,
+        srv.serial_number,
+        srv.trade_id,
+        srv.active_type,
+        srv.service_id,
+        --O.ORDER_ID,
+        WO.WO_ID,
+        O.PS_ID,
+        WS.TACHE_ID,
+        UT.TACHE_NAME,
+        c.*,
+        KI.SPECIALTY_CODE,
+        KI.REGION_ID,
+        CK.NUM
+        FROM
+        gom_bdw_cst_ord cst
+        JOIN gom_bdw_sec_local_relate_info srvi ON cst.cst_ord_id = srvi.cst_ord_id
+        JOIN GOM_BDW_SRV_ORD_INFO srv ON srvi.srv_ord_id = srv.srv_ord_id
+        JOIN (
+        SELECT
+        A .*
+        FROM
+        (
+        SELECT
+        D .code_content AS state,
+        A .srv_ord_id,a.order_id,
+        attr_code,
+        attr_value,
+        co.HANDLE_CITY,
+        co.HANDLE_DEP_ID AS areaId,
+        co.HANDLE_DEP AS areaName
+        FROM
+        gom_bdw_sec_local_relate_info A
+        LEFT JOIN GOM_BDW_CODE_INFO D ON D .code_value = A .configstate
+        AND D .code_type = 'order_state'
+        JOIN gom_bdw_srv_ord_attr_info b ON A .srv_ord_id = b.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = A .CST_ORD_ID where co.cst_ord_id = #{cstOrdId}
+        ) A PIVOT (
+        MAX (A .attr_value) FOR attr_code IN (
+        '20000078' ACITY,
+        '20000096' ZCITY,
+        '20000064' circuitCode,
+        '20000234' Aregion,
+        '20000235' Zregion,
+        '20000082' A_installed_add,
+        '20000100' Z_installed_add
+        )
+        ) A
+        ) c ON srvi.order_id = c.order_id
+        LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srvi.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS. ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT. ID = WS.TACHE_ID
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE
+        AND DF_TYPE = 'SPECIALTY_TYPE'
+        LEFT JOIN department gas ON TO_CHAR(gas.dept_id) = KI.REGION_ID
+        LEFT JOIN (
+        SELECT DISTINCT
+        WO_ID,
+        COUNT (WO_ID) NUM
+        FROM
+        GOM_BDW_CHECK_FEEDBACK
+        GROUP BY
+        WO_ID
+        ) CK ON CK.WO_ID = WO.WO_ID
+        where cst.cst_ord_id = #{cstOrdId}
+        <if test="dealUserId != null and dealUserId != '' ">
+            AND WO.deal_user_id = #{dealUserId}
+        </if>
+
+        and WO.DISP_OBJ_ID = #{dispObjTyeValue}
+        and WO.DISP_OBJ_TYE = #{dispObjTye}
+        and WO.WO_STATE = #{woState}
+        and UT.ID = #{tacheId}
+        ORDER BY
+        srv.serial_number
+        ) T
+        LEFT JOIN department a1 ON TO_CHAR(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON TO_CHAR(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON TO_CHAR(a3.dept_id) = T.AREAID
+    </select>
+    <select id="qrySrvOrdList" resultType="map">
+    SELECT distinct T.*, (ACITY || '' || a1.dept_name)        AS AREGIONNAME,
+                (ZCITY || '' || a2.dept_name)        AS ZREGIONNAME,
+                 A3.dept_name                        AS AREA
+      FROM (select srv.dispatch_order_id,
+                   srv.RELATE_INFO_ID,
+                   cst.cst_ord_id,
+                   srv.TRADE_TYPE_CODE,
+                   cst.cust_name_chinese,
+                   gbci.code_content as productType,
+                   ci.code_content as operatyep,
+                    case
+                    when   srv.SERVICE_ID = '20181221006' then ''
+                    else srv.SERIAL_NUMBER end as serial_number,
+                   srv.trade_id,
+                   srv.active_type,
+                   srv.service_id,
+                   O.ORDER_ID,
+                   WO.WO_ID,
+                   O.PS_ID,
+                   WS.TACHE_ID,
+                   UT.TACHE_NAME,
+                   UT.TACHE_CODE,
+                   c.*,
+                   KI.SPECIALTY_CODE,
+                   KI.REGION_ID
+              from gom_bdw_cst_ord cst
+              join GOM_BDW_SRV_ORD_INFO_VIEW srv on cst.cst_ord_id = srv.cst_ord_id
+              join GOM_BDW_CODE_INFO gbci on srv.service_id = gbci.code_value
+                                         and gbci.code_type = 'product_code'
+              join GOM_BDW_CODE_INFO ci on srv.active_type = ci.code_value
+                                       and ci.code_type = 'operate_type'
+              join (SELECT a.*
+                     FROM (select d.code_content as state,
+                                  a.srv_ord_id,
+                                  attr_code,
+                                  attr_value,
+                                  co.HANDLE_CITY,
+                                  co.HANDLE_DEP_ID AS areaId,
+                                  co.HANDLE_DEP AS areaName
+                             from GOM_BDW_SRV_ORD_INFO_VIEW a
+                             LEFT JOIN GOM_BDW_CODE_INFO d on d.code_value =
+                                                              a.state
+                                                          and d.code_type =
+                                                              'order_state'
+                             join gom_bdw_srv_ord_attr_info b on a.srv_ord_id =
+                                                                 b.srv_ord_id
+                             LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = a.CST_ORD_ID
+                            where co.cst_ord_id = #{cstOrdId}
+         ) a pivot(MAX(a.attr_value) FOR attr_code IN ('20000078' ACITY, '20000096' ZCITY, '20000132' rfsdate, '20000064' circuitCode,
+        '20000234' Aregion, '20000235' Zregion, '20000082' A_installed_add, '20000100' Z_installed_add,
+        'ORD10171' A_IF_RES_HAVE, 'ORD10172' Z_IF_RES_HAVE)) a) c on srv.srv_ord_id = c.srv_ord_id
+              LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srv.ORDER_ID OR O.PARENT_ORDER_ID = srv.ORDER_ID
+              LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+              LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+              LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+              LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+              LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id =
+                                              KI.SPECIALTY_CODE
+                                          AND DF_TYPE = 'SPECIALTY_TYPE'
+              LEFT JOIN department  gas ON to_char(gas.dept_id) = KI.REGION_ID
+ 	      <if test="applyState == '290000002' ">
+               LEFT JOIN GOM_BDW_POSTPONEMENT_APPLY APP ON APP.SRV_ORD_ID=SRV."SRV_ORD_ID"
+              </if>
+             where cst.cst_ord_id = #{cstOrdId}
+               and WO.DISP_OBJ_ID = #{dispObjTyeValue}
+               and WO.DISP_OBJ_TYE = #{dispObjTye}
+               and WO.WO_STATE = #{woState}
+               and UT.ID = #{tacheId}
+	       <if test="applyState == '290000002' ">
+                 /** 待审核 */
+                 and APP.APPLY_STATE ='290000002'
+               </if>
+            <if test="woIds != null and woIds != '' ">
+	          and WO.WO_ID IN
+	         <foreach collection="woIds" item="id" index="index" open="(" close=")" separator = ",">
+	                #{id}
+	         </foreach>
+	   </if>
+             ORDER BY srv.serial_number) T
+        LEFT JOIN department a1 ON to_char(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON to_char(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON to_char(a3.dept_id) = T.AREAID
+    </select>
+
+    <select id="qrySrvOrdListSecond" resultType="map">
+        SELECT distinct T .*, (ACITY || '' || a1.dept_name) AS AREGIONNAME, (ZCITY || '' || a2.dept_name) AS ZREGIONNAME,
+        A3. dept_name AS AREA
+        FROM
+            (
+                SELECT
+                    srv.dispatch_order_id,
+                    srvi.RELATE_INFO_ID,
+                    cst.cst_ord_id,
+                    cst.cust_name_chinese,
+                    gbci.code_content AS productType,
+                    ci.code_content AS operatyep,
+                    case
+                    when   srv.SERVICE_ID = '20181221006' then ''
+                    else srv.SERIAL_NUMBER end as serial_number,
+                    srv.trade_id,
+                    srv.active_type,
+                    srv.service_id,
+                    WO.WO_ID,
+                    <![CDATA[ case when  o.REQ_FIN_DATE > sysdate then 1 when  o.REQ_FIN_DATE <= sysdate then 0 end as OVERTIME,]]>
+                    O.PS_ID,
+                    WS.TACHE_ID,
+                    UT.TACHE_NAME,
+                    UT.TACHE_CODE,
+                    c.*, KI.SPECIALTY_CODE,
+                    KI.REGION_ID
+                FROM
+                    gom_bdw_cst_ord cst
+                JOIN gom_bdw_sec_local_relate_info srvi ON cst.cst_ord_id = srvi.cst_ord_id
+                JOIN GOM_BDW_SRV_ORD_INFO srv ON srvi.srv_ord_id = srv.srv_ord_id
+                JOIN GOM_BDW_CODE_INFO gbci ON srv.service_id = gbci.code_value
+                AND gbci.code_type = 'product_code'
+                JOIN GOM_BDW_CODE_INFO ci ON srv.active_type = ci.code_value
+                AND ci.code_type = 'operate_type'
+                JOIN (
+                    SELECT A .* FROM (
+                            SELECT
+                                D .code_content AS state,
+                                A .srv_ord_id,a.order_id,
+                                attr_code,
+                                attr_value,
+                                co.HANDLE_CITY,
+                                co.HANDLE_DEP_ID AS areaId,
+                                co.HANDLE_DEP AS areaName
+                            FROM
+                                gom_bdw_sec_local_relate_info A
+                            LEFT JOIN GOM_BDW_CODE_INFO D ON D .code_value = A .configstate
+                            AND D .code_type = 'order_state'
+                            JOIN gom_bdw_srv_ord_attr_info b ON A .srv_ord_id = b.srv_ord_id
+                            LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = A .CST_ORD_ID
+                            where co.cst_ord_id = #{cstOrdId}
+                        ) A PIVOT (
+                            MAX (A .attr_value) FOR attr_code IN (
+                                '20000078' ACITY,
+                                '20000096' ZCITY,
+                                '20000132' rfsdate,
+                                '20000064' circuitCode,
+                                '20000234' Aregion,
+                                '20000235' Zregion,
+                                '20000082' A_installed_add,
+                                '20000100' Z_installed_add,
+                                'ORD10171' A_IF_RES_HAVE,
+                                'ORD10172' Z_IF_RES_HAVE
+                            )
+                        ) A
+                ) c ON srvi.order_id = c.order_id
+                LEFT JOIN GOM_ORDER O ON O.ORDER_ID = srvi.ORDER_ID
+                OR O.PARENT_ORDER_ID = srvi.ORDER_ID
+                LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_PS_2_WO_S WS ON WS. ID = WO.PS_ID
+                LEFT JOIN UOS_TACHE UT ON UT. ID = WS.TACHE_ID
+                LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE
+                AND DF_TYPE = 'SPECIALTY_TYPE'
+                LEFT JOIN department gas ON to_char(gas.dept_id) = KI.REGION_ID
+		<if test="applyState == '290000002' ">
+                    LEFT JOIN GOM_BDW_POSTPONEMENT_APPLY APP ON APP.SRV_ORD_ID=SRV."SRV_ORD_ID"
+                </if>
+                where cst.cst_ord_id = #{cstOrdId}
+                and WO.DISP_OBJ_ID = #{dispObjTyeValue}
+                and WO.DISP_OBJ_TYE = #{dispObjTye}
+                and WO.WO_STATE = #{woState}
+                and UT.ID = #{tacheId}
+                <if test="woIds != null and woIds != '' ">
+                    and WO.WO_ID IN
+                    <foreach collection="woIds" item="id" index="index" open="(" close=")" separator = ",">
+                        #{id}
+                    </foreach>
+                </if>
+                ORDER BY
+                    srv.serial_number
+            ) T
+        LEFT JOIN department a1 ON to_char(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON to_char(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON to_char(a3.dept_id) = T.AREAID
+    </select>
+    <!-- 查询业务电路单 流程订单 子流程时 -->
+    <select id="qrySrvOrdChildList" resultType="map">
+        SELECT T.*, (ACITY || '' || a1.dept_name) AS AREGIONNAME, (ZCITY || '' || a2.dept_name) AS ZREGIONNAME,
+        A3.dept_name AS AREA FROM (
+        select srv.RELATE_INFO_ID,
+               cst.cst_ord_id,
+               srv.TRADE_TYPE_CODE,
+                case
+                when   srv.SERVICE_ID = '20181221006' then ''
+                else srv.SERIAL_NUMBER end as serial_number,
+               srv.trade_id,
+               srv.active_type,
+               srv.service_id,
+               O.ORDER_ID,
+               WO.WO_ID,
+                <![CDATA[ case when  o.REQ_FIN_DATE > sysdate then 1 when  o.REQ_FIN_DATE <= sysdate then 0 end as OVERTIME,]]>
+                O.PS_ID,
+               WS.TACHE_ID,
+               UT.TACHE_NAME,
+               UT.TACHE_CODE,
+               c.* ,
+               KI.SPECIALTY_CODE,
+               <if test="500001155 == tacheId or 500001157 == tacheId">
+                   case when dj.ORDER_ID is null then '未保存' else '已保存' end  as df_Order_Config,
+               </if>
+               KI.REGION_ID
+        from gom_bdw_cst_ord  cst
+        join GOM_BDW_SRV_ORD_INFO_VIEW  srv on  cst.cst_ord_id= srv.cst_ord_id
+        join (
+        SELECT a.* FROM (select d.code_content as state,a.srv_ord_id,attr_code,attr_value ,co.HANDLE_CITY,co.HANDLE_DEP_ID AS areaId,co.HANDLE_DEP AS areaName
+        from  GOM_BDW_SRV_ORD_INFO  a
+        LEFT JOIN gom_BDW_code_info d on d.code_value = a.state and d.code_type = 'order_state'
+        join  gom_bdw_srv_ord_attr_info  b  on a.srv_ord_id=b.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord co ON co.CST_ORD_ID = a.CST_ORD_ID  where co.cst_ord_id = #{cstOrdId}
+        ) a pivot(MAX(a.attr_value) FOR attr_code IN ('20000078' ACITY, '20000096' ZCITY,'20000132' rfsdate,'20000064' circuitCode ,'20000234' Aregion,'20000235' Zregion, '20000082' A_installed_add,'20000100' Z_installed_add, 'ORD10171' A_IF_RES_HAVE, 'ORD10172' Z_IF_RES_HAVE) )a
+          ) c on srv.srv_ord_id=c.srv_ord_id
+        LEFT JOIN GOM_ORDER O ON O.PARENT_ORDER_ID = srv.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND DF_TYPE = 'SPECIALTY_TYPE'
+        LEFT JOIN department gas ON to_char(gas.dept_id) = KI.REGION_ID
+        <if test="500001155 == tacheId">
+        LEFT JOIN (select j.order_id from GOM_BDW_DISP_OBJ j where j.disp_state = '10A' and j.tache_id = '500001156' group by j.order_id) dj ON dj.order_id = O.ORDER_ID
+        </if>
+        <if test="500001157 == tacheId">
+            LEFT JOIN (select j.order_id from GOM_BDW_DISP_OBJ j where j.disp_state = '10A' and (j.tache_id = '500001158' or j.tache_id = '500001159')  group by j.order_id) dj ON dj.order_id = O.ORDER_ID
+        </if>
+        WHERE cst.cst_ord_id = #{cstOrdId}
+        AND WO.deal_user_id = #{dealUserId}
+        and WO.DISP_OBJ_ID = #{dispObjTyeValue}
+        and WO.DISP_OBJ_TYE = #{dispObjTye}
+        and WO.WO_STATE = #{woState}
+        and UT.ID = #{tacheId}
+        <if test="specialtyCode != '' and specialtyCode != null">
+            AND KI.SPECIALTY_CODE = #{specialtyCode}
+        </if>
+        <if test="regionId != '' and regionId != null">
+            AND KI.REGION_ID = #{regionId}
+        </if>
+        ORDER BY srv.TRADE_ID,srv.serial_number) T
+        LEFT JOIN department a1 ON to_char(a1.dept_id) = T.AREGION
+        LEFT JOIN department a2 ON to_char(a2.dept_id) = T.ZREGION
+        LEFT JOIN department a3 ON to_char(a3.dept_id) = T.AREAID
+    </select>
+
+    <select id="queryOrderInfo" resultType="map">
+        select q.*
+        From (
+        <include refid="queryOrderInfoData"/>
+        ) q
+        ORDER BY q.serial_number
+    </select>
+    <select id="querySubOrderInfoColl" resultType="map">
+        select distinct q.*
+        From (
+        <include refid="querySubOrderInfoCollData"/>
+        ) q
+        ORDER BY q.serial_number
+    </select>
+
+    <!-- 查询客户订单 总数 -->
+    <select id="queryStandbyOrderCount" resultType="int" timeout="3000">
+        select count(1)
+        From (
+        <include refid="qryCstOrdData"/>
+        ) e
+    </select>
+
+    <!-- 查询客户已完成订单 总数 -->
+    <select id="queryStandbyOrderCompleteCount" resultType="int" timeout="3000">
+        select count(1)
+        From (
+        <include refid="qryCstOrdCompleteData"/>
+        ) e
+    </select>
+
+    <sql id="querySubOrderInfoCollData">
+        SELECT
+        WO.WO_ID WO_ID,
+        WO.COMP_USER_ID,
+        O.PS_ID,
+        O.ORDER_CODE,
+        CO.APPLY_ORD_ID,
+        CO.APPLY_ORD_NAME,
+        WO.ORDER_ID,
+        WO.WO_STATE,
+        CO.SUBSCRIBE_ID,
+        SO.TRADE_ID,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        case
+        when   SO.SERVICE_ID = '20181221006' then ''
+        else   SO.SERIAL_NUMBER end as SERIAL_NUMBER,
+        SO.SERVICE_ID,
+        ATTR.ATTR_VALUE,
+        SO.SRV_ORD_ID,
+        CO.CUST_NAME_CHINESE,
+        SO.ACTIVE_TYPE,
+        WS.TACHE_ID,
+        KI.REGION_ID,
+        UT.TACHE_NAME,
+        pds.PUB_DATE_NAME,
+        gas.DEPT_NAME as REGION_NAME,
+        to_char(WO.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        TO_CHAR(WO.Alarm_Date, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        to_char(O.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE_ORDER,
+        ATTRTIME.ATTR_VALUE ONE_REQ_FIN_DATE ,
+        case when ATTRS.ATTR_VALUE is not null then round(TO_NUMBER(sysdate - TO_DATE(ATTRS.ATTR_VALUE, 'yyyy-MM-dd hh24:mi:ss')))
+        else 0
+        end AS ORDERISNORMAL,
+        <![CDATA[
+            CASE
+            WHEN WO.REQ_FIN_DATE <= sysdate then '超时单'
+            WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then '预警单'
+            WHEN WO.ALARM_DATE > sysdate then '正常单'
+            ELSE '正常单'
+            END WO_COMPLETE_STATE
+        ]]>
+        FROM GOM_BDW_CST_ORD CO
+        INNER JOIN GOM_BDW_SRV_ORD_INFO_VIEW SO
+          ON CO.CST_ORD_ID = SO.CST_ORD_ID
+        INNER JOIN GOM_ORDER O
+          ON SO.ORDER_ID = O.ORDER_ID OR O.PARENT_ORDER_ID=SO.ORDER_ID
+        INNER JOIN GOM_WO WO
+          ON O.ORDER_ID = WO.ORDER_ID
+        LEFT JOIN gom_ord_key_info KI
+          ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN (select SRV_ORD_ID,ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO where attr_code = '20000064' group by SRV_ORD_ID,ATTR_VALUE) ATTR
+          ON ATTR.SRV_ORD_ID = SO.SRV_ORD_ID
+        LEFT JOIN (select SRV_ORD_ID, ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE attr_code in ('20000073', '20000132', 'CON0014') group by SRV_ORD_ID, ATTR_VALUE) ATTRS  ON ATTRS.SRV_ORD_ID = SO.SRV_ORD_ID /** 全程要求完成时间*/
+        LEFT JOIN (SELECT SRV_ORD_ID, ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE ATTR_CODE = 'CON0015' GROUP BY SRV_ORD_ID, ATTR_VALUE) ATTRTIME
+        ON ATTRTIME.SRV_ORD_ID = SO.SRV_ORD_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+          ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+          ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_PUB_DATE_S pds
+          ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        LEFT JOIN department gas
+          ON to_char(gas.dept_id) = KI.REGION_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO
+          ON SO.DISPATCH_ORDER_ID = DO.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        WHERE 1=1
+            AND WO.WO_STATE != '200000005'
+        <if test="cstOrdId !=null and cstOrdId !=''">
+            AND CO.CST_ORD_ID in
+            <foreach collection="cstOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+
+        </if>
+        <if test="tacheId !=null and tacheId !=''">
+            AND WS.TACHE_ID in
+            <foreach collection="tacheId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="regionId != '' and regionId != null">
+            AND KI.REGION_ID  IN
+            <foreach collection="regionId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+
+
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND SO.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="compUserId == null and compUserId == '' and woState !=290000004">
+            AND (WO.COMP_USER_ID IS NULL or WO.COMP_USER_ID='')
+        </if>
+        <if test="compUserId != null and compUserId != '' and woState == 290000004">
+            AND WO.COMP_USER_ID = #{compUserId}
+        </if>
+        <if test="dispType == 260000001">
+            AND WO.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND WO.DISP_OBJ_ID IN
+            (SELECT STAFF_GROUP_ID FROM GOM_STAFF_GROUP_RELA_S WHERE STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null"> /*个人待办*/
+            AND WO.DISP_OBJ_ID = #{staffId}
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 "> /*处理中*/
+            and WO.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <if test="woState == 290000004">
+            and WO.WO_STATE in ('290000004','290000110','290000006','290000005')
+        </if>
+        <if test="woState == 290000002 ">
+            and WO.WO_STATE = #{woState}
+        </if>
+
+        <if test="dispObjTye != '' and dispObjTye != null">
+            AND WO.DISP_OBJ_TYE IN
+            <foreach collection="dispObjTye" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="dispObjTyeValue != '' and dispObjTyeValue != null">
+            AND WO.DISP_OBJ_ID IN
+            <foreach collection="dispObjTyeValue" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="woId != '' and woId != null">
+            AND WO.WO_ID IN
+            <foreach collection="woId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="resourceType !='' and resourceType !=null ">
+            AND SO.RESOURCES = #{resourceType}
+        </if>
+        ORDER BY WO.CREATE_DATE DESC
+    </sql>
+
+    <sql id="teachIds">
+        <if test="teacheName != null  ">
+            and (UT.ID in
+            <foreach collection="teacheName" index="index" item="temp" separator="," open="(" close=")">
+                #{temp}
+            </foreach>
+            <if test="resList != null  ">
+                or (UT.ID ='500001157' and PDS.PUB_DATE_NAME in
+                <foreach collection="resList" index="index" item="temp" separator="," open="(" close=")">
+                    #{temp}
+                </foreach>
+                )
+            </if>
+            <if test="dataMakeList != null  ">
+                or (UT.ID ='500001158' and PDS.PUB_DATE_NAME in
+                <foreach collection="dataMakeList" index="index" item="temp" separator="," open="(" close=")">
+                    #{temp}
+                </foreach>
+                )
+            </if>
+            <if test="constructList != null  ">
+                or (UT.ID ='500001159' and PDS.PUB_DATE_NAME in
+                <foreach collection="constructList" index="index" item="temp" separator="," open="(" close=")">
+                    #{temp}
+                </foreach>
+                )
+            </if>
+            )
+        </if>
+    </sql>
+
+    <sql id="queryOrderInfoData">
+        SELECT
+        CO.CST_ORD_ID,
+        WO.WO_ID,
+        WO.COMP_USER_ID,
+        O.PS_ID,
+        O.ORDER_CODE,
+        CO.APPLY_ORD_ID,
+        CO.APPLY_ORD_NAME,
+        O.ORDER_ID,
+        WO.WO_STATE,
+        CO.SUBSCRIBE_ID,
+        SO.TRADE_ID,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        SO.SERIAL_NUMBER,
+        SO.SERVICE_ID,
+        pc.CODE_CONTENT as serviceType,
+        pt.CODE_CONTENT as activeTypeName,
+        ATTR.ATTR_VALUE,
+        SO.SRV_ORD_ID,
+        CO.CUST_NAME_CHINESE,
+        SO.ACTIVE_TYPE,
+        WS.TACHE_ID,
+        UT.TACHE_NAME,
+        pds.PUB_DATE_NAME,
+        gas.DEPT_NAME as REGION_NAME,
+        to_char(WO.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        CASE WHEN WO.limit_state = '84000003' then '超时单'
+        WHEN WO.limit_state = '84000002' then '预警单'
+        else '正常单' END AS WO_COMPLETE_STATE
+        FROM GOM_BDW_CST_ORD CO
+        INNER JOIN GOM_BDW_SRV_ORD_INFO_VIEW SO
+        ON CO.CST_ORD_ID = SO.CST_ORD_ID
+        INNER JOIN GOM_ORDER O
+        ON SO.ORDER_ID = O.ORDER_ID OR O.PARENT_ORDER_ID=SO.ORDER_ID
+        LEFT JOIN GOM_WO WO
+        ON O.ORDER_ID = WO.ORDER_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO
+        ON SO.DISPATCH_ORDER_ID = DO.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        LEFT JOIN (select SRV_ORD_ID,ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO where attr_code = '20000064' group by SRV_ORD_ID,ATTR_VALUE) ATTR
+        ON ATTR.SRV_ORD_ID = SO.SRV_ORD_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        LEFT JOIN DEPARTMENT gas ON to_char(gas.dept_id) = KI.REGION_ID
+        LEFT JOIN (select code_content,code_value from gom_BDW_code_info where CODE_type = 'product_code') pc on SO.SERVICE_ID = pc.code_value
+        LEFT JOIN (select code_content,code_value from gom_BDW_code_info where CODE_type = 'operate_type') pt on SO.ACTIVE_TYPE = pt.code_value
+        WHERE 1=1
+        <if test="compUserId == null and compUserId == '' and woState !=290000004">
+            AND (WO.COMP_USER_ID IS NULL or WO.COMP_USER_ID='')
+        </if>
+        <if test="compUserId != null and compUserId != '' and woState == 290000004">
+            AND WO.COMP_USER_ID = #{compUserId}
+        </if>
+        <if test="dispType == 260000001">
+            AND WO.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND WO.DISP_OBJ_ID IN
+            (SELECT STAFF_GROUP_ID FROM GOM_STAFF_GROUP_RELA_S WHERE STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null">
+            AND WO.DISP_OBJ_ID = #{staffId}
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 ">
+            and WO.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <if test="woState == 290000004">
+            and WO.WO_STATE in ('290000004','290000110')
+        </if>
+        <if test="woState == 290000002 ">
+            and WO.WO_STATE = #{woState}
+        </if>
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and CO.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and CO.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and CO.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and CO.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+          <!-- 完成开始时间、结束时间-->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        ORDER BY CO.CST_ORD_ID,WO.CREATE_DATE DESC
+    </sql>
+
+    <sql id="qryCstOrdData">
+        SELECT Q.CST_ORD_ID,
+        Q.SENDER,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.SERVICETYPE,
+        Q.RESOURCES,
+        Q.PS_ID,
+        MAX(Q.ALARM_DATE) ALARM_DATE,
+        MAX(Q.REQ_FIN_DATE) REQ_FIN_DATE,
+        Q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.REGION_ID,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        LISTAGG(Q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY Q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        LISTAGG(Q.WO_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_IDS,
+        LISTAGG(Q.ORDER_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_IDS,
+        LISTAGG(Q.SRV_ORD_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT SRV.ORDER_ID,
+        SRV.SRV_ORD_ID,
+        WO.WO_ID,
+        SRV.TRADE_ID,
+        SRV.SERIAL_NUMBER,
+        SRV.SRV_ORD_STAT,
+        SRV.ORDER_CODE,
+        SRV.ORDER_STATE,
+        wo.WO_STATE,
+        SRV.CST_ORD_ID, SRV.REQ_FIN_TIME,
+        CST.SUBSCRIBE_ID,
+        CST.SENDER,
+        CST.CUST_NAME_CHINESE,
+        CST.APPLY_ORD_ID,
+        CST.APPLY_ORD_NAME,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        DO.SRV.DISPATCH_ORDER_ID,
+        SRV.ORDER_TYPE,
+        SRV.ACTIVE_TYPE,
+        SRV.SERVICE_ID,
+        decode(srv.BUSS_SON_TYPE,null,SRV.SERVICE_ID,SRV.SERVICE_ID|| '-' ||srv.BUSS_SON_TYPE) as SERVICETYPE,
+        SRV.RESOURCES,
+        SRV.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+        CASE
+            WHEN WO.REQ_FIN_DATE <= WO.STATE_DATE THEN '超时单'
+            WHEN WO.ALARM_DATE <=  WO.STATE_DATE AND WO.STATE_DATE < WO.REQ_FIN_DATE THEN '预警单'
+            WHEN WO.ALARM_DATE >  WO.STATE_DATE THEN '正常单'
+            ELSE '正常单'
+        END WO_COMPLETE_STATE,
+ ]]>
+        WO.CREATE_DATE,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN    UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        BWA.BACK_FLAG AS WOORDERBACKFLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN (
+        SELECT SOI.CST_ORD_ID,SOI.REQ_FIN_TIME,
+        SOI.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        SOI.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.BUSS_SON_TYPE,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SRV_ORD_INFO SOI
+        INNER JOIN GOM_ORDER O ON SOI.ORDER_ID = O.ORDER_ID OR SOI.ORDER_ID = O.PARENT_ORDER_ID
+        WHERE SOI.SYSTEM_RESOURCE = 'flow-schedule-lt'
+        ) SRV ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO ON DO.DISPATCH_ORDER_ID = SRV.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_BDW_WO_ATTR BWA ON BWA.WO_ID = WO.WO_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE 1 = 1 AND srv.SRV_ORD_STAT <![CDATA[ <> ]]> '4D'
+        <if test="woState == 290000002 ">
+            and WO.WO_STATE = #{woState}
+            and SRV.ORDER_STATE <![CDATA[ <> ]]> '200000005'
+        </if>
+        <if test="dispType == 260000001">
+            AND WO.DISP_OBJ_TYE = '260000001'
+            AND WO.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND WO.DISP_OBJ_TYE = '260000002'
+            AND EXISTS (SELECT 1 FROM STAFF_WORKGRP SW WHERE SW.WORK_GROUP_ID = WO.DISP_OBJ_ID  AND SW.STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null"> /*个人待办*/
+            AND WO.DISP_OBJ_TYE = '260000003'
+            AND WO.DISP_OBJ_ID = #{staffId}
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 "> /*处理中*/
+            and WO.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and CST.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and CST.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and CST.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and CST.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and SRV.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND SRV.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and SRV.ORDER_TYPE = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN TO_DATE( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            TO_DATE(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss') BETWEEN TO_DATE( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            TO_DATE(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.STATE_DATE BETWEEN TO_DATE( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            AND WO.WO_STATE='290000004'
+            AND WS.TACHE_ID IN('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and BWA.BACK_FLAG LIKE '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY WO.CREATE_DATE  desc
+        ) Q
+        GROUP BY  Q.CST_ORD_ID,
+        Q.SENDER,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.REGION_ID,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.SERVICETYPE,
+        Q.RESOURCES,
+        Q.PS_ID,
+        Q.WO_COMPLETE_STATE
+
+        UNION ALL
+
+        SELECT Q.CST_ORD_ID,
+        Q.SENDER,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.SERVICETYPE,
+        Q.RESOURCES,
+        Q.PS_ID,
+        MAX(Q.ALARM_DATE) ALARM_DATE,
+        MAX(Q.REQ_FIN_DATE) REQ_FIN_DATE,
+        Q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.REGION_ID,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        LISTAGG(Q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY Q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        LISTAGG(Q.WO_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_IDS,
+        LISTAGG(Q.ORDER_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_IDS,
+        LISTAGG(Q.SRV_ORD_ID, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT SRV.ORDER_ID,
+        SRV.SRV_ORD_ID,
+        WO.WO_ID,
+        SRV.TRADE_ID,
+        SRV.SERIAL_NUMBER,
+        SRV.SRV_ORD_STAT,
+        SRV.ORDER_CODE,
+        SRV.ORDER_STATE,
+        wo.WO_STATE,
+        SRV.CST_ORD_ID, SRV.REQ_FIN_TIME,
+        CST.SUBSCRIBE_ID,
+        CST.SENDER,
+        CST.CUST_NAME_CHINESE,
+        CST.APPLY_ORD_ID,
+        CST.APPLY_ORD_NAME,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        DO.SRV.DISPATCH_ORDER_ID,
+        SRV.ORDER_TYPE,
+        SRV.ACTIVE_TYPE,
+        SRV.SERVICE_ID,
+        decode(srv.BUSS_SON_TYPE,null,SRV.SERVICE_ID,SRV.SERVICE_ID|| '-' ||srv.BUSS_SON_TYPE) as SERVICETYPE,
+        SRV.RESOURCES,
+        SRV.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+        CASE
+            WHEN WO.REQ_FIN_DATE <= WO.STATE_DATE THEN '超时单'
+            WHEN WO.ALARM_DATE <=  WO.STATE_DATE AND WO.STATE_DATE < WO.REQ_FIN_DATE THEN '预警单'
+            WHEN WO.ALARM_DATE >  WO.STATE_DATE THEN '正常单'
+            ELSE '正常单'
+        END WO_COMPLETE_STATE,
+ ]]>
+        WO.CREATE_DATE,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN    UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        BWA.BACK_FLAG AS WOORDERBACKFLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN (
+        SELECT SOI.CST_ORD_ID,SOI.REQ_FIN_TIME,
+        GDSLR.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        GDSLR.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.BUSS_SON_TYPE,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO GDSLR
+        INNER JOIN GOM_BDW_SRV_ORD_INFO SOI ON GDSLR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        INNER JOIN GOM_ORDER O ON GDSLR.ORDER_ID = O.ORDER_ID OR  GDSLR.ORDER_ID = O.PARENT_ORDER_ID
+        ) SRV ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO ON DO.DISPATCH_ORDER_ID = SRV.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_BDW_WO_ATTR BWA ON BWA.WO_ID = WO.WO_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE 1 = 1 AND srv.SRV_ORD_STAT <![CDATA[ <> ]]> '4D'
+        <if test="woState == 290000002 ">
+            and WO.WO_STATE = #{woState}
+            and SRV.ORDER_STATE <![CDATA[ <> ]]> '200000005'
+        </if>
+        <if test="dispType == 260000001">
+            AND WO.DISP_OBJ_TYE = '260000001'
+            AND WO.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND WO.DISP_OBJ_TYE = '260000002'
+            AND EXISTS (SELECT 1 FROM STAFF_WORKGRP SW WHERE SW.WORK_GROUP_ID = WO.DISP_OBJ_ID  AND SW.STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null"> /*个人待办*/
+            AND WO.DISP_OBJ_TYE = '260000003'
+            AND WO.DISP_OBJ_ID = #{staffId}
+            AND (WO.DEAL_USER_ID IS NULL or WO.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 "> /*处理中*/
+            and WO.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and CST.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and CST.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and CST.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and CST.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and SRV.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND SRV.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and SRV.ORDER_TYPE = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN TO_DATE( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            TO_DATE(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss')  BETWEEN TO_DATE( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            TO_DATE(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.STATE_DATE BETWEEN TO_DATE( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            AND WO.WO_STATE='290000004'
+            AND WS.TACHE_ID IN('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and BWA.BACK_FLAG LIKE '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY WO.CREATE_DATE desc
+        ) Q
+        GROUP BY  Q.CST_ORD_ID,
+        Q.SENDER,
+        Q.TACHE_ID,
+        Q.TACHE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.REGION_ID,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.SERVICETYPE,
+        Q.RESOURCES,
+        Q.PS_ID,
+        Q.WO_COMPLETE_STATE
+    </sql>
+
+    <sql id="qryCstOrdCompleteData">
+        SELECT  q.cst_ord_id,
+        q.SUBSCRIBE_ID,
+        q.CUST_NAME_CHINESE,
+        q.APPLY_ORD_ID,
+        q.APPLY_ORD_NAME,
+        q.DISPATCH_ORDER_NO,
+        q.DISPATCH_TITLE,
+        q.DISPATCH_ORDER_ID,
+        q.ORDER_TYPE,
+        q.ACTIVE_TYPE,
+        q.SERVICE_ID,
+        Q.SERVICETYPE,
+        q.RESOURCES,
+        q.PS_ID,
+        q.DEAL_DATE,
+        max(q.ALARM_DATE) ALARM_DATE,
+        max(q.REQ_FIN_DATE) REQ_FIN_DATE,
+        q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        q.TACHE_ID,
+        q.TACHE_NAME,
+        q.REGION_ID,
+        q.SPECIALTY_CODE,
+        q.PUB_DATE_NAME,
+        q.SPC_TAC_NAME,
+        q.DISPOBJTYEVALUE,
+        q.DISPOBJTYE,
+        LISTAGG(q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        listagg(q.wo_id, ',') within group(order by q.create_date) AS WO_IDS,
+        listagg(q.ORDER_ID, ',') within group(order by q.create_date) AS ORDER_IDS,
+        listagg(q.SRV_ORD_ID, ',') within group(order by q.create_date) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT srv.ORDER_ID,
+        srv.SRV_ORD_ID,
+        WO.WO_ID,
+        WO.WO_STATE,
+        srv.TRADE_ID,
+        srv.SERIAL_NUMBER,
+        srv.SRV_ORD_STAT,
+        srv.ORDER_CODE,
+        srv.ORDER_STATE,
+        srv.cst_ord_id, srv.req_fin_time,
+        cst.SUBSCRIBE_ID,
+        cst.CUST_NAME_CHINESE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        do.DISPATCH_ORDER_NO,
+        do.DISPATCH_TITLE,
+        do.srv.DISPATCH_ORDER_ID,
+        srv.ORDER_TYPE,
+        srv.ACTIVE_TYPE,
+        srv.SERVICE_ID,
+        decode(SRV.BUSS_SON_TYPE, NULL,srv.SERVICE_ID, srv.SERVICE_ID ||'-'|| SRV.BUSS_SON_TYPE)  as SERVICETYPE,
+        srv.RESOURCES,
+        srv.PS_ID,
+        TO_CHAR(WO.DEAL_DATE, 'yyyy-MM-dd hh24:mi:ss') DEAL_DATE,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+            CASE
+            WHEN WO.REQ_FIN_DATE <= wo.STATE_DATE then '超时单'
+            WHEN WO.ALARM_DATE <=  wo.STATE_DATE and wo.STATE_DATE < WO.REQ_FIN_DATE then '预警单'
+            WHEN WO.ALARM_DATE >  wo.STATE_DATE then '正常单'
+            ELSE '正常单'
+            END WO_COMPLETE_STATE,
+          ]]>
+        wo.create_date,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN
+        UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        bwa.back_flag AS WOORDERBACKFLAG
+        FROM gom_bdw_cst_ord cst
+        LEFT JOIN (
+        SELECT soi.cst_ord_id, soi.req_fin_time,
+        SOI.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        SOI.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.BUSS_SON_TYPE,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SRV_ORD_INFO SOI
+        JOIN GOM_ORDER O ON SOI.ORDER_ID = O.ORDER_ID OR SOI.ORDER_ID = O.PARENT_ORDER_ID
+        WHERE soi.system_resource = 'flow-schedule-lt'
+        ) srv ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO ON DO.DISPATCH_ORDER_ID = srv.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        LEFT JOIN gom_wo wo ON wo.order_id = srv.order_id
+        LEFT JOIN gom_bdw_wo_attr bwa ON bwa.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = srv.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE srv.ORDER_STATE = '200000002'
+        AND WO.COMP_USER_ID = #{compUserId}
+        AND wo.wo_state <![CDATA[ <> ]]> '290000002'
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and srv.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND srv.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and srv.order_type = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss') BETWEEN to_date( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.state_date BETWEEN to_date( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            and wo.wo_state='290000004'
+            and ws.tache_id in('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and bwa.back_flag like '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY wo.create_date desc) q GROUP BY  q.cst_ord_id,
+        q.TACHE_ID,
+        q.TACHE_NAME,
+        q.SPC_TAC_NAME,
+        q.SPECIALTY_CODE,
+        q.PUB_DATE_NAME,
+        q.REGION_ID,
+        q.DISPOBJTYEVALUE,
+        q.DISPOBJTYE,
+        q.SUBSCRIBE_ID,
+        q.CUST_NAME_CHINESE,
+        q.APPLY_ORD_ID,
+        q.APPLY_ORD_NAME,
+        q.DISPATCH_ORDER_NO,
+        q.DISPATCH_TITLE,
+        q.DISPATCH_ORDER_ID,
+        q.ORDER_TYPE,
+        q.ACTIVE_TYPE,
+        q.SERVICE_ID,
+        Q.SERVICETYPE,
+        q.RESOURCES,
+        q.PS_ID,
+        q.WO_COMPLETE_STATE,
+        q.DEAL_DATE
+        UNION ALL
+        SELECT  q.cst_ord_id,
+        q.SUBSCRIBE_ID,
+        q.CUST_NAME_CHINESE,
+        q.APPLY_ORD_ID,
+        q.APPLY_ORD_NAME,
+        q.DISPATCH_ORDER_NO,
+        q.DISPATCH_TITLE,
+        q.DISPATCH_ORDER_ID,
+        q.ORDER_TYPE,
+        q.ACTIVE_TYPE,
+        q.SERVICE_ID,
+        Q.SERVICETYPE,
+        q.RESOURCES,
+        q.PS_ID,
+        q.DEAL_DATE,
+        max(q.ALARM_DATE) ALARM_DATE,
+        max(q.REQ_FIN_DATE) REQ_FIN_DATE,
+        q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        q.TACHE_ID,
+        q.TACHE_NAME,
+        q.REGION_ID,
+        q.SPECIALTY_CODE,
+        q.PUB_DATE_NAME,
+        q.SPC_TAC_NAME,
+        q.DISPOBJTYEVALUE,
+        q.DISPOBJTYE,
+        LISTAGG(q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        listagg(q.wo_id, ',') within group(order by q.create_date) AS WO_IDS,
+        listagg(q.ORDER_ID, ',') within group(order by q.create_date) AS ORDER_IDS,
+        listagg(q.SRV_ORD_ID, ',') within group(order by q.create_date) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT srv.ORDER_ID,
+        srv.SRV_ORD_ID,
+        WO.WO_ID,
+        WO.WO_STATE,
+        srv.TRADE_ID,
+        srv.SERIAL_NUMBER,
+        srv.SRV_ORD_STAT,
+        srv.ORDER_CODE,
+        srv.ORDER_STATE,
+        srv.cst_ord_id, srv.req_fin_time,
+        cst.SUBSCRIBE_ID,
+        cst.CUST_NAME_CHINESE,
+        cst.APPLY_ORD_ID,
+        cst.APPLY_ORD_NAME,
+        do.DISPATCH_ORDER_NO,
+        do.DISPATCH_TITLE,
+        do.srv.DISPATCH_ORDER_ID,
+        srv.ORDER_TYPE,
+        srv.ACTIVE_TYPE,
+        srv.SERVICE_ID,
+        decode(SRV.BUSS_SON_TYPE, NULL,srv.SERVICE_ID, srv.SERVICE_ID ||'-'|| SRV.BUSS_SON_TYPE)  as SERVICETYPE,
+        srv.RESOURCES,
+        srv.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+            CASE
+            WHEN WO.REQ_FIN_DATE <= wo.STATE_DATE then '超时单'
+            WHEN WO.ALARM_DATE <=  wo.STATE_DATE and wo.STATE_DATE < WO.REQ_FIN_DATE then '预警单'
+            WHEN WO.ALARM_DATE >  wo.STATE_DATE then '正常单'
+            ELSE '正常单'
+            END WO_COMPLETE_STATE,
+          ]]>
+        wo.create_date,
+        TO_CHAR(WO.DEAL_DATE, 'yyyy-MM-dd hh24:mi:ss') DEAL_DATE,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN
+        UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        bwa.back_flag AS WOORDERBACKFLAG
+        FROM gom_bdw_cst_ord cst
+        LEFT JOIN (
+        SELECT soi.cst_ord_id, soi.req_fin_time,
+        GDSLR.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        GDSLR.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.BUSS_SON_TYPE,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO GDSLR
+        JOIN GOM_BDW_SRV_ORD_INFO SOI ON GDSLR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        JOIN GOM_ORDER O ON GDSLR.ORDER_ID = O.ORDER_ID or GDSLR.ORDER_ID = O.PARENT_ORDER_ID
+        ) srv ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO ON DO.DISPATCH_ORDER_ID = srv.DISPATCH_ORDER_ID AND DO.STATE = '10A'
+        LEFT JOIN gom_wo wo ON wo.order_id = srv.order_id
+        LEFT JOIN gom_bdw_wo_attr bwa ON bwa.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = srv.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE srv.ORDER_STATE = '200000002'
+        AND WO.COMP_USER_ID = #{compUserId}
+        AND wo.wo_state <![CDATA[ <> ]]> '290000002'
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and srv.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+
+        <!--单据来源-->
+        <if test="resourceType !='' and resourceType !=null ">
+            AND srv.RESOURCES = #{resourceType}
+        </if>
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and srv.order_type = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss')  BETWEEN to_date( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.state_date BETWEEN to_date( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            and wo.wo_state='290000004'
+            and ws.tache_id in('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and bwa.back_flag like '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY wo.create_date desc) q GROUP BY  q.cst_ord_id,
+        q.TACHE_ID,
+        q.TACHE_NAME,
+        q.SPC_TAC_NAME,
+        q.SPECIALTY_CODE,
+        q.PUB_DATE_NAME,
+        q.REGION_ID,
+        q.DISPOBJTYEVALUE,
+        q.DISPOBJTYE,
+        q.SUBSCRIBE_ID,
+        q.CUST_NAME_CHINESE,
+        q.APPLY_ORD_ID,
+        q.APPLY_ORD_NAME,
+        q.DISPATCH_ORDER_NO,
+        q.DISPATCH_TITLE,
+        q.DISPATCH_ORDER_ID,
+        q.ORDER_TYPE,
+        q.ACTIVE_TYPE,
+        q.SERVICE_ID,
+        Q.SERVICETYPE,
+        q.RESOURCES,
+        q.PS_ID,
+        q.WO_COMPLETE_STATE,
+        q.DEAL_DATE
+    </sql>
+
+<insert id="updateCollapsible"  parameterType="java.util.Map" >
+       INSERT INTO GOM_BDW_SRV_ORD_REMARK (SRV_ORD_REMARK_ID,
+                                            SRV_ORD_ID,
+                                            WO_ID,
+                                            REMARK,
+                                            FILE_ID,
+                                            USER_ID,
+                                            CREATE_DATE)
+                                  VALUES   ( SEQ_GOM_BDW_SRV_ORD_REMARK.nextval+1,
+                                              #{srvOrdId},
+                                              #{woId},
+                                              #{remark},
+                                              #{fileId} ,
+                                              #{staffId} ,
+                                              sysdate)
+</insert>
+
+
+<insert id="upLoadAttach"  parameterType="java.util.Map" >
+      insert into GOM_BDW_ATTACH_INFO (ATTACH_INFO_ID,
+                                        SRV_ORD_ID,
+                                        FILE_ID,
+                                        FILE_NAME,
+                                        FILE_PATH,
+                                        FILE_TYPE,
+                                        CREATE_DATE,
+                                        WO_ORD_ID,
+                                        ORIGIN,
+                                        FILE_SIZE,
+                                        dispatch_order_id,
+                                        CST_ORD_ID
+            <if test="staffId != null">,STAFF_ID</if>
+                                        )
+                                values (SEQ_GOM_BDW_ATTACH_INFO.nextval+1,
+                                          #{srvOrdId},
+                                          #{fileId},
+                                          #{fileName},
+                                          #{filePath},
+                                          #{fileType},
+                                          sysdate,
+                                          #{woId},
+                                          #{origin},
+                                          #{fileSize},
+                                          #{dispatchOrderId},
+                                          #{cstOrdId}
+                <if test="staffId != null">,#{staffId}</if>
+                                          )
+</insert>
+        <!--查询附件信息-->
+    <select id="queryAttachBySrvId" parameterType="java.util.Map" resultType="map" >
+        select * from GOM_BDW_ATTACH_INFO where SRV_ORD_ID=#{srvOrdId}
+    </select>
+    <!--删除附件信息-->
+    <delete id="delAttachBuSrvId" parameterType="java.util.Map" >
+        delete from GOM_BDW_ATTACH_INFO where
+        1=1 and FILE_ID=#{fileId}
+        <if test="srvOrdId != null">
+            and SRV_ORD_ID=#{srvOrdId}
+        </if>
+    </delete>
+    <!--获取序列-->
+    <select id="getSequence" parameterType="String" resultType="int"  useCache="false" flushCache="true">
+        SELECT ${sequences} FROM DUAL
+    </select>
+    <select id="qryResConfigOrderNum" parameterType="String" resultType="int">
+        SELECT COUNT(DISTINCT ORD.ORDER_ID) NUM  FROM  GOM_ORDER_ATTR ATTR
+        JOIN GOM_ORDER ORD ON ATTR.ORDER_ID = ORD.ORDER_ID
+        WHERE ATTR_ID='SPECIALTY_CODE'
+        AND ATTR_VAL IN('COMPLEX_1','OPTICAL_2','TRANS_3','DATA_4','EXCHANGE_5')
+        <if test="type == 'parent'">
+            AND ORD.PARENT_ORDER_ID=#{orderId}
+        </if>
+        <if test="type == 'child'">
+            AND ORD.ORDER_ID=#{orderId}
+        </if>
+    </select>
+
+    <!--<delete id="removeAttach">
+        delete from GOM_BDW_ATTACH_INFO where wo_ord_id = #{woId}
+        <if test="array !=null and array.length > 0">
+            and ATTACH_INFO_ID in
+            <foreach collection="array" item="code" open="(" separator="," close=")" index="index">
+                #{code}
+            </foreach>
+        </if>
+    </delete>-->
+    <delete id="removeAttach">
+        delete from GOM_BDW_ATTACH_INFO where  ATTACH_INFO_ID in
+        <foreach item="item" index="index" collection="arrayList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+    </delete>
+
+    <select id="qryAbnormalOrderCount" parameterType="map" resultType="int">
+        select count(1)
+        From (
+        <include refid="abnormalOrderSql"/>
+        ) q
+    </select>
+    <select id="qryAbnormalOrder" parameterType="map" resultType="map">
+        select z.*
+        FROM (
+        SELECT distinct ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="abnormalOrderSql"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <sql id="abnormalOrderSql">
+        with col as (select distinct a.CHG_ORDER_ID, a.SRC_CST_ORDER_ID, a.CHG_TYPE, a.CHG_VERSION
+        from gom_change_order_log_s a),
+        cols as (
+        SELECT distinct listagg( WO_ID,',') within GROUP (order by  WO_ID)as wo_ids,max(WO_Id) WO_Id, cst_ord_id,order_ids, SRV_ORD_IDS,order_id,  CHG_TYPE,  CHG_VERSION,
+        LEVEL_ID FROM (
+
+        --异常单父单
+        select distinct col.CHG_ORDER_ID  order_ids,
+
+        listagg(SO.SRV_ORD_ID,',') within GROUP (order by SO.SRV_ORD_ID)   as SRV_ORD_IDS,
+        col.CHG_ORDER_ID  as order_id,
+        w.WO_ID  as wo_id,
+        col.SRC_CST_ORDER_ID        as cst_ord_id,
+        col.CHG_TYPE,
+        col.CHG_VERSION,
+        '01' LEVEL_ID
+        from col
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SO  ON SO.CST_ORD_ID =COL.SRC_CST_ORDER_ID
+        left join gom_order o on o.ORDER_ID = col.CHG_ORDER_ID
+        left join gom_wo w on w.ORDER_ID = o.ORDER_ID
+        where 1 = 1
+        and w.wo_state = '290000002'
+        and w.WO_TYPE = '620000001'
+        and o.ORDER_STATE = '200000002'
+        and ((w.disp_obj_tye = '260000003' AND W.DISP_OBJ_ID = #{dealUserId} AND (W.DEAL_USER_ID IS NULL or W.DEAL_USER_ID = '')) or
+        (W.DEAL_USER_ID = #{dealUserId}))
+        group by col.SRC_CST_ORDER_ID, col.CHG_TYPE,   col.CHG_ORDER_ID,
+        w.WO_ID, col.CHG_VERSION
+
+        --异常单子单
+        union all
+        select distinct col.CHG_ORDER_ID  order_ids,
+        --listagg(w.WO_ID,',') within GROUP (order by w.WO_ID)as wo_ids,
+        listagg(SO.SRV_ORD_ID,',') within GROUP (order by SO.SRV_ORD_ID)   as SRV_ORD_IDS,
+        col.CHG_ORDER_ID  as order_id,
+        w.WO_ID  as wo_id,
+        col.SRC_CST_ORDER_ID     as cst_ord_id,
+        col.CHG_TYPE,
+        col.CHG_VERSION,
+        '02' LEVEL_ID
+        from col
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SO  ON SO.CST_ORD_ID =COL.SRC_CST_ORDER_ID
+        left join gom_order cldo on cldo.PARENT_ORDER_ID = col.CHG_ORDER_ID
+        left join gom_wo w on w.ORDER_ID = cldo.ORDER_ID
+        where 1 = 1
+        and w.wo_state = '290000002'
+        and w.WO_TYPE = '620000001'
+        and cldo.ORDER_STATE = '200000002'
+        and ((w.disp_obj_tye = '260000003' AND W.DISP_OBJ_ID = #{dealUserId} AND
+        (W.DEAL_USER_ID IS NULL or W.DEAL_USER_ID = '')) or
+        (W.DEAL_USER_ID = #{dealUserId}))
+        group by col.SRC_CST_ORDER_ID, col.CHG_TYPE,    col.CHG_ORDER_ID,
+        w.WO_ID,col.CHG_VERSION
+
+        --二干发本地的本地子单
+        union all
+        select distinct col.CHG_ORDER_ID  order_ids,
+        --listagg(w.WO_ID,',') within GROUP (order by w.WO_ID)as wo_ids,
+        listagg(SO.SRV_ORD_ID,',') within GROUP (order by SO.SRV_ORD_ID)   as SRV_ORD_IDS,
+        col.CHG_ORDER_ID  as order_id,
+        w.WO_ID  as wo_id,
+        col.SRC_CST_ORDER_ID     as cst_ord_id,
+        col.CHG_TYPE,
+        col.CHG_VERSION,
+        '03' LEVEL_ID
+        from col
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO SO  ON SO.CST_ORD_ID =COL.SRC_CST_ORDER_ID
+        left join gom_order cldo on cldo.PARENT_ORDER_ID = col.CHG_ORDER_ID
+        left join gom_order cldo1 on cldo1.PARENT_ORDER_ID = cldo.ORDER_ID
+        left join gom_wo w on w.ORDER_ID = cldo1.ORDER_ID
+        where 1 = 1
+        and w.wo_state = '290000002'
+        and w.WO_TYPE = '620000001'
+        and cldo1.ORDER_STATE = '200000002'
+        and ((w.disp_obj_tye = '260000003' AND W.DISP_OBJ_ID = #{dealUserId} AND
+        (W.DEAL_USER_ID IS NULL or W.DEAL_USER_ID = '')) or
+        (W.DEAL_USER_ID = #{dealUserId}))
+        group by col.SRC_CST_ORDER_ID, col.CHG_TYPE,    col.CHG_ORDER_ID,
+        w.WO_ID,col.CHG_VERSION
+        )
+        group by order_ids,cst_ord_id,SRV_ORD_IDS,order_id,  CHG_TYPE,  CHG_VERSION,   LEVEL_ID
+        )
+        select 'abnormalOrder' ABNORMAL_ORDER,
+        cols.wo_ids as wo_ids,
+        cols.CHG_TYPE itemtype,
+        COLS.SRV_ORD_IDS,
+        decode(SOI.BUSS_SON_TYPE, NULL, PC.CODE_CONTENT, PC.CODE_CONTENT ||'-'||  PB.CODE_CONTENT)  as SERVICETYPE,
+        PT.CODE_CONTENT ACTIVETYPENAME,
+        ITEM.CODE_CONTENT  ITEMTYPENAME,
+        cols.CHG_VERSION,
+        cols.LEVEL_ID,
+        O.ORDER_ID,
+        O.PS_ID,
+        wo.wo_id,
+        WO.WO_CODE,
+        WO.DISP_OBJ_TYE,
+        WO.DISP_OBJ_ID,
+        WO.DEAL_USER_ID,
+        WO.WO_STATE,
+        to_char(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+                    CASE
+                    WHEN WO.REQ_FIN_DATE <= sysdate then '超时单'
+                    WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then '预警单'
+                    WHEN WO.ALARM_DATE > sysdate then '正常单'
+                    ELSE '正常单'
+                    END WO_COMPLETE_STATE,
+                ]]>
+        to_char(WO.CREATE_DATE,'yyyy-MM-dd hh24:mi:ss') CREATE_DATE,
+        UT.ID  AS TACHE_ID,
+        UT.TACHE_CODE  AS TACHE_CODE,
+        UT.TACHE_NAME as SPC_TAC_NAME,
+        CO.CST_ORD_ID,
+        CO.SUBSCRIBE_ID,
+        CO.CUST_NAME_CHINESE,
+        CO.APPLY_ORD_ID,
+        CO.APPLY_ORD_NAME,
+        soi.RESOURCES,
+        do.DISPATCH_ORDER_NO,
+        do.DISPATCH_TITLE
+        from  cols
+        left join GOM_BDW_CST_ORD co on co.CST_ORD_ID = cols.cst_ord_id
+        left join (select distinct RESOURCES, ACTIVE_TYPE, SERVICE_ID, CST_ORD_ID, BUSS_SON_TYPE from GOM_BDW_SRV_ORD_INFO) soi on co.CST_ORD_ID = soi.CST_ORD_ID
+        left join (select distinct DISPATCH_ORDER_ID,CST_ORD_ID, DISPATCH_ORDER_NO, DISPATCH_TITLE from GOM_BDW_DISPATCH_ORDER where STATE = '10A') do on co.CST_ORD_ID = do.CST_ORD_ID
+        left join gom_order o on cols.ORDER_ID = o.ORDER_ID
+        left join gom_wo wo on cols.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        left join ( SELECT code_value,code_content FROM gom_bdw_code_info where code_type='ITEM_TYPE') ITEM on ITEM.CODE_VALUE= cols.CHG_TYPE
+        left join (select CODE_CONTENT, CODE_VALUE from GOM_BDW_CODE_INFO where CODE_TYPE = 'product_code') PC on  SOI.SERVICE_ID = PC.CODE_VALUE
+        left join (select CODE_CONTENT, CODE_VALUE from GOM_BDW_CODE_INFO where CODE_TYPE = 'operate_type') PT on  SOI.ACTIVE_TYPE = PT.CODE_VALUE
+        left join (select CODE_CONTENT, CODE_VALUE from GOM_BDW_CODE_INFO where CODE_TYPE = '10002111') PB on  SOI.BUSS_SON_TYPE = PB.CODE_VALUE
+
+        where 1 = 1
+        AND (DO.DISPATCH_ORDER_ID IS NULL OR DO.DISPATCH_ORDER_ID IN (SELECT MAX(DO1.DISPATCH_ORDER_ID) FROM GOM_BDW_DISPATCH_ORDER DO1 WHERE DO1.CST_ORD_ID = CO.CST_ORD_ID and  DO1.STATE = '10A'))
+        <if test="chgType != null and chgType != ''">
+            and cols.CHG_TYPE = #{chgType}
+        </if>
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and CO.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and CO.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and CO.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and CO.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 环节名称-->
+        <if test="teacheName != null  ">
+            and UT.ID in
+            <foreach collection="teacheName" index="index" item="temp" separator="," open="(" close=")">
+                #{temp}
+            </foreach>
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="resourceType !='' and resourceType !=null ">
+            AND SOI.RESOURCES = #{resourceType}
+        </if>
+        <if test="itemType != null and itemType != ''">
+            and cols.CHG_TYPE = #{itemType}
+        </if>
+        order by co.CST_ORD_ID asc, cols.CHG_VERSION asc
+    </sql>
+  <!-- <insert id="addCC">
+       INSERT INTO GOM_BDW_CC (id,wo_id,disp_obj_id,state,disp_obj_type)
+       VALUES(seq_gom_bdw_cc.nextval,#{woId},#{dispObjId}','0','26000003')
+   </insert>-->
+    <insert id="addCC" parameterType="list">
+        INSERT  INTO GOM_BDW_CC  (id,wo_id,disp_obj_id,state,disp_obj_type,SRV_ORD_ID)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            SELECT GET_SEQ_NEXT('seq_gom_bdw_cc'),#{item.woId},#{item.dispObjId},'0',#{item.dispObjType},#{item.srvOrdId} FROM dual
+        </foreach>
+    </insert>
+    <update id="updateCC" parameterType="map">
+        UPDATE  GOM_BDW_CC SET
+        disp_obj_type=#{dispObjType}
+        <if test="state!=null">,state=#{state}</if>
+        WHERE  disp_obj_id = #{dispObjId}
+        <if test="srvOrdId!=null">
+            and SRV_ORD_ID  IN
+            <foreach collection="srvOrdId" index="index" item="id" separator="," open="(" close=")">
+              #{id}
+            </foreach>
+        </if>
+    </update>
+    <delete id="delCC" parameterType="map">
+      DELETE  GOM_BDW_CC
+        WHERE  disp_obj_id = #{dispObjId}
+        <if test="srvOrdId!=null">
+            and SRV_ORD_ID  IN
+            <foreach collection="srvOrdId" index="index" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+
+    <insert id="insertFlowLogInfo"  parameterType="java.util.Map" >
+    insert into gom_bdw_log_info
+      (LOG_ID,
+       ORDER_ID,
+       WO_ORD_ID,
+       TRACK_DATE,
+       TRACK_ORG_ID,
+       TRACK_ORG_NAME,
+       TRACK_STAFF_ID,
+       TRACK_STAFF_NAME,
+       TRACK_STAFF_PHONE,
+       TRACK_STAFF_EMAIL,
+       TRACK_MESSAGE,
+       TRACK_CONTENT,
+       CREATE_DATE,
+       OPER_TYPE)
+    values
+      (seq_gom_bdw_log_info.nextval,
+       #{orderId},
+       #{woId},
+       sysdate,
+       #{regionId},
+       null,
+       #{staffId},
+       #{userName},
+       null,
+       null,
+       #{trackContent},
+       '[提交]',
+       sysdate,
+       '1')
+</insert>
+
+    <!-- 查询对应的专业名称 -->
+    <select id="qrySpecName" resultType="String" >
+        SELECT REMARK FROM GOM_BDW_CODE_INFO  WHERE  CODE_TYPE='TEACH_NAME'AND CODE_VALUE=#{codeValue}
+    </select>
+
+    <!-- 查询工单或子流程是否已经配置过资源信息-->
+    <select id="qryIsResConfigNum" parameterType="String" resultType="int">
+        SELECT COUNT(1) NUM  FROM GOM_BDW_SRV_ORD_ATTR_INFO
+        where ATTR_ACTION ='resReturnService' and SRV_ORD_ID =#{srvOrdId} and  ATTR_VALUE=#{orderId}
+    </select>
+
+    <!-- 延期申请 总数 -->
+    <select id="queryPostponementOrderCount" resultType="int" timeout="3000">
+        select count(1)
+        From (
+        <include refid="queryPostponementData"/>
+        ) q
+    </select>
+    <select id="queryPostponementOrderInfo" resultType="map" timeout="3000">
+        select z.cst_ord_id,
+        z.SUBSCRIBE_ID,
+        z.CUST_NAME_CHINESE,
+        z.APPLY_ORD_ID,
+        z.APPLY_ORD_NAME,
+        z.DISPATCH_ORDER_NO,
+        z.DISPATCH_TITLE,
+        z.DISPATCH_ORDER_ID,
+        z.ORDER_TYPE,
+        z.ACTIVE_TYPE,
+        z.SERVICE_ID,
+        z.RESOURCES,
+        z.PS_ID,
+        z.WO_COMPLETE_STATE,
+        z.TACHE_ID,
+        Z.WO_ID,
+        z.TACHE_NAME,
+        z.REGION_ID,
+        z.SPECIALTY_CODE,
+        z.PUB_DATE_NAME,
+        z.SPC_TAC_NAME,
+        z.DISPOBJTYEVALUE,
+        z.DISPOBJTYE,
+        z.WOORDERBACKFLAGS,
+        z.WO_IDS,
+        z.ORDER_IDS,
+        z.SRV_ORD_IDS,
+        Z.WO_STATES,
+        Z.SRV_ORD_STATS,
+        Z.ORDER_STATES
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.cst_ord_id desc) AS rowindex,
+        y.cst_ord_id,
+        y.SUBSCRIBE_ID,
+        y.CUST_NAME_CHINESE,
+        y.APPLY_ORD_ID,
+        y.APPLY_ORD_NAME,
+        y.DISPATCH_ORDER_NO,
+        y.DISPATCH_TITLE,
+        y.DISPATCH_ORDER_ID,
+        y.ORDER_TYPE,
+        y.ACTIVE_TYPE,
+        y.SERVICE_ID,
+        y.RESOURCES,
+        y.PS_ID,
+        y.WO_COMPLETE_STATE,
+        y.TACHE_ID,
+        y.WO_ID,
+        y.TACHE_NAME,
+        y.REGION_ID,
+        y.SPECIALTY_CODE,
+        y.PUB_DATE_NAME,
+        y.SPC_TAC_NAME,
+        y.DISPOBJTYEVALUE,
+        y.DISPOBJTYE,
+        y.WOORDERBACKFLAGS,
+        y.WO_IDS,
+        y.ORDER_IDS,
+        y.SRV_ORD_IDS,
+        y.WO_STATES,
+        y.SRV_ORD_STATS,
+        y.ORDER_STATES
+        From (
+        <include refid="queryPostponementData"/>
+        ) y
+        )z
+        <![CDATA[
+	        where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+    <sql id="queryPostponementData">
+        SELECT Q.CST_ORD_ID,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        max(q.ALARM_DATE) ALARM_DATE,
+        max(q.REQ_FIN_DATE) REQ_FIN_DATE,
+        Q.WO_COMPLETE_STATE,
+        COUNT(0) COUNTS,
+        Q.TACHE_ID,
+        Q.WO_ID,
+        Q.TACHE_NAME,
+        Q.REGION_ID,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        LISTAGG(Q.WOORDERBACKFLAG, ',') WITHIN GROUP(ORDER BY Q.WOORDERBACKFLAG) AS WOORDERBACKFLAGS,
+        LISTAGG(Q.WO_IDS, ',') WITHIN GROUP(ORDER BY Q.create_date) AS WO_IDS,
+        LISTAGG(Q.ORDER_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS ORDER_IDS,
+        LISTAGG(Q.SRV_ORD_ID, ',') WITHIN GROUP(ORDER BY Q.create_date) AS SRV_ORD_IDS,
+        LISTAGG(Q.WO_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS WO_STATES,
+        LISTAGG(Q.SRV_ORD_STAT, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS SRV_ORD_STATS,
+        LISTAGG(Q.ORDER_STATE, ',') WITHIN GROUP(ORDER BY Q.CREATE_DATE) AS ORDER_STATES
+        FROM (SELECT SRV.ORDER_ID, srv.req_fin_time,
+        SRV.SRV_ORD_ID,
+        APP.WO_ID,
+        WO.WO_ID WO_IDS,
+        WO.WO_STATE,
+        SRV.TRADE_ID,
+        SRV.SERIAL_NUMBER,
+        SRV.SRV_ORD_STAT,
+        SRV.ORDER_CODE,
+        SRV.ORDER_STATE,
+        SRV.CST_ORD_ID,
+        CST.SUBSCRIBE_ID,
+        CST.CUST_NAME_CHINESE,
+        CST.APPLY_ORD_ID,
+        CST.APPLY_ORD_NAME,
+        DO.DISPATCH_ORDER_NO,
+        DO.DISPATCH_TITLE,
+        DO.SRV.DISPATCH_ORDER_ID,
+        SRV.ORDER_TYPE,
+        SRV.ACTIVE_TYPE,
+        SRV.SERVICE_ID,
+        SRV.RESOURCES,
+        SRV.PS_ID,
+        TO_CHAR(WO.ALARM_DATE, 'yyyy-MM-dd hh24:mi:ss') ALARM_DATE,
+        TO_CHAR(WO.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') REQ_FIN_DATE,
+        <![CDATA[
+                        CASE
+                        WHEN WO.REQ_FIN_DATE <= sysdate then '超时单'
+                        WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then '预警单'
+                        WHEN WO.ALARM_DATE > sysdate then '正常单'
+                        ELSE '正常单'
+                        END WO_COMPLETE_STATE,
+                      ]]>
+        wo.create_date,
+        UT.ID AS TACHE_ID,
+        UT.TACHE_NAME,
+        KI.REGION_ID,
+        KI.SPECIALTY_CODE,
+        PDS.PUB_DATE_NAME,
+        CASE UT.TACHE_NAME
+        WHEN '光纤资源分配' THEN
+        UT.TACHE_NAME
+        ELSE
+        CONCAT(PDS.PUB_DATE_NAME, UT.TACHE_NAME)
+        END AS SPC_TAC_NAME,
+        WO.DISP_OBJ_ID AS DISPOBJTYEVALUE,
+        WO.DISP_OBJ_TYE AS DISPOBJTYE,
+        bwa.back_flag AS WOORDERBACKFLAG
+        FROM GOM_BDW_CST_ORD CST
+        LEFT JOIN (SELECT SOI.CST_ORD_ID, soi.req_fin_time,
+        SOI.DISPATCH_ORDER_ID,
+        O.ORDER_ID,
+        SOI.ORDER_TYPE,
+        SOI.SRV_ORD_ID,
+        SOI.ACTIVE_TYPE,
+        SOI.TRADE_ID,
+        SOI.SERIAL_NUMBER,
+        SOI.SERVICE_ID,
+        SOI.SRV_ORD_STAT,
+        SOI.RESOURCES,
+        O.PS_ID,
+        O.ORDER_CODE,
+        O.ORDER_STATE
+        FROM GOM_BDW_SRV_ORD_INFO SOI
+        JOIN GOM_ORDER O
+        ON SOI.ORDER_ID = O.ORDER_ID or SOI.ORDER_ID = O.PARENT_ORDER_ID
+        WHERE soi.system_resource = 'flow-schedule-lt' ) SRV
+        ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER DO
+        ON DO.DISPATCH_ORDER_ID = SRV.DISPATCH_ORDER_ID
+        AND DO.STATE = '10A'
+        LEFT JOIN GOM_WO WO
+        ON WO.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN gom_bdw_wo_attr bwa ON bwa.wo_id = wo.wo_id
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON KI.ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_PUB_DATE_S PDS
+        ON PDS.PUB_DATE_ID = KI.SPECIALTY_CODE
+        AND PDS.DF_TYPE = 'SPECIALTY_TYPE'
+        JOIN GOM_BDW_POSTPONEMENT_APPLY APP ON SRV.cst_ord_id = APP.Cst_Ord_Id
+        AND APP.Apply_State = '290000002' and app.deal_user =wo.comp_user_id and app.save_state='1'
+
+        WHERE  1 = 1
+         and app.deal_user = #{staffId}
+        and ut.tache_code='CIRCUIT_DISPATCH'
+        AND srv.RESOURCES = 'onedry'
+        <!--申请单编号 -->
+        <if test="srvOrdId != null and srvOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{srvOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like '%'||#{custName}||'%'
+        </if>
+        <!-- 客户订单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 调单编号-->
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DO.DISPATCH_ORDER_NO like '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and srv.SERIAL_NUMBER like '%'|| #{serialNumber}||'%'
+        </if>
+        <!-- 环节名称-->
+        <include refid="teachIds"></include>
+
+        <!--单据类型-->
+        <if test="itemType != null and itemType != ''">
+            and srv.order_type = #{itemType}
+        </if>
+        <!--完成开始时间、完成结束时间 -->
+        <if test="finishDate != null and finishDate != '' and endDate != null and endDate != '' ">
+            AND WO.REQ_FIN_DATE BETWEEN to_date( #{finishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--本地要求完成时间 -->
+        <if test="localFinishDate != null and localFinishDate != '' and localEndDate != null and localEndDate != '' ">
+            AND TO_DATE(SRV.REQ_FIN_TIME, 'yyyy-MM-dd hh24:mi:ss')  BETWEEN to_date( #{localFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{localEndDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!--全程调测时间 -->
+        <if test="qcFinishDate != null and qcFinishDate != '' and qcEndDate != null and qcEndDate != '' ">
+            AND WO.state_date BETWEEN to_date( #{qcFinishDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{qcEndDate},'yyyy-mm-dd hh24:mi:ss')
+            and wo.wo_state='290000004'
+            and ws.tache_id in('500001161','500001168','510101045','510101051') /**  全程调测环节完成时间*/
+        </if>
+        <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+            and bwa.back_flag like '%'||#{woOrderBackFlag}||'%'
+        </if>
+        ORDER BY wo.create_date desc) Q
+        GROUP BY Q.CST_ORD_ID,
+        Q.TACHE_ID,
+        Q.WO_ID,
+        Q.TACHE_NAME,
+        Q.SPC_TAC_NAME,
+        Q.SPECIALTY_CODE,
+        Q.PUB_DATE_NAME,
+        Q.REGION_ID,
+        Q.DISPOBJTYEVALUE,
+        Q.DISPOBJTYE,
+        Q.SUBSCRIBE_ID,
+        Q.CUST_NAME_CHINESE,
+        Q.APPLY_ORD_ID,
+        Q.APPLY_ORD_NAME,
+        Q.DISPATCH_ORDER_NO,
+        Q.DISPATCH_TITLE,
+        Q.DISPATCH_ORDER_ID,
+        Q.ORDER_TYPE,
+        Q.ACTIVE_TYPE,
+        Q.SERVICE_ID,
+        Q.RESOURCES,
+        Q.PS_ID,
+        Q.WO_COMPLETE_STATE
+
+    </sql>
+
+</mapper>

@@ -1,0 +1,140 @@
+<div class="modal-header">
+    <h4 class="modal-title">电路详情</h4>
+</div>
+<div class="modal-body">
+    <div id="isa-route-mainPanel">
+        <form class="form-horizontal form-ui-label" id="route-form">
+            <div class="title_left">
+                <span class="title_left_span">电路信息：</span>
+            </div>
+            <div class="row" style="margin-left: 30px;margin-top: 20px;">
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">客户名称</label>
+                <div class="col-md-8 input-group">
+                    <div id="CUST_NAME" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">客户联系电话</label>
+                <div class="col-md-8 input-group">
+                    <div id="LINK_TELE" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">客户地址</label>
+                <div class="col-md-8 input-group">
+                    <div id="ADDRESS" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">客户联系人</label>
+                <div class="col-md-8 input-group">
+                    <div id="LINK_MAN" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">客户联系人电话</label>
+                <div class="col-md-8 input-group">
+                    <div id="LINK_TELE2" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">产品名称</label>
+                <div class="col-md-8 input-group">
+                    <div id="PRODUCT_NO" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">业务号码</label>
+                <div class="col-md-8 input-group">
+                    <div id="BUSINESS_IDENTITY" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">电路编号</label>
+                <div class="col-md-8 input-group">
+                    <div id="CIRCUIT_NO" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">带宽</label>
+                <div class="col-md-8 input-group">
+                    <div id="CIRCUIT_RATE" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">A端地市</label>
+                <div class="col-md-8 input-group">
+                    <div id="A_RESISTANCE" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">A端装机地址</label>
+                <div class="col-md-8 input-group">
+                    <div id="A_ADDRESS" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">A端接口类型</label>
+                <div class="col-md-8 input-group">
+                    <div id="LONG_INTER_PORT" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">A端联系人</label>
+                <div class="col-md-8 input-group">
+                    <div id="A_LINK_MAN" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">A端联系人电话</label>
+                <div class="col-md-8 input-group">
+                    <div id="A_LINK_TELE" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">Z端地市</label>
+                <div class="col-md-8 input-group">
+                    <div id="SYS_EMS_NAME" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">Z端装机地址</label>
+                <div class="col-md-8 input-group">
+                    <div id="Z_ADDRESS" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">Z端接口类型</label>
+                <div class="col-md-8 input-group">
+                    <div id="SYS_NETWORK_GW" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">Z端联系人</label>
+                <div class="col-md-8 input-group">
+                    <div id="Z_LINK_MAN" class="form-order-info"/>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="col-md-4 control-label">Z端联系人电话</label>
+                <div class="col-md-8 input-group">
+                    <div id="Z_LINK_TELE" class="form-order-info"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="title_left col-md-12">
+        <span class="title_left_span">路由信息：</span>
+    </div>
+    <div class="row" style="margin-left: 30px;margin-top: 20px;">
+    </div>
+    <div class="col-md-12">
+        <div id="routeGrid"></div>
+    </div>
+</div>
+
+<div class="modal-footer" style="text-align: center">
+    <button type="button" class="btn btn-danger" id="close">关闭</button>
+</div>

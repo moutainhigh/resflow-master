@@ -1,0 +1,287 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">工单处理</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <!-- 电路信息 -->
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+                    <!-- 是否投资估算 -->
+                    <div class="row form-group" id="estimateDiv" >
+                        <label class="col-md-2 col-sm-4 control-label"  style="padding-right: 0;">是否投资估算：</label>
+                        <div class="col-md-10 col-sm-8" id="estimate">
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimatePass" value="0">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimateNoPass" value="1" checked="true" >否</label>
+                        </div>
+                    </div>
+                    <!-- 核查反馈 A端   masterRetDiv-->
+                    <div class="row form-group" id="feedBackADiv" hidden >
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">A端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_CONSTRUCT_SCHEME" name="A_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id ="a"><span style="color: red">*</span>A端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_RES_SATISFY" name="A_RES_SATISFY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomADiv">
+                                <label class="col-md-4 col-sm-4 control-label">A端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="A_ACCESS_ROOM" name="A_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountA">A端投资金额(万):</label>
+                                    <label class="control-label" id="amount" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_INVESTMENT_AMOUNT" name="A_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodA">A端建设工期(工作日):</label>
+                                    <label class="control-label" id="period" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_CONSTRUCT_PERIOD" name="A_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--添加字段-->
+                        <div class="col-md-12 col-sm-12" id="resAp" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端资源提供方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_RES_PROVIDE" name="A_RES_PROVIDE" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端资源接入方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="A_RES_ACCESS" name="A_RES_ACCESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 备货情况-->
+                        <div class="col-md-12 col-sm-12" id="resA" hidden  style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端备货情况:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_EQUIP_READY" name="A_EQUIP_READY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <!--A端工建反馈费用信息-->
+                        <div class="col-md-12 col-sm-12" hidden id = "enginBackA">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" >A端设备费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="DEV_COST_A" name="DEV_COST_A" class="form-control" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" >A端光缆费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="OPT_COST_A" name="OPT_COST_A" class="form-control" readonly disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" hidden id="enginBackA2">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label">A端其他费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="OTHER_COST_A" name="OTHER_COST_A" class="form-control" readonly disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 核查反馈 Z端-->
+                    <div class="row form-group" id="feedBackZDiv" hidden >
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">Z端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_CONSTRUCT_SCHEME" name="Z_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_RES_SATISFY" name="Z_RES_SATISFY" class="form-control"  data-rule="required ">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomZDiv">
+                                <label class="col-md-4 col-sm-4 control-label">Z端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="Z_ACCESS_ROOM" name="Z_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountZ">Z端投资金额(万):</label>
+                                    <label class="control-label" id="amountLabel" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_INVESTMENT_AMOUNT" name="Z_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodZ">Z端建设工期(工作日):</label>
+                                    <label class="control-label" id="periodLabel" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_CONSTRUCT_PERIOD" name="Z_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--添加字段-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="resZp" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id="resProvideZ"><span style="color: red">*</span>Z端资源提供方式:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="resProvide" hide><span style="color: red">*</span>资源提供方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_RES_PROVIDE" name="Z_RES_PROVIDE" class="form-control"  data-rule="required" style="width: 300px">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"id="resAccessZ"><span style="color: red">*</span>Z端资源接入方式:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="resAccess" hide><span style="color: red">*</span>资源接入方式:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="Z_RES_ACCESS" name="Z_RES_ACCESS" class="form-control"  data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px" id="resZ" hidden>
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id="equipReadyZ"><span style="color: red">*</span>Z端备货情况:</label>
+                                <label class="col-md-4 col-sm-4 control-label" id="equipReady" hide><span style="color: red">*</span>备货情况:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_EQUIP_READY" name="Z_EQUIP_READY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <!--工建反馈费用信息-->
+                        <div class="col-md-12 col-sm-12" hidden id="enginBackZ">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="devCostLabelZ">Z端设备费用(万):</label>
+                                    <label class="control-label" id="devCostLabel" hidden>设备费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="DEV_COST_Z" name="DEV_COST_Z" class="form-control" readonly disabled >
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="optCostLabelZ">Z端光缆费用(万):</label>
+                                    <label class="control-label" id="optCostLabel" hidden>光缆费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="OPT_COST_Z" name="OPT_COST_Z" class="form-control"readonly disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12"  hidden id="enginBackZ2">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="othCostLabelZ">Z端其他费用(万):</label>
+                                    <label class="control-label" id="othCostLabel" hidden>其他费用(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="OTHER_COST_Z" name="OTHER_COST_Z" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" >投资总金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="TOTAL_AMOUNT" name="TOTAL_AMOUNT" class="form-control" readonly disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="text-align: right;"  id="checkSaveBtnDiv">
+                        <button type="button" id="checkSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存</button>
+                    </div>
+
+
+                    <!-- 附件上传 -->
+                    <div class="row form-group" id="fileUpdateDiv">
+                        <div id="attach" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <form id="displaySource">
+                                    <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="" data-rule="required">
+                                        </span>
+                                    </div>
+                                    <div id="fileGrid"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 说明 -->
+                    <div class="row form-group" id="remarkDiv">
+                        <div id="remarkGoRoll" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"> 说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                          data-rule="required;length[10~, true]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>

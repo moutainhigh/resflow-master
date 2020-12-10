@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.DispObjDao">
+
+    <select id="qryOrderKeyInfo" resultType="map">
+        WITH X AS
+        (SELECT D.act_type       AS act_type1,
+                 D.specialty_id   AS specialty_id1,
+                 D.product_type   AS product_type1,
+                 E.ACT_TYPE       AS ACT_TYPE2,
+                 E.SPECIALTY_CODE AS specialty_id2,
+                 E.PRODUCT_TYPE   AS PRODUCT_TYPE2,
+                 D.ID
+            from gom_disp_srv_s        A,
+                 GOM_PS_2_WO_S         B,
+                 UOS_TACHE             C,
+                 GOM_DISP_DETAIL_SRV_S D,
+                 gom_ord_key_info      E
+           where B.id = #{psId}
+             AND E.Order_Id = #{orderId}
+             AND B.tache_id = C.id
+             and A.tache_code = C.tache_code
+             AND D.DISP_SRV_ID = A.ID
+             AND A.AREA_ID = E.REGION_ID
+             AND A.REC_STATE = '170000001'
+             AND D.REC_STATE = '170000001'),
+        X2 AS
+        (select distinct act_type1,
+                          specialty_id1,
+                          product_type1,
+                          ACT_TYPE2,
+                          specialty_id2,
+                          PRODUCT_TYPE2,
+                          ID
+            from (select X.*
+                    from X
+                   where (X.ACT_TYPE1 = X.ACT_TYPE2 AND X.ACT_TYPE2 IS  NOT NULL)
+                  UNION ALL
+                  select X.*
+                    from X
+                   where (X.SPECIALTY_ID1 = X.SPECIALTY_ID2 AND
+                         X.SPECIALTY_ID2 IS NOT NULL)
+                  UNION ALL
+                  select X.*
+                    from X
+                   where (X.PRODUCT_TYPE1 = X.PRODUCT_TYPE2 AND
+                         X.PRODUCT_TYPE2 IS NOT NULL))),
+        X3 AS
+        (select distinct act_type1,
+                          specialty_id1,
+                          product_type1,
+                          ACT_TYPE2,
+                          specialty_id2,
+                          PRODUCT_TYPE2,
+                          ID
+            from (select *
+                    from X2
+                   WHERE X2.ACT_TYPE1 = X2.ACT_TYPE2
+                     AND (X2.SPECIALTY_ID1 = X2.SPECIALTY_ID2 OR
+                         X2.SPECIALTY_ID1 IS NULL)
+                     AND (X2.PRODUCT_TYPE1 = X2.PRODUCT_TYPE2 OR
+                         X2.PRODUCT_TYPE1 IS NULL)
+                  UNION ALL
+                  select *
+                    from X2
+                   WHERE X2.SPECIALTY_ID1 = X2.SPECIALTY_ID2
+                     AND (X2.ACT_TYPE1 = X2.ACT_TYPE2 OR X2.ACT_TYPE1 IS  NULL)
+                     AND (X2.PRODUCT_TYPE1 = X2.PRODUCT_TYPE2 OR
+                         X2.PRODUCT_TYPE1 IS NULL)
+                  UNION ALL
+                  select *
+                    from X2
+                   WHERE X2.PRODUCT_TYPE1 = X2.PRODUCT_TYPE2
+                     AND (X2.ACT_TYPE1 = X2.ACT_TYPE2 OR X2.ACT_TYPE1 IS  NULL)
+                     AND (X2.SPECIALTY_ID1 = X2.SPECIALTY_ID2 OR
+                         X2.SPECIALTY_ID1 IS NULL)))
+        select count(act_type1) as actType,
+               count(specialty_id1) as specialtyCode,
+               count(product_type1) as productType
+          from x3
+    </select>
+
+    <select id="qryOrderKeyInfoParticular" resultType="map">
+        SELECT count(D.ACT_TYPE)     AS ACTTYPE,
+               count(D.SPECIALTY_ID) AS SPECIALTYCODE,
+               count(D.PRODUCT_TYPE) AS PRODUCTTYPE
+            from gom_disp_srv_s        A,
+                 GOM_PS_2_WO_S         B,
+                 UOS_TACHE             C,
+                 GOM_DISP_DETAIL_SRV_S D
+           where B.id = #{psId}
+             AND B.tache_id = C.id
+             and A.tache_code = C.tache_code
+             AND D.DISP_SRV_ID = A.ID
+             AND A.AREA_ID = #{areaId}
+             AND A.REC_STATE = '170000001'
+             AND D.REC_STATE = '170000001'
+    </select>
+
+    <select id="qryDispObj" resultType="String">
+        SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID|| '_J!G@F_' ||D.IS_AUTO,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID|| '_J!G@F_' ||'210000002')
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID=E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE='170000001'
+    </select>
+
+    <select id="qryDispObjPreviousOne" resultType="map">
+        SELECT D.SRC_TACHE_CODE,D.SRC_TACHE_STAFF,D.IS_AUTO
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        <choose>
+            <when test="areaId != '' and areaId != null">
+                AND A.AREA_ID = #{areaId}
+            </when>
+            <otherwise>
+                AND A.AREA_ID = E.REGION_ID
+            </otherwise>
+        </choose>
+
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID=E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE='170000001'
+    </select>
+
+    <select id="qryTacheInfo" resultType="map">
+        SELECT ws.id,ws.tache_id, t.tache_code, t.tache_name
+        FROM  gom_ps_2_wo_s ws
+        LEFT JOIN uos_tache t ON t.id = ws.tache_id
+        WHERE ws.id = #{psId} AND ws.rec_state = '170000001'
+    </select>
+
+    <select id="mainDispService" resultType="string">
+        select case
+        when NO1 &lt;&gt; 1 then
+        (SELECT c.DISP_OBJ_TYPE || '_J!G@F_' || c.DISP_OBJ_ID
+        FROM gom_bdw_srv_ord_info a
+        LEFT JOIN gom_disp_srv_s b
+        ON b.area_id = a.mainorg_bdw
+        LEFT JOIN GOM_DISP_DETAIL_SRV_S c
+        ON c.DISP_SRV_ID = b.id
+        LEFT JOIN UOS_TACHE e
+        ON e.tache_code = b.tache_code
+        LEFT JOIN GOM_PS_2_WO_S d
+        ON d.tache_id = e.id
+        LEFT JOIN gom_ord_key_info f ON f.Order_Id = a.order_id
+        WHERE a.order_id =#{orderId}
+        AND d.id =  #{psId}
+        <if test='actType != null and actType != "0" '>
+            AND c.ACT_TYPE = f.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND c.SPECIALTY_ID = f.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND c.PRODUCT_TYPE = f.PRODUCT_TYPE
+        </if>
+        AND b.REC_STATE = '170000001'
+        AND c.REC_STATE = '170000001')
+        else
+        (SELECT c.DISP_OBJ_TYPE || '_J!G@F_' || c.DISP_OBJ_ID
+        FROM gom_bdw_sec_local_relate_info a2
+        LEFT JOIN gom_disp_srv_s b
+        ON b.area_id = a2.masterarea
+        LEFT JOIN GOM_DISP_DETAIL_SRV_S c
+        ON c.DISP_SRV_ID = b.id
+        LEFT JOIN UOS_TACHE e
+        ON e.tache_code = b.tache_code
+        LEFT JOIN GOM_PS_2_WO_S d
+        ON d.tache_id = e.id
+        LEFT JOIN gom_ord_key_info f ON f.Order_Id = a2.order_id
+        WHERE a2.order_id = #{orderId}
+        AND d.id = #{psId}
+        <if test='actType != null and actType != "0" '>
+            AND c.ACT_TYPE = f.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND c.SPECIALTY_ID = f.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND c.PRODUCT_TYPE = f.PRODUCT_TYPE
+        </if>
+        AND b.REC_STATE = '170000001'
+        AND c.REC_STATE = '170000001')
+        end
+        from
+        ( select count(1) NO1 from
+        gom_bdw_sec_local_relate_info gb
+        where gb.order_id =  #{orderId})
+    </select>
+
+    <select id="dataMakeDispService" resultType="string">
+        select case when exists(
+        select do.DISP_OBJ
+        from GOM_BDW_DISP_OBJ do
+        LEFT JOIN UOS_TACHE ut ON ut.id = do.tache_id
+        LEFT JOIN GOM_PS_2_WO_S pws ON pws.tache_id = ut.id
+        WHERE pws.id = #{psId}  AND do.order_id = #{orderId} and do.disp_state = '10A' )
+        then (
+        select do.DISP_OBJ
+        from GOM_BDW_DISP_OBJ do
+        LEFT JOIN UOS_TACHE ut ON ut.id = do.tache_id
+        LEFT JOIN GOM_PS_2_WO_S pws ON pws.tache_id = ut.id
+        WHERE pws.id = #{psId} AND do.order_id = #{orderId} and do.disp_state = '10A')
+        else (
+        SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID)
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE=E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND D.IS_AUTO = '210000002'
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE = '170000001'
+        ) end from dual
+    </select>
+
+    <select id="resourceConstructionDispService" resultType="string">
+        SELECT CASE
+        WHEN s.area_id = '350002000000000042766427' or s.area_id = '350002000000000042766423' THEN
+        ( -- 海南 湖北
+        select do.DISP_OBJ
+        from GOM_BDW_DISP_OBJ do
+        LEFT JOIN UOS_TACHE ut
+        ON ut.id = do.tache_id
+        LEFT JOIN GOM_PS_2_WO_S pws
+        ON pws.tache_id = ut.id
+        WHERE pws.id = #{psId}
+        AND do.order_id = #{orderId} and do.disp_state = '10A')
+        WHEN s.area_id = '350002000000000042766429' AND
+        substr(i.act_type,0,3)  IN ('101', '103', '106') THEN
+        (
+        -- 重庆 新开，变更，移机
+        SELECT *
+        FROM (SELECT 260000003 || '_J!G@F_' || w.comp_user_id
+        FROM gom_order o
+        LEFT JOIN gom_wo w
+        ON o.parent_order_id = w.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws
+        ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut
+        ON ut.id = ws.tache_id
+        WHERE o.order_id = #{orderId}
+        AND ut.tache_code = 'CIRCUIT_DISPATCH'
+        AND w.comp_user_id IS NOT NULL
+        ORDER BY w.create_date)
+        WHERE ROWNUM = 1)
+        WHEN s.area_id = '350002000000000042766429' AND
+        substr(i.act_type,0,3) NOT IN ('101', '103', '106') THEN
+        (SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID)
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND D.IS_AUTO = '210000002'
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE = '170000001')
+        ELSE
+        (SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID|| '_J!G@F_' ||D.IS_AUTO,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID|| '_J!G@F_' ||'210000002')
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND D.IS_AUTO = '210000002'
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE = '170000001')
+        END
+        FROM  gom_order o
+        LEFT JOIN gom_ord_key_info i
+        ON i.ORDER_ID = o.ORDER_ID
+        LEFT JOIN GOM_ORG_S s
+        ON s.org_id = i.REGION_ID
+        where o.order_id = #{orderId}
+    </select>
+
+    <select id="adjustTestDispService" resultType="string">
+        SELECT c.DISP_OBJ_TYPE || '_J!G@F_' || c.DISP_OBJ_ID FROM gom_bdw_srv_ord_info a,
+        gom_disp_srv_s b ,
+        GOM_DISP_DETAIL_SRV_S c ,
+        gom_ord_key_info f ,
+        UOS_TACHE e ,
+        GOM_PS_2_WO_S d
+        WHERE a.order_id = #{orderId}
+        AND d.id = #{psId}
+        AND b.area_id = a.mainorg_bdw
+        AND c.DISP_SRV_ID = b.id
+        AND e.tache_code = b.tache_code
+        AND d.tache_id = e.id
+        and a.order_id=f.order_id
+        <if test='actType != null and actType != "0" '>
+            AND c.ACT_TYPE = f.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND c.SPECIALTY_ID = f.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND c.PRODUCT_TYPE = f.PRODUCT_TYPE
+        </if>
+        AND b.REC_STATE = '170000001'
+        AND c.REC_STATE = '170000001'
+    </select>
+
+    <select id="fullCommissioningDispService" resultType="string">
+        SELECT CASE
+        WHEN disp.to_bdw = '否' THEN
+        (SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID)
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id =#{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        AND D.IS_AUTO = '210000002'
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND A.REC_STATE = '170000001'
+        and D.REC_STATE = '170000001')
+        ELSE
+        (select w.disp_obj_tye || '_J!G@F_' || w.disp_obj_id
+        from gom_bdw_sec_local_relate_info t,
+        gom_bdw_dispatch_dept         g,
+        gom_ps_2_wo_s                 gp,
+        gom_wo                        w,
+        uos_tache                     u
+        where t.srv_ord_id = g.srv_ord_id
+        and t.cst_ord_id = g.cst_ord_id
+        and t.parent_order_id = #{orderId}
+        and t.region_id = g.master_region
+        and t.order_id = w.order_id
+        and gp.id = w.ps_id
+        and gp.tache_id = u.id
+        and u.tache_code = 'CROSS_WHOLE_COURDER_TEST'
+        and w.wo_id = (select max(w2.wo_id)
+        from gom_wo w2
+        where w2.order_id = w.order_id
+        and w2.ps_id = w.ps_id)
+        and g.DELETE_STATE = '0')
+        END
+        FROM gom_bdw_srv_ord_info srv
+        LEFT JOIN gom_order o
+        ON o.order_id = srv.order_id
+        LEFT JOIN GOM_BDW_DISPATCH_DEPT disp
+        ON disp.srv_ord_id = srv.srv_ord_id
+        WHERE o.order_id = #{orderId} AND disp.DELETE_STATE = '0'
+    </select>
+
+    <select id="provincialCommissioningDispService" resultType="string">
+        SELECT CASE
+        WHEN disp.to_bdw = '否' AND
+        KI.ACT_TYPE IN (10110101060, 10210101060, 10310101060) THEN
+        (SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID)
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E
+        where B.id = #{psId}
+        AND E.Order_Id =  #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = E.REGION_ID
+        AND D.IS_AUTO = '210000002'
+        <if test='actType != null and actType != "0" '>
+            AND D.ACT_TYPE = E.ACT_TYPE
+        </if>
+        <if test='specialtyCode != null and specialtyCode != "0" '>
+            AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+        </if>
+        <if test='productType != null and productType != "0" '>
+            AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+        </if>
+        AND A.REC_STATE = '170000001'
+        and D.REC_STATE = '170000001')
+        WHEN disp.to_bdw = '否' AND
+        KI.ACT_TYPE NOT IN (10110101060, 10210101060, 10310101060) THEN
+        (SELECT '260000003_J!G@F_' || a.create_op
+        FROM gom_order a
+        WHERE a.order_id =  #{orderId})
+        ELSE
+        (select w.disp_obj_tye || '_J!G@F_' || w.disp_obj_id
+        from gom_bdw_sec_local_relate_info t,
+        gom_bdw_dispatch_dept         g,
+        gom_ps_2_wo_s                 gp,
+        gom_wo                        w,
+        uos_tache                     u
+        where t.srv_ord_id = g.srv_ord_id
+        and t.cst_ord_id = g.cst_ord_id
+        and t.parent_order_id =  #{orderId}
+        and t.region_id = g.master_region
+        and t.order_id = w.order_id
+        and gp.id = w.ps_id
+        and gp.tache_id = u.id
+        and u.tache_code = 'CROSS_WHOLE_COURDER_TEST'
+        and w.wo_id = (select max(w2.wo_id)
+        from gom_wo w2
+        where w2.order_id = w.order_id
+        and w2.ps_id = w.ps_id)
+        and g.DELETE_STATE = '0')
+        END
+        FROM gom_bdw_srv_ord_info srv
+        LEFT JOIN gom_order o
+        ON o.order_id = srv.order_id
+        LEFT JOIN GOM_BDW_DISPATCH_DEPT disp
+        ON disp.srv_ord_id = srv.srv_ord_id
+        LEFT JOIN GOM_ORD_KEY_INFO KI
+        ON O.ORDER_ID = KI.ORDER_ID
+        WHERE o.order_id =  #{orderId} AND disp.DELETE_STATE = '0'
+    </select>
+
+    <select id="qryDispObjsLocalTest" resultType="string" parameterType="map">
+        SELECT NVL2(D.DISP_OBJ_ID,
+                 D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID,
+                 B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID)
+                 from gom_disp_srv_s        A,
+                 GOM_PS_2_WO_S         B,
+                 UOS_TACHE             C,
+                 GOM_DISP_DETAIL_SRV_S D,
+                 gom_ord_key_info      E
+                 where B.id = #{psId}
+                 AND E.Order_Id = #{orderId}
+                 AND B.tache_id = C.id
+                 and A.tache_code = C.tache_code
+                 AND D.DISP_SRV_ID = A.ID
+                 AND A.AREA_ID = #{areaId}
+                <if test='actType != null and actType != "0" '>
+                    AND D.ACT_TYPE = E.ACT_TYPE
+                </if>
+                <if test='specialtyCode != null and specialtyCode != "0" '>
+                    AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+                </if>
+                <if test='productType != null and productType != "0" '>
+                    AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+                </if>
+                 AND D.IS_AUTO = '210000002'
+                 AND A.REC_STATE = '170000001'
+                 AND D.REC_STATE = '170000001'
+    </select>
+
+    <select id="qryMainDispService" resultType="map">
+         SELECT count(D.ACT_TYPE) AS ACTTYPE,
+           count(D.SPECIALTY_ID) AS SPECIALTYCODE,
+           count(D.PRODUCT_TYPE) AS PRODUCTTYPE
+        from gom_disp_srv_s        A,
+             GOM_PS_2_WO_S         B,
+             UOS_TACHE             C,
+             GOM_DISP_DETAIL_SRV_S D,
+             gom_bdw_srv_ord_info  F
+       where B.id =  #{psId}
+         AND B.tache_id = C.id
+         and A.tache_code = C.tache_code
+         AND D.DISP_SRV_ID = A.ID
+         AND A.AREA_ID = F.mainorg_bdw
+         AND F.order_id = #{orderId}
+         AND A.REC_STATE = '170000001'
+         AND D.REC_STATE = '170000001'
+    </select>
+
+    <select id="qryMainDispServiceSec" resultType="map">
+        SELECT count(D.ACT_TYPE)     AS ACTTYPE,
+               count(D.SPECIALTY_ID) AS SPECIALTYCODE,
+               count(D.PRODUCT_TYPE) AS PRODUCTTYPE
+            from gom_disp_srv_s        A,
+                 GOM_PS_2_WO_S         B,
+                 UOS_TACHE             C,
+                 GOM_DISP_DETAIL_SRV_S D,
+                 gom_bdw_sec_local_relate_info  F
+           where B.id = #{psId}
+             AND B.tache_id = C.id
+             and A.tache_code = C.tache_code
+             AND D.DISP_SRV_ID = A.ID
+             AND A.AREA_ID = F.masterarea
+             AND F.order_id = #{orderId}
+             AND A.REC_STATE = '170000001'
+             AND D.REC_STATE = '170000001'
+    </select>
+
+    <select id="completeConfirmDispService" resultType="string">
+        SELECT CASE
+        WHEN s.area_id = '350002000000000042766427'
+        or s.area_id = '350002000000000042766429'
+        or s.area_id = '350002000000000042766435' THEN  -- 海南 重庆 青海
+        (   SELECT * FROM (
+                SELECT w.DISP_OBJ_TYE || '_J!G@F_' || w.DISP_OBJ_ID
+                FROM gom_wo w
+                LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+                LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+                WHERE w.order_id = #{orderId} AND ut.tache_code = 'CIRCUIT_DISPATCH' ORDER BY w.create_date DESC
+                ) WHERE ROWNUM = 1
+        )
+        ELSE
+        (   SELECT NVL2(D.DISP_OBJ_ID,
+            D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID|| '_J!G@F_' ||D.IS_AUTO,
+            B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID|| '_J!G@F_' ||'210000002')
+            from gom_disp_srv_s        A,
+            GOM_PS_2_WO_S         B,
+            UOS_TACHE             C,
+            GOM_DISP_DETAIL_SRV_S D,
+            gom_ord_key_info      E
+            where B.id = #{psId}
+            AND E.Order_Id = #{orderId}
+            AND B.tache_id = C.id
+            and A.tache_code = C.tache_code
+            AND D.DISP_SRV_ID = A.ID
+            AND A.AREA_ID = E.REGION_ID
+            <if test='actType != null and actType != "0" '>
+                AND D.ACT_TYPE = E.ACT_TYPE
+            </if>
+            <if test='specialtyCode != null and specialtyCode != "0" '>
+                AND D.SPECIALTY_ID = E.SPECIALTY_CODE
+            </if>
+            <if test='productType != null and productType != "0" '>
+                AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+            </if>
+            AND D.IS_AUTO = '210000002'
+            AND A.REC_STATE = '170000001'
+            AND D.REC_STATE = '170000001'
+        )
+        END
+        FROM  gom_order o
+        LEFT JOIN gom_ord_key_info I  ON i.ORDER_ID = o.ORDER_ID
+        LEFT JOIN GOM_ORG_S S ON s.org_id = i.REGION_ID
+        where o.order_id = #{orderId}
+    </select>
+
+    <select id="qryCircuitTacheWoOrder" resultType="map">
+        SELECT ord.order_id, ord.parent_order_id, wo.wo_id, wo.disp_obj_tye, wo.disp_obj_id, wo.deal_user_id, wo.comp_user_id,
+        ut.id, ut.tache_code, ut.tache_name, ki.region_id, ki.product_type, ki.act_type, ki.specialty_code
+        FROM GOM_ORDER ord
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = ord.order_id
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ord.order_state <![CDATA[ <> ]]> '200000005'
+        AND wo.wo_state <![CDATA[ <> ]]> '290000005'
+        AND wo.disp_obj_id <![CDATA[ <> ]]> '-2000'
+        AND ord.order_id IN
+        <foreach collection="allOrderIdList" item="orderId" index="index" open="(" close=")" separator = ",">
+            #{orderId}
+        </foreach>
+        AND ut.tache_code in
+        <foreach collection="sameNameTache" item="tache" index="index" open="(" close=")" separator=",">
+            #{tache.tacheCode}
+        </foreach>
+        AND ki.product_type = #{productType}
+        <if test="regionId != '' and regionId != null">
+            AND ki.region_id = #{regionId}
+        </if>
+        <if test="specialtyCode != '' and specialtyCode != null">
+            AND ki.specialty_code = #{specialtyCode}
+        </if>
+        ORDER BY wo.create_date DESC
+    </select>
+
+    <select id="qryBdwMainOrg" resultType="string">
+        SELECT r.mainorg_bdw as AREAID FROM gom_bdw_srv_ord_info r WHERE r.order_id = #{orderId}
+    </select>
+
+    <select id="qryBdwMainOrgSec" resultType="string">
+        SELECT r.masterarea as AREAID FROM gom_bdw_sec_local_relate_info r WHERE r.order_id = #{orderId}
+    </select>
+
+    <select id="qryConfigTacheDealObj" resultType="map">
+        SELECT DO.TACHE_ID,
+               DO.ORDER_ID,
+               DO.DISP_OBJ,
+               DO.DISP_STATE,
+               DO.DISP_OBJ_ID,
+               DO.DISP_OBJ_LIST,
+               DO.TACHE_NAME
+          FROM GOM_BDW_DISP_OBJ DO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.TACHE_ID = DO.TACHE_ID
+         WHERE ORDER_ID = #{orderId}
+           AND WS.ID = #{psId}
+           AND DISP_STATE = '10A'
+    </select>
+
+    <select id="qryPopDispObj" resultType="String">
+        SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID|| '_J!G@F_' ||D.IS_AUTO,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID|| '_J!G@F_' ||'210000002')
+        from gom_disp_srv_s        A,
+        GOM_PS_2_WO_S         B,
+        UOS_TACHE             C,
+        GOM_DISP_DETAIL_SRV_S D,
+        gom_ord_key_info      E,
+        gom_bdw_srv_ord_info  g
+        where B.id = #{psId}
+        AND E.Order_Id = #{orderId}
+        AND B.tache_id = C.id
+        and A.tache_code = C.tache_code
+        AND D.DISP_SRV_ID = A.ID
+        AND A.AREA_ID = g.mainorg
+        and g.order_id = E.Order_Id
+        AND A.REC_STATE = '170000001'
+        AND D.REC_STATE='170000001'
+    </select>
+
+    <select id="queryTacheIdByPsId" resultType="string" parameterType="string">
+        SELECT TACHE_ID FROM GOM_PS_2_WO_S WHERE ID = #{psId}
+    </select>
+
+    <select id="queryKeyInfoByOrderId" parameterType="string" resultType="map">
+        SELECT SPECIALTY_CODE FROM gom_ord_key_info WHERE ORDER_ID = #{orderId}
+    </select>
+    <select id="queryParentOrderId" parameterType="string" resultType="string">
+        SELECT PARENT_ORDER_ID FROM GOM_ORDER WHERE ORDER_ID = #{orderId}
+    </select>
+    <select id="qryDispatchData" resultType="map" parameterType="String">
+       SELECT srv.cst_ord_id,srv.srv_ord_id,cst.handle_dep_id,ki.region_id,
+       disp.res_allocate,disp.TO_BDW,disp.specialty,disp.netmanage,
+       disp.ASS_MKDATA_PERSON,disp.MKDATA_PERSON_ID,disp.IS_ASSIGN_PERSON,
+       DISP.RES_ASS_PERSION_ID
+       FROM gom_bdw_srv_ord_info srv
+       LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+       LEFT JOIN gom_order o ON o.order_id = srv.order_id
+       LEFT JOIN gom_ord_key_info ki ON ki.order_id = o.order_id
+       LEFT JOIN GOM_BDW_DISPATCH_DEPT disp ON disp.srv_ord_id = srv.srv_ord_id AND disp.cst_ord_id = srv.cst_ord_id
+       WHERE o.order_id = #{orderId} AND disp.delete_state = '0'
+    </select>
+</mapper>

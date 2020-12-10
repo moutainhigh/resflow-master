@@ -1,0 +1,126 @@
+<div id="cloudNetWorkResCheckFlowDiv">
+    <div class="modal-header">
+        <h4 style="font-size: 16px;font-weight:bold;" class="modal-title">{{TITLE}}</h4>
+    </div>
+    <div class="modal-body">
+        <div id="orderOperView">
+            <div style="margin-left: 15px;margin-right: 15px;">
+                <form class="form-horizontal" id="orderOper-form">
+                    <!-- 电路信息 -->
+                    <div class="col-md-12 col-sm-12 form-group">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="cloudNetWorkResCheckGrid"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0;">是否直接核查汇总：</label>
+                            <div class="col-md-8 col-sm-8" id="isDirctCheckSum">
+                                <label class="radio-inline">
+                                    <input type="radio" name="resRadio" value="0" >是</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="resRadio" value="1" checked="true">否</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">核查专业：</label>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline">
+                                <input type="checkbox" name="ipRan" id="ipRan" value="ipRan">传输IPRAN专业:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">专业区域：</label>
+                            <div class="input-group">
+                                <input id="ipRanPopedit" name="ipRanPopedit" value="请选择派发区域！" class="form-control" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0"></label>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline">
+                                <input type="checkbox" name="fiber" id="fiber" value="fiber">光纤专业:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">A端区域：</label>
+                            <div class="input-group">
+                                <input id="fiberPopeditA" name="fiberPopedit" value="请选择A端区域！" class="form-control" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">Z端区域：</label>
+                            <div class="input-group">
+                                <input id="fiberPopeditZ" name="fiberPopedit" value="请选择Z端区域！" class="form-control" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 form-group">
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0"></label>
+                            <div class="col-md-8 col-sm-8">
+                                <label class="checkbox-inline">
+                                <input type="checkbox" name="terminalBox" id="terminalBox" value="terminalBox">终端盒:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">A端区域：</label>
+                            <div class="input-group">
+                                <input id="terminalBoxPopeditA" name="terminalBoxPopedit" value="请选择A端区域！" class="form-control" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label" style="padding-right: 0">Z端区域：</label>
+                            <div class="input-group">
+                                <input id="terminalBoxPopeditZ" name="terminalBoxPopedit" value="请选择Z端区域！" class="form-control" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 form-group" style="text-align: right;" id="saveBtnDiv">
+                        <button type="button" id="saveBtn" class="btn btn-danger" style="margin-right:20px;margin-bottom:15px;">保存
+                        </button>
+                    </div>
+                    <!-- 附件上传 -->
+                    <div class="col-md-12 col-sm-12 form-group" id="fileUpdateDiv">
+                        <div id="attach" class="col-md-12">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                    <span class="btn btn-default fileinput-button">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                        <span style="line-height: 23px;">选择文件...</span>
+                                        <input class="js-select-file" id="selectFiles" type="file"
+                                               name="selectFiles" multiple="" data-rule="required">
+                                    </span>
+                                </div>
+                                <div id="fileGrid"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 说明 -->
+                    <div class="col-md-12 col-sm-12 form-group" id="remarkDiv">
+                        <div class="col-md-12">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                          data-rule="required;length[10~, true]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+            <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,155 @@
+<div class="modal-header">
+    <h4 class="modal-title">审查事务</h4>
+</div>
+<div class="modal-body">
+    <div id="sc-tabs" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a href="#tabs-a">事务调单信息</a>
+            </li>
+            <li>
+                <a href="#tabs-b">事务处理进度</a>
+            </li>
+        </ul>
+        <div id="tabs-a" class="ui-tabs-panel-new">
+            <div class="panel-body" id="sh-body-div">
+        <form class="form-horizontal" id="affairCheck-form">
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务调单编号</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="affairCheck-code" name="AFFAIR_DISPATCH_ORDER_CODE" placeholder="保存或提交后系统自动生成" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务状态</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="affairCheck-state" name="state" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务类型</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="type" name="type" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group  ">
+                    <label class="col-md-2 col-sm-2 control-label">事务调单标题</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <input class="form-control" id="affairCheck-title" name="TITLE"  disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group  ">
+                    <label class="col-md-2 col-sm-2 control-label">调单正文</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="5" id="affairCheck-content" name="CONTENT" class="form-control"
+                                  placeholder="2000字以内"
+                                  data-rule="required;length[~2000, true]" disabled></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class=" form-group">
+                    <label class="col-md-2 col-sm-2 control-label">调单附件</label>
+                    <div class="input-group col-md-10 col-sm-10" id="affairFileInfoDiv" style="padding-top: 5px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group ">
+                    <label class="col-md-2 col-sm-2 control-label">调单处理人</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <div style="width: 90%" id="affairCheck-disposeStaffGrid"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group required">
+                    <label class="col-md-4 col-sm-4 control-label">是否审核</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input id="affairCheck-isCheck" type="text" name="isCheck" data-rule="required"
+                               class="combobox form-control" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group"  id="checkStaffDiv">
+                    <label class="col-md-4 col-sm-4 control-label">审核人</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input id="affairCheck-checkStaff" name="CHECK_STAFF_NAME" class="form-control" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group">
+                    <label class="col-md-2 col-sm-2 control-label">抄送人</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <div style="width: 90%" id="affairCheck-copyStaffArrGrid"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group">
+                    <label class="col-md-2 col-sm-2 control-label">事务审查</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="isPass" id="isPassRadio1" value="0"
+                                   data-rule="affairCheck-checked" checked="true">通过</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isPass" id="isPassRadio2" value="1">不通过</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group" id="auditOpinionsDiv">
+                    <label class="col-md-2 col-sm-2 control-label">审核意见</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="3" id="affairCheck-auditOpinions" name="auditOpinions"
+                                  class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group" id="shfileUpdateDiv">
+                    <div id="shattach">
+                        <label class="col-md-2 col-sm-2 control-label">审核附件</label>
+                        <div class="input-group col-md-10 col-sm-10">
+                            <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                <span class="btn btn-default fileinput-button">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    <span style="line-height: 23px;">选择文件...</span>
+                                    <input class="js-select-file" id="affairCheck-selectFiles" type="file"
+                                           name="selectFiles" multiple="">
+                                </span>
+                            </div>
+                            <div style="width: 90%" id="affairCheck-shfileGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+        </div>
+        <div id="tabs-b" class="ui-tabs-panel-new">
+            <div class="panel-body">
+                <div id="scAffairGrid" class="affair">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="commit" type="button" class="btn btn-danger">提交</button>
+    <button id="cancel" type="reset" class="btn btn-default">取消</button>
+</div>
+
+

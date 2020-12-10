@@ -1,0 +1,62 @@
+/**
+         * fish-desktop v3.10.0
+         *
+         * Copyright 2013-2017, ZTESoft, Inc.
+         * All rights reserved.
+         *
+         * This source code is licensed under the LGPL-3.0-style license found in the
+         * LICENSE file in the root directory of this source tree. 
+         *
+         */
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+}
+.fileinput-button input,
+.fileinput-input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  font-size: 200px;
+  direction: ltr;
+  cursor: pointer;
+}
+.fileinput-input {
+  width: 100%;
+  height: 32px;
+  overflow: hidden;
+  bottom: auto;
+}
+.fileinput-container {
+  position: relative;
+}
+.input-group-addon.fileinput-container {
+  padding: 0;
+}
+.input-group-addon.fileinput-container .fileinput-pick {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin-bottom: -2px;
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  background-color: #eeeeee;
+  border-radius: 0;
+}
+.fileinput-container .fileinput-pick {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  background: #00b7ee;
+  padding: 10px 15px;
+  text-align: center;
+  border-radius: 3px;
+  overflow: hidden;
+}

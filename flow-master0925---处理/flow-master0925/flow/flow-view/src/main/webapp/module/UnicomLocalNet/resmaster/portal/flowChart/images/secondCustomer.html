@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="title">二干客户电路</title>
+    <!--modify 20190319 zhangrui 修改原有css样式,注释一个，增加一个-->
+    <!--<link rel="stylesheet" href="module/component/css/ngc-desktop-default.css">-->
+    <link rel="stylesheet" href="../../../../flow/common/css/fish-desktop-compact.css">
+    <link rel="stylesheet" href="../../../../flow/common/css/rest-ui.css">
+    <link rel="stylesheet" href="../styles/flowChart.css">
+</head>
+
+<body>
+    <!-- 流程图s -->
+    <div class="fish-flowBox">
+        <!-- 流程图展示 -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title">二干客户电路</span>
+            </div>
+            <div class="panel-body flow-chart-box">
+                <ul class="fish-prompt">
+                    <li class="fish-prompt-1">已完成</li>
+                    <li class="fish-prompt-2">处理中</li>
+                    <li class="fish-prompt-3">未完成</li>
+                </ul>
+
+                <ul class="fish-flowUl clearfix">
+                    <li class="fish-finish">
+                        <span class="fish-flowIcon"><img src="icon-9.png" /></span>
+                        <p class="fish-flowName">本地发起</p>
+                    </li>
+                    <li class="fish-finish">
+                        <span class="fish-flowIcon"><img src="icon-1.png" /></span>
+                        <p class="fish-flowName">二干调度</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li class="fish-Line-s1 fish-finish"><label style="top: 50%"></label></li>
+                    <li class="fish-flow1">
+                        <!-- 处理中加 fish-dispose\ 完成加 fish-finish -->
+                        <div class="fish-dispose relative">
+                            <span class="fish-flowIcon"><img src="icon-2.png" /></span>
+                            <p class="fish-flowName">二干资源分配</p>
+                            <div class="fish-arrows"></div>
+                        </div>
+                        <!-- 单横线 -->
+                        <div class="fish-line-h"></div>
+                    </li>
+                    <li class="fish-Line-s1">
+                        <label style="top: 0"></label>
+                        <label style="left:0;top:50%"></label>
+                    </li>
+
+                    <li class="fish-Line-s2"></li>
+                    <li class="fish-flow2">
+                        <dl class="fish-flow-dl">
+                            <dd class="clearfix">
+                                <div class="relative">
+                                    <span class="fish-flowIcon"><img src="icon-8.png" /></span>
+                                    <p class="fish-flowName">本地调度</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="inline-block relative">
+                                    <span class="fish-flowIcon"><img src="icon-7.png" /></span>
+                                    <p class="fish-flowName">专业数据制作</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+
+                        </dl>
+                    </li>
+                    <li class="fish-Line-s2">
+                        <label style="top: 0"></label>
+                        <label style="top: 100%"></label>
+                    </li>
+                    <li class="fish-Line-s1"><label style="top: 50%"></label></li>
+                    <li class="fish-flow1">
+                        <!-- 处理中加 fish-dispose\ 完成加 fish-finish -->
+                        <div class="relative">
+                            <span class="fish-flowIcon"><img src="icon-2.png" /></span>
+                            <p class="fish-flowName">全程调测</p>
+                            <div class="fish-arrows"></div>
+                        </div>
+                        <!-- 单横线 -->
+                        <div class="fish-line-he"></div>
+                    </li>
+                    <li class="fish-Line-s2">
+                        <label style="top: 0"></label>
+                        <label style="top: 100%"></label>
+                    </li>
+                    <li>
+                        <span class="fish-flowIcon"><img src="icon-5.png" /></span>
+                        <p class="fish-flowName">完工汇总</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li>
+                        <span class="fish-flowIcon"><img src="icon-5.png" /></span>
+                        <p class="fish-flowName">起租确认通知</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 步骤s -->
+        <div class="track-list">
+            <ul>
+                <li class="first">
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time">2016-03-10 18:07:15</span>
+                    <p class="txt"><span>所属部门: 开发部</span><span>操作人: 吴慧君</span><span>联系方式：12345678901</span><span>工单环节:
+                            动环施工</span></p>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <script src="../../../../flow/common/view/fish-desktop-all.min.js"></script>
+    <script>
+        $(function () {
+            $('.panel').panel({
+                collapsible: true,
+                beforeClose: function (e) {
+                    console.log('beforeClose');
+                    return fish.blockedConfirm(e, 'Are you sure to close this panel?');
+                    //return false;// 阻止关闭
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.QueryAttachmentDao">
+    <!-- 根据业务订单ID 查询 附件相关信息 -->
+
+    <select id="queryAttachmentId" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT G.FILE_ID, G.FILE_NAME, G.FILE_PATH, G.FILE_TYPE, G.FILE_SIZE, G.SRV_ORD_ID
+      FROM GOM_BDW_ATTACH_INFO G
+      WHERE SRV_ORD_ID = #{srv_ord_id} and ORIGIN = #{origin}
+    </select>
+</mapper>

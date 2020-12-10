@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetWork.dao.CloudNetCommonDao">
+    <select id="enumTrans" parameterType="string" resultType="string">
+        SELECT CODE_CONTENT FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE = #{type} AND CODE_VALUE = #{value}
+    </select>
+
+    <insert id="insertLogInfo" parameterType="map" keyColumn="id" keyProperty="id">
+        <selectKey resultType="String" order="BEFORE" keyProperty="id">
+            SELECT SEQ_GOM_BDW_INTERF_LOG_INFO.NEXTVAL from dual
+        </selectKey>
+        INSERT INTO GOM_BDW_INTERF_LOG_INFO(
+            ID,
+            <if test="interfName != null and interfName != ''">INTERF_NAME,</if>
+            <if test="url != null and url != ''">URL,</if>
+            <if test="content != null and content != ''">CONTENT,</if>
+            <if test="returnContent != null and returnContent != ''">RETURN_CONTENT,</if>
+            <if test="orderNo != null and orderNo != ''">ORDER_NO,</if>
+            <if test="remark != null and remark != ''">REMARK,</if>
+            CREATE_DATE,
+            UPDATE_DATE
+        )
+        VALUES(
+            #{id},
+            <if test="interfName != null and interfName != ''">#{interfName},</if>
+            <if test="url != null and url != ''">#{url},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="returnContent != null and returnContent != ''">#{returnContent},</if>
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate,
+            sysdate
+        )
+    </insert>
+    <update id="updateLogInfo" parameterType="string">
+        UPDATE GOM_BDW_INTERF_LOG_INFO SET RETURN_CONTENT = #{msg}, UPDATE_DATE = SYSDATE WHERE ID = #{id}
+    </update>
+    <select id="queryUrlInfo" parameterType="string" resultType="string">
+        SELECT CODE_VALUE FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE =#{codeType}
+    </select>
+</mapper>

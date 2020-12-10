@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <h4 class="modal-title">电路信息</h4>
+</div>
+<div class="modal-body">
+    <div id="isa-operTaskManagement-mainPanel" style="overflow-x: hidden"><!-- background-color: #EDEDED;-->
+        <div id="tabs-order-b">
+            <!-- 电路信息-->
+            <form class="form-horizontal form-ui-label" id="dianlu-form">
+                <div id="tabsCirNum-pill" class="tabs-pill ui-tabs">
+                    <ul class="ui-tabs-nav">
+                        <li id="tabs-circuitSub"><a href="#tabs-order-bSub">电路属性信息</a></li>
+                        <li id="tabs-resourceOrder-w"><a href="#tabs-order-w">一干资源信息</a></li>
+                        <li id="tabs-resourceOrder"><a href="#tabs-order-x">二干资源信息</a></li>
+                        <li id="tabs-resourceOrder-y"><a href="#tabs-order-y">本地资源信息</a></li>
+                    </ul>
+                    <div id="tabs-order-bSub">
+                        <!-- 电路信息-->
+                        <form class="form-horizontal" id="circuit-form">
+                            <div class="orderDetailDemo_content" >
+                                <div id="otherInfo" class="row"></div>
+                                <table style="width: 100%" id="azpeInfo">
+                                    <tr style="border:1px dashed #FF0000;">
+                                        <td class="col-md-6 col-sm-6" style="border-right: 1px dashed #FF0000;" id="apeInfo"></td>
+                                        <td class="col-md-6 col-sm-6" id="zceInfo" style="border-right: 1px dashed #FF0000;"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="tabs-order-w">
+                        <!--一干资源信息-->
+                        <div id="resource-grid-w"></div>
+                    </div>
+                    <div id="tabs-order-x">
+                        <!--二干资源信息-->
+                        <div id="resource-grid"></div>
+                    </div>
+                    <div id="tabs-order-y">
+                        <!--本地资源信息-->
+                        <div id="resource-grid-y"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+<div class="modal-footer" style="text-align: center">
+        <button type="button" class="btn btn-danger" id="close">关闭</button>
+</div>

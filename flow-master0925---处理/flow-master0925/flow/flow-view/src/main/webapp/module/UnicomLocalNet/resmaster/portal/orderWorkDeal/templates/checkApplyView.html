@@ -1,0 +1,87 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">延期申请审核</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+                </div>
+                <!--延期时间-->
+                <div class="row form-group" id="applyTypeDiv" hidden>
+                    <div class="col-md-6 col-sm-6">
+                        <label class="col-md-4 col-sm-4 control-label">延期类型:</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input class="combobox form-control" name="applyType" id="applyType" >
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6" id="postponementDateDiv" hidden>
+                        <label class="col-md-4 col-sm-4 control-label">延期时间：</label>
+                        <div class="col-md-8 col-sm-8">
+                            <div class="input-group">
+                                <input id="postponementDate" name="postponementDate" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- 说明 -->
+                <div class="row form-group" id="applyRemarkDiv" hidden>
+                    <label class="col-md-2 col-sm-4 control-label">延期说明：</label>
+                    <div class="col-md-10 col-sm-8 clear-white">
+                            <textarea id="applyRemark" name="applyRemark" class="form-control" rows="8" style="width: 531px;height: 66px;"></textarea>
+                    </div>
+                </div>
+                <div class="row form-group" id="selectSpecialDiv">
+                    <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">是否同意：</label>
+                    <div class="col-md-10 col-sm-8" id="selectSpecial">
+                        <label class="radio-inline">
+                            <input type="radio" name="agreeOrNot" id="agreePass" value="0" checked="true">是</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="agreeOrNot" id="agreeNoPass" value="1">否</label>
+                    </div>
+                </div>
+                <!-- 说明 -->
+                <div class="row form-group" id="remarkDiv">
+                    <label class="col-md-2 col-sm-4 control-label"><span
+                            style="color: red">*</span>审核意见：</label>
+                    <div class="col-md-10 col-sm-8 clear-white">
+                            <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 531px;"
+                                      data-rule="required"></textarea>
+                    </div>
+                </div>
+                <!-- 附件上传 -->
+                <div class="row form-group" id="fileUpdateDiv">
+                    <div id="attach" class="">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <form id="displaySource">
+                                <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="" >
+                                        </span>
+                                </div>
+                                <div id="fileGrid"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>

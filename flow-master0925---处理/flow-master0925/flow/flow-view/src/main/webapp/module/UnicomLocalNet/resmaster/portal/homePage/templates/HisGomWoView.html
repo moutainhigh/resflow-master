@@ -1,0 +1,102 @@
+<div id="isa-operTaskManagement-mainPanel">
+    <div style="padding: 15px;">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="operTaskManagement-btn-row" style="margin-bottom: 0 !important;">
+                <div id="operTaskManagement-searchCodeDiv" class="row">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="his_applyOrdId" name="his_applyOrdId" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单标题</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="his_orderTitle" name="his_orderTitle" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="his_custName" name="his_custName" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="his_serialNumber" name="his_serialNumber" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">环节名称</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <select  id="his_tacheName" name="tacheName" class="form-control" multiple=""></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">单据类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="his_productType" id="his_orderType">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">单据来源</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="his_resourceType" id="his_resourceType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">是否退单</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="his_isBack" id="his_isBack">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">历史月份</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="his_month" name="his_month" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4" id="searchBtnDiv">
+                            <div style="float: right;margin-right: 30px">
+                                <button id="his_queryOrder" type="button" class="btn btn-danger">查询</button>
+                                <button id="his_excelOrder" type="button" class="btn btn-danger">导出数据</button>
+                                <button type="reset" class="btn btn-default">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="his_gomWOGrid"></div>
+    </div>
+</div>

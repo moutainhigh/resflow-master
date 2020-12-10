@@ -1,0 +1,42 @@
+<div id="resConfigView">
+    <div class="modal-header">
+        <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">{{TITLE}}</h4>
+    </div>
+    <div class="modal-body">
+        <div id="orderOperView">
+            <div style="margin-left: 15px;margin-right: 15px;">
+                <label class="control-label" style="padding-left: 0px;font-size:16px;">{{NOTCONFIGGRID}}</label>
+                <!-- 未配置电路信息 -->
+                <div class="row form-group" id="circuitDiv">
+                    <div class="col-md-12 col-sm-12">
+                        <div id="circuitGrid"></div>
+                    </div>
+                </div>
+                <div class="row form-group" style="margin-bottom: 8px;">
+                    <button type="button" id="manualBtn" name="manual" class="btn btn-danger">{{CONFIG}}</button>
+                 <!--   <button type="button" id="closeCircuitBtn" name="transmission" class="btn btn-danger" style="display:none">{{CLASE}}</button>-->
+                </div>
+                        <!-- 资源配置按钮
+                        <div class="row form-group" id="configBtnDiv">
+                            <div class="col-md-12" style="text-align: center">
+                                <button type="button" id="configBtn" class="btn btn-danger">配置</button>
+                                <button type="button" id="frushBtn" class="btn btn-danger">刷新</button>
+                            </div>
+                        </div>-->
+                <!-- 已配置电路信息 -->
+                <label class="control-label" style="padding-left: 0px;font-size:16px;">{{CONFIGGRID}}</label>
+                <div class="row form-group" id="circuitConfigDiv" >
+                    <div class="col-md-12 col-sm-12">
+                        <div id="circuitConfigGrid"></div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <button type="button" id="manualUpdateBtn" name="manual" class="btn btn-danger">{{CONFIGUPDATE}}</button>
+                    <!--<button type="button" id="resourcesBackBtn" name="transmission" class="btn btn-danger">{{CONFIGBACK}}</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>

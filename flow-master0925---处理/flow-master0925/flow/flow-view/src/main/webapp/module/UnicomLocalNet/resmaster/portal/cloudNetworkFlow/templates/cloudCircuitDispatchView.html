@@ -1,0 +1,199 @@
+<div id="woOrderSubmitCloudDiv">
+    <div class="modal-header">
+        <h4 style="font-size: 16px;font-weight:bold;" class="modal-title">{{TITLE}}</h4>
+    </div>
+    <div class="modal-body">
+        <div id="orderOperView">
+            <div style="margin-left: 15px;margin-right: 15px;">
+                <form class="form-horizontal" id="cloudSubmit-form">
+                    <div id="orderOperDiv" style="width: 99%">
+                        <!-- 电路信息 -->
+                        <div class="row form-group" id="circuitDiv">
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0">电路信息：</label>
+                            <div class="col-md-10 col-sm-10">
+                                <div id="circuitGrid"></div>
+                            </div>
+                        </div>
+                        <!-- 是否新建资源 -->
+                        <div class="row form-group" id="newResourceDiv">
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">是否新建资源：</label>
+                            <div class="col-md-10 col-sm-10" id="newResource">
+                                <label class="radio-inline">
+                                    <input type="radio" name="newResRadio" id="newResPass" value="0">是</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="newResRadio" id="newResNoPass" value="1"
+                                           checked="true">否</label>
+                            </div>
+                        </div>
+                        <div class="row form-group" id="newResourceAreaDiv" hidden>
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">派发区域：</label>
+                            <div class="col-md-10">
+                                <div class="col-md-5">
+                                    <div class="input-group">
+                                        <input id="newResource_CfgPopedit" name="newResource_aCfgPopedit"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div id="newResourceAreaSelectAZProtDiv" class="col-md-10 col-sm-10" style="width: auto !important;display: inline-block;"></div>-->
+                        </div>
+                        <div class="row form-group" id="masterSelectDiv">
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">主调选择：</label>
+                            <div id="masterSelectAZProtDiv" class="col-md-10 col-sm-10" style="width: auto !important;display: inline-block;"></div>
+                        </div>
+                        <div class="row form-group" id="constructDiv">
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">是否网络施工：</label>
+                            <div class="col-md-10 col-sm-10" id="construct">
+                                <label class="radio-inline">
+                                    <input type="radio" name="constructRadio" id="constructYes" value="0" checked="true">是</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="constructRadio" id="nconstructNo" value="1">否</label>
+                            </div>
+                        </div>
+                        <div class="row" id="childSendDiv">
+                            <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0">派发专业：</label>
+                            <div class="col-md-10 col-sm-10" style="padding-left: 0px">
+                                <div class="clearfix mgb-15">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-10">
+                                        <div class="col-md-5">
+                                            <label class="checkbox-inline">A端</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="checkbox-inline">Z端</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix mgb-15" id="ipranDiv">
+                                    <div class="col-md-2">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="specialtyCheckbox" id="YZW_IPRAN_Checkbox" value="YZW_IPRAN">传输ipran</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="ipran_aCfgPopedit" name="ipran_aCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="ipran_zCfgPopedit" name="ipran_zCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <label class="radio-inline" style="padding-left: 40px;">
+                                            <input type="radio" name="" id="" value="1" >本部</label>
+                                    </div>
+                                </div>
+                                <div class="clearfix mgb-15" id="opticalDiv">
+                                    <div class="col-md-2">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="specialtyCheckbox" id="YZW_OPTICAL_Checkbox" value="YZW_OPTICAL">光纤</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="optical_aCfgPopedit" name="optical_aCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="optical_zCfgPopedit" name="optical_zCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix mgb-15">
+                                    <div class="col-md-2">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="specialtyCheckbox" id="YZW_MCPE_Checkbox" value="YZW_MCPE">终端盒</label>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="mcpe_aCfgPopedit" name="mcpe_aCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="input-group">
+                                                <input id="mcpe_zCfgPopedit" name="mcpe_zCfgPopedit"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix" style="text-align: right;" id="saveBtnDiv">
+                            <button type="button" id="saveBtn" class="btn btn-danger" style="margin-right:20px;margin-bottom:15px;">保存
+                            </button>
+                        </div>
+                        <div class="row" id="dispatchOrderDiv">
+                            <div class="clearfix mgb-15">
+                                <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">电路调单号：</label>
+                                <div class="col-md-10 col-sm-10 clear-white">
+                                    <input id="dispatchOrderNum" name="dispatchOrderNum" class="form-control"
+                                           data-rule="required" >
+                                </div>
+                            </div>
+                            <div class="clearfix mgb-15 requireds">
+                                <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">
+                                    <!--<span style="color: red">*</span>-->调单标题：</label>
+                                <div class="col-md-10 col-sm-10 clear-white">
+                                    <input id="dispatchOrderName" name="dispatchOrderName" class="form-control"
+                                           data-rule="required" value="">
+                                </div>
+                            </div>
+                            <div class="clearfix mgb-15">
+                                <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">调单正文：</label>
+                                <div class="col-md-10 col-sm-10 clear-white">
+                                <textarea id="dispatchOrderText" name="dispatchOrderText" class="form-control" rows="6"
+                                          data-rule="required;length[10~, true]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 附件上传 -->
+                        <div class="row form-group" id="fileUpdateDiv">
+                            <div id="attach" class="">
+                                <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0">上传附件：</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <form id="displaySource">
+                                        <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                            <span class="btn btn-default fileinput-button">
+                                                <i class="glyphicon glyphicon-plus"></i>
+                                                <span style="line-height: 23px;">选择文件...</span>
+                                                <input class="js-select-file" id="selectFiles" type="file"
+                                                       name="selectFiles" multiple="" data-rule="required">
+                                            </span>
+                                    </div>
+                                    <div id="fileGrid"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                        <!-- 说明 -->
+                        <div class="row form-group" id="remarkDiv">
+                            <div id="remarkGoRoll" class="">
+                                <label class="col-md-2 col-sm-2 control-label" style="padding-right: 0;">说明：</label>
+                                <div class="col-md-10 col-sm-10 clear-white">
+                                    <textarea id="remark" name="remark" class="form-control" rows="8"
+                                              data-rule="required;length[10~, true]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+            <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+        </div>
+    </div>
+</div>

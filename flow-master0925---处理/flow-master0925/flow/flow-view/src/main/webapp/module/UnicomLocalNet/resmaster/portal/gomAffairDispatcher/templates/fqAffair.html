@@ -1,0 +1,129 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="fq-model-title">发起事务</h4>
+</div>
+<div class="modal-body">
+    <div class="panel-body" id="fq-body-div">
+        <form class="form-horizontal" id="fq-form">
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务调单编号</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="fq-code" name="code" placeholder="保存或提交后系统自动生成" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务状态</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="state" name="state" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group">
+                    <label class="col-md-4 col-sm-4 control-label">事务类型</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input class="form-control" id="type" name="type">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group required">
+                    <label class="col-md-2 col-sm-2 control-label">事务调单标题</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <input class="form-control" id="fq-title" name="title" data-rule="required;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group required">
+                    <label class="col-md-2 col-sm-2 control-label">调单正文</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="5" id="fq-content" name="content" class="form-control" placeholder="2000字以内"
+                                  data-rule="required;length[~2000, true]"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group" id="fileUpdateDiv">
+                    <div id="attach">
+                        <label class="col-md-2 col-sm-2 control-label">调单附件</label>
+                        <div class="input-group col-md-10 col-sm-10">
+                            <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                <span class="btn btn-default fileinput-button">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    <span style="line-height: 23px;">选择文件...</span>
+                                    <input class="js-select-file" id="selectFiles" type="file"
+                                           name="selectFiles" multiple="">
+                                </span>
+                            </div>
+                            <div style="width: 90%" id="fileGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group required">
+                    <label class="col-md-2 col-sm-2 control-label">调单处理人</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <div class="btn-toolbar" style="margin-bottom: 10px;" id="disposeStaffBtn">
+                            <span class="btn btn-default fileinput-button">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                <span style="line-height: 23px;">选择调单处理人...</span>
+                            </span>
+                        </div>
+                        <div style="width: 90%" id="disposeStaffGrid"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group required">
+                    <label class="col-md-4 col-sm-4 control-label">是否审核</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input id="isCheck" type="text" name="isCheck" data-rule="required"
+                               class="combobox form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="form-group" style="display: none" id="checkStaffDiv">
+                    <label class="col-md-4 col-sm-4 control-label">审核人</label>
+                    <div class="input-group col-md-8 col-sm-8">
+                        <input id="checkStaff" name="checkStaff" data-rule="required" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group">
+                    <label class="col-md-2 col-sm-2 control-label">抄送人</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <div class="btn-toolbar" style="margin-bottom: 10px;" id="copyStaffArrBtn">
+                            <span class="btn btn-default fileinput-button">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                <span style="line-height: 23px;">选择调单抄送人...</span>
+                            </span>
+                        </div>
+                        <div style="width: 90%" id="copyStaffArrGrid"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="form-group" id="auditOpinionsDiv" style="display: none">
+                    <label class="col-md-2 col-sm-2 control-label">事务审核意见</label>
+                    <div class="input-group col-md-10 col-sm-10">
+                        <textarea rows="5" id="auditOpinions" name="auditOpinions" class="form-control"
+                                  disabled></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="save" type="button" class="btn btn-danger">保存草稿</button>
+    <button id="commit" type="button" class="btn btn-danger">提交</button>
+    <button id="cancel" type="reset" class="btn btn-default">取消</button>
+</div>
+
+

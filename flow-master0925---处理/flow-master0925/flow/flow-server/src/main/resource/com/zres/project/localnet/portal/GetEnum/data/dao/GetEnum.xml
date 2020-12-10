@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.GetEnumDao">
+    <!--查询枚举值-->
+    <select id="queryEnum"  resultType="map" >
+      SELECT CODE_CONTENT as "name" ,CODE_VALUE as "value"
+      FROM gom_BDW_code_info
+      where CODE_TYPE = #{enumCode}
+      ORDER BY TO_NUMBER(SORT_NO) asc
+    </select>
+    <!--查询枚举值 不同字段的字典值 根据sort_no 进行查询 -->
+    <select id="queryEnum2"  resultType="map" >
+        SELECT CODE_CONTENT as "name" ,CODE_VALUE as "value"
+        FROM gom_BDW_code_info
+        where CODE_TYPE = #{enumCode} and code_value &gt;  TO_NUMBER('100000')
+        ORDER BY TO_NUMBER(SORT_NO) asc
+    </select>
+    <!--查询枚举值 不同字段的字典值 根据sort_no 进行查询 -->
+    <select id="queryEnum3"  resultType="map" >
+        SELECT CODE_CONTENT as "name" ,CODE_VALUE as "value"
+        FROM gom_BDW_code_info
+        where CODE_TYPE = #{enumCode} and code_value  &lt; TO_NUMBER('100000')
+        ORDER BY TO_NUMBER(SORT_NO) asc
+    </select>
+    <!--查询流程实例-->
+    <select id="queryProcessInst" resultType="map" >
+         SELECT SORT_NO
+         FROM gom_BDW_code_info
+         WHERE CODE_TYPE=#{codeType}  AND CODE_TYPE_NAME=#{codeTypeName}
+         AND CODE_VALUE=#{codeValue} AND CODE_CONTENT=#{codeContent}
+    </select>
+</mapper>

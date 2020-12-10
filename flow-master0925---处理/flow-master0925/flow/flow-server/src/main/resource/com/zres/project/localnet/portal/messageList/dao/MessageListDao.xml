@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.messageList.dao.MessageListDao">
+    <select id="exportrderList" resultType="map">
+      select
+        a.prod_type,
+        a.prod_id,
+        a.apply_order,
+        a.order_no,
+        a.SERIAL_NUMBER,
+        a.order_id,
+        a.wo_id,
+        a.spec_name,
+        case a.disp_obj_tye when '260000003' then
+        (select us.user_name from bfm_user us where us.user_id=a.disp_obj_id)
+        when '260000002' then
+        (select sw.name from work_group sw where sw.work_group_id=a.disp_obj_id)
+        end as user_name,
+        a.message_alias
+        from GOM_ORDER_MESSAGE a
+        where  1=1 and a.delete_state = '0'
+        and a.message_state not in ('已处理')
+        <if test="orderNo != null and  orderNo != '' ">
+            and a.order_no = #{orderNo}
+        </if>
+        <if test="prodType != null and  prodType != '' ">
+            and a.prod_id = #{prodType}
+        </if>
+        <if test="applyOrder != null and  applyOrder != '' ">
+            and a.apply_order = #{applyOrder}
+        </if>
+        <if test="userId != null and  userId != '' ">
+            and (a.disp_obj_id = #{userId} or a.disp_obj_id in (select sw.work_group_id from staff_workgrp sw where sw.staff_id=#{userId}))
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.EquipMentRecycleDao">
+
+    <insert id="addEquip" parameterType="com.zres.project.localnet.portal.flowdealinfo.service.entry.EquipMentEntry">
+        insert into GOM_BDW_EQUIP_RECYCLE (SRV_ORD_ID,SPECIALTY_CODE ,CREATE_DATE, IS_RECYCLE ,RECYCLE_COUNT ,EQUIP_SEQUENCE ,REMOVE_EQUIP )
+        values (#{srvOrdId},#{specialtyCode},sysdate,#{isRecycle},#{recycleCount},#{equipSequence},#{removeEquip})
+    </insert>
+    <update id="updateEquip" parameterType="com.zres.project.localnet.portal.flowdealinfo.service.entry.EquipMentEntry">
+        update GOM_BDW_EQUIP_RECYCLE
+        set IS_RECYCLE = #{isRecycle}
+        <if test="recycleCount != null and recycleCount != ''"> , RECYCLE_COUNT = #{recycleCount} </if>
+        <if test="equipSequence != null and equipSequence != ''"> , EQUIP_SEQUENCE = #{equipSequence}</if>
+        <if test="removeEquip != null and removeEquip != ''"> , REMOVE_EQUIP = #{removeEquip}</if>
+        where SRV_ORD_ID = #{srvOrdId}
+        <if test="specialtyCode != null and specialtyCode != ''">
+            and SPECIALTY_CODE = #{specialtyCode}
+        </if>
+    </update>
+
+    <select id="queryEquipBySrvOrdId" parameterType="string" resultType="com.zres.project.localnet.portal.flowdealinfo.service.entry.EquipMentEntry">
+        select SRV_ORD_ID as srvOrdId,pub.PUB_DATE_NAME as specialtyCode, ci.CODE_CONTENT as isRecycle
+        ,RECYCLE_COUNT as recycleCount,EQUIP_SEQUENCE as equipSequence,REMOVE_EQUIP as removeEquip, CREATE_DATE AS createDate
+        from GOM_BDW_EQUIP_RECYCLE er
+        left join (select PUB_DATE_ID,PUB_DATE_NAME from GOM_PUB_DATE_S where df_type ='SPECIALTY_TYPE') pub on pub.PUB_DATE_ID = er.SPECIALTY_CODE
+        left join  (select CODE_VALUE,CODE_CONTENT from GOM_BDW_CODE_INFO where CODE_TYPE =  'IS_RECYCLE') ci on er.IS_RECYCLE = ci.CODE_VALUE
+        where SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <select id="queryEquipCountBySrvOrdIdAndSpecialty" resultType="int">
+        select count(1)
+        from GOM_BDW_EQUIP_RECYCLE
+        where SRV_ORD_ID = #{srvOrdId} and SPECIALTY_CODE = #{specialtyCode}
+    </select>
+    <select id="queryAreaList" resultType="java.util.Map">
+        select id as value,name from gom_area_s  where length(id) = 24 and REC_STATE = '170000001'
+        <if test="areaId != null and areaId != ''">
+            and PARENT_ID = #{areaId}
+        </if>
+    </select>
+</mapper>

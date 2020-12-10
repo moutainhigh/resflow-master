@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.order.data.dao.OrderQueryListDao">
+    <sql id="queryOrderListData">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY R.cst_ord_id desc) AS rowindex,
+            r.cst_ord_id,
+            MAX(R.SUBSCRIBE_ID) SUBSCRIBE_ID,
+            MAX(r.CUST_NAME_CHINESE) CUST_NAME_CHINESE,
+            MAX(r.APPLY_ORD_ID) APPLY_ORD_ID,
+            MAX(r.APPLY_ORD_NAME) APPLY_ORD_NAME,
+            MAX(r.ACTIVE_TYPE) ACTIVE_TYPE,
+            MAX(r.SERVICE_ID) SERVICE_ID,
+            MAX(r.ACTIVETYPENAME) ACTIVETYPENAME,
+            MAX(r.SERVICETYPE) SERVICETYPE,
+            MAX(r.ORDERTYPENAME) ORDERTYPENAME,
+            MAX(r.ORDER_TYPE) ORDER_TYPE,
+            MAX(r.SYSTEM_RESOURCE) SYSTEM_RESOURCE,
+            MAX(r.resources) resources,
+            MIN(r.req_fin_date) req_fin_date,
+            listagg(r.ORDER_ID, ',') within group(order by r.ORDER_ID) AS ORDER_IDS,
+            listagg(r.SRV_ORD_ID, ',') within group(order by r.SRV_ORD_ID) AS SRV_ORD_IDS,
+            RTRIM(XMLAGG(XMLPARSE(CONTENT r.SERIAL_NUMBER ||',' WELLFORMED) ORDER BY r.srv_ord_id).GETCLOBVAL(), ',') AS SERIAL_NUMBER,
+            RTRIM(XMLAGG(XMLPARSE(CONTENT r.ATTR_VALUE || ',' WELLFORMED) ORDER BY r.ATTR_VALUE).GETCLOBVAL(), ',') AS CIRCODE,
+            RTRIM(XMLAGG(XMLPARSE(CONTENT r.DISPATCH_ORDER_NO || ',' WELLFORMED) ORDER BY r.CST_ORD_ID).GETCLOBVAL(), ',') AS DISPATCH_ORDER_NO,
+            RTRIM(XMLAGG(XMLPARSE(CONTENT r.DISPATCH_TITLE || ',' WELLFORMED) ORDER BY r.CST_ORD_ID).GETCLOBVAL(), ',') AS DISPATCH_TITLE,
+            RTRIM(XMLAGG(XMLPARSE(CONTENT r.TACHE_NAME || ',' WELLFORMED) ORDER BY r.CST_ORD_ID).GETCLOBVAL(), ',') AS TACHE_NAME
+        FROM (
+        SELECT
+            cst.cst_ord_id,
+            cst.CUST_NAME_CHINESE,
+            cst.SUBSCRIBE_ID,
+            cst.APPLY_ORD_ID,
+            cst.APPLY_ORD_NAME,
+            srv.ACTIVE_TYPE,
+            CIO.CODE_CONTENT AS ACTIVETYPENAME,
+            CI.CODE_CONTENT AS SERVICETYPE,
+            FO.CODE_CONTENT as ORDERTYPENAME,
+            srv.SERVICE_ID,
+            srv.ORDER_TYPE,
+            srv.SYSTEM_RESOURCE,
+            srv.resources,
+            srv.SERIAL_NUMBER,
+            srv.SRV_ORD_ID,
+            SRV.ORDER_ID,
+            ATTR.ATTR_VALUE,
+            dis.DISPATCH_ORDER_NO,
+            dis.DISPATCH_TITLE,
+            ord.req_fin_date,
+            CASE WHEN srv.SRV_ORD_STAT = '10C' THEN '申请人拟稿'
+            WHEN srv.SRV_ORD_STAT = '10F' THEN '已完成'
+            WHEN srv.SRV_ORD_STAT = '10X' THEN '撤单/作废'
+            WHEN srv.SRV_ORD_STAT = '10N' THEN (
+            SELECT to_char(wm_concat(decode(ut.Tache_Name, '光纤资源分配' ,ut.Tache_Name,concat(kip.pub_date_name,ut.Tache_Name))))
+            FROM gom_order ord
+            LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+            LEFT JOIN GOM_ORD_KEY_INFO KI ON ord.ORDER_ID = KI.ORDER_ID
+            LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+            LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+            LEFT JOIN (select pds.pub_date_id,pds.pub_date_name FROM GOM_PUB_DATE_S pds WHERE pds.DF_TYPE = 'SPECIALTY_TYPE') kip  ON ki.SPECIALTY_CODE = kip.pub_date_id
+            WHERE (ORD.ORDER_ID = SRV.ORDER_ID
+            OR ORD.PARENT_ORDER_ID = SRV.ORDER_ID
+            )  AND WO.WO_STATE = '290000002' AND WO.DISP_OBJ_ID != '-2000')
+            END AS TACHE_NAME
+        FROM gom_bdw_cst_ord cst
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN gom_order ord ON ord.order_id = srv.order_id
+        LEFT JOIN gom_bdw_dispatch_order dis ON dis.cst_ord_id = cst.cst_ord_id AND DIS.STATE = '10A' AND DIS.DISPATCH_SOURCE = 'local'
+        LEFT JOIN (SELECT SRV_ORD_ID, ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO  WHERE ATTR_CODE = '20000064') ATTR ON ATTR.SRV_ORD_ID = srv.SRV_ORD_ID
+        LEFT JOIN GOM_BDW_CODE_INFO CI ON SRV.SERVICE_ID = CI.CODE_VALUE AND CI.CODE_TYPE = 'product_code'
+        LEFT JOIN GOM_BDW_CODE_INFO CIO ON SRV.ACTIVE_TYPE = CIO.CODE_VALUE AND CIO.CODE_TYPE = 'operate_type'
+        LEFT JOIN GOM_BDW_CODE_INFO FO ON SRV.ORDER_TYPE = FO.CODE_VALUE AND FO.CODE_TYPE = 'order_type'
+        WHERE srv.SYSTEM_RESOURCE = 'flow-schedule-lt'
+        <!--申请单编号 -->
+        <if test="applyOrdId != null and applyOrdId != '' ">
+            and cst.APPLY_ORD_ID like '%'|| #{applyOrdId}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and cst.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+        </if>
+        <!--客户定单号-->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.SUBSCRIBE_ID like  '%'||#{subscribeId}||'%'
+        </if>
+        <!-- 产品类型 -->
+        <if test="productType != null and productType != '' ">
+            and srv.SERVICE_ID = #{productType}
+        </if>
+        <if test="orderType != null and orderType != '' ">
+            and SRv.ORDER_TYPE = #{orderType}
+        </if>
+        <if test="actType != null and actType != '' ">
+            and srv.ACTIVE_TYPE =#{actType}
+        </if>
+        <if test="cirNum != null and cirNum != '' ">
+            and  ATTR.ATTR_VALUE like  '%'||#{cirNum}||'%'
+        </if>
+        <if test="serialNumber != null and serialNumber != '' ">
+            and SRv.SERIAL_NUMBER like  '%'||#{serialNumber}||'%'
+        </if>
+        <if test="tradeId != null and tradeId != '' ">
+            and  srv.TRADE_ID like  '%'||#{tradeId}||'%'
+        </if>
+        <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+            and DIS.DISPATCH_ORDER_NO like  '%'|| #{dispatchOrderId}||'%'
+        </if>
+        <!-- 完成开始时间、结束时间-->
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
+            AND ATTR.REQ_FIN_DATE BETWEEN to_date( #{startDate},'yyyy-mm-dd hh24:mi:ss') AND
+            to_date(#{endDate},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <!-- 单据状态-->
+        <if test="srvOrdStat != null and srvOrdStat != '' ">
+            AND srv.SRV_ORD_STAT=#{srvOrdStat}
+        </if>
+        AND cst.HANDLE_DEP_ID IN (
+        SELECT ORG_ID
+        FROM GOM_ORG_S
+        START WITH ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = #{userId})
+        CONNECT BY PRIOR
+        A.PARENT_ORG_ID = A.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID
+        ) ORDER BY CST_ORD_ID DESC
+        ) r GROUP BY r.cst_ord_id
+    </sql>
+
+    <select id="queryOrderList"  parameterType="java.util.Map" resultType="map" timeout="10000">
+        select distinct
+            CST_ORD_ID,
+            CUST_NAME_CHINESE,
+            SUBSCRIBE_ID,
+            APPLY_ORD_ID,
+            APPLY_ORD_NAME,
+            DISPATCH_ORDER_NO as DISPATCH_ORDER_NO,
+            DISPATCH_TITLE    as DISPATCH_TITLE,
+            CIRCODE,
+            SYSTEM_RESOURCE,
+            RESOURCES,
+            SERVICE_ID,
+            SERIAL_NUMBER,
+            TACHE_NAME,
+            SERVICETYPE,
+            ORDER_IDS,
+            SRV_ORD_IDS,
+            ACTIVETYPENAME,
+            REQ_FIN_DATE
+        From (
+        <include refid="queryOrderListData"/>
+        ) q
+        where 1=1
+        <![CDATA[
+	        and q.rowIndex >#{startRow,jdbcType=INTEGER} and q.rowIndex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+    </select>
+
+    <select id="countOrderList" parameterType="map" resultType="int" timeout="10000">
+        select count(1)
+        From (
+            select  distinct
+            CST_ORD_ID,
+            CUST_NAME_CHINESE,
+            SUBSCRIBE_ID,
+            APPLY_ORD_ID,
+            APPLY_ORD_NAME,
+            DISPATCH_ORDER_NO as DISPATCH_ORDER_NO,
+            DISPATCH_TITLE    as DISPATCH_TITLE,
+            CIRCODE,
+            SYSTEM_RESOURCE,
+            RESOURCES,
+            SERVICE_ID,
+            SERIAL_NUMBER,
+            TACHE_NAME,
+            SERVICETYPE,
+            ORDER_IDS,
+            SRV_ORD_IDS,
+            ACTIVETYPENAME,
+            REQ_FIN_DATE
+            From (
+            <include refid="queryOrderListData"/>
+            ) q   )
+    </select>
+
+    <select id="exportOrderList" parameterType="java.util.Map" resultType="map" timeout="30000">
+        select  distinct
+                CST_ORD_ID,
+                CUST_NAME_CHINESE,
+                SUBSCRIBE_ID,
+                APPLY_ORD_ID,
+                APPLY_ORD_NAME,
+                DISPATCH_ORDER_NO as DISPATCH_ORDER_NO,
+                DISPATCH_TITLE    as DISPATCH_TITLE,
+                CIRCODE,
+                SYSTEM_RESOURCE,
+                RESOURCES,
+                SERVICE_ID,
+                SERIAL_NUMBER,
+                TACHE_NAME,
+                SERVICETYPE,
+                ORDER_IDS,
+                SRV_ORD_IDS,
+                ACTIVETYPENAME,
+                REQ_FIN_DATE
+        From (
+        <include refid="queryOrderListData"/>
+        ) q
+        where 1=1
+    </select>
+</mapper>

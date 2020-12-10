@@ -1,0 +1,85 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="title">追单详情</h4>
+</div>
+
+<div class="modal-body">
+    <div class="handle-order-div" id="btnHDiv">
+        <div class="handle-order-content" id="btnDiv">
+            <button id="appendConfirm" class="btn handle-order-btn" type="button"
+                    style="border:1px solid #fff; display: none;">追单确认
+            </button>
+
+            <button id="appendReject" class="btn handle-order-btn" type="button"
+                    style="border:1px solid #fff; display: none;">追单驳回
+            </button>
+            <button id="resModify" class="btn handle-order-btn" type="button"
+                    style="border:1px solid #fff; display: none;">资源修改
+            </button>
+            <button id="compOrder" class="btn handle-order-btn" type="button"
+                    style="border:1px solid #fff;">提交
+            </button>
+            <button id="oldOrderInfo" class="btn handle-order-btn" type="button"
+                    style="border:1px solid #fff;">原定单信息
+            </button>
+        </div>
+    </div>
+    <div id="accordion" class="ui-accordion" style="position: relative">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+                <h3 class="panel-title" style=" font-size: 16px">
+                    <a>客户信息
+                        <span class="glyphicon glyphicon-user pull-right"></span>
+                    </a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div id="cstInfo" style="padding: 15px;">
+                    <div id="noCstInfo" style="text-align: center;">无变更记录</div>
+                </div>
+            </div>
+        </div><!--客户信息-->
+        <div class="panel panel-default">
+            <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+                <h3 class="panel-title" style=" font-size: 16px">
+                    <a>调单信息
+                        <span class="glyphicon glyphicon-user pull-right"></span>
+                    </a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div id="dispOrderInfo" style="padding:15px;">
+                    <div id="noDispOrderInfo" style="text-align: center;">无变更记录</div>
+                </div>
+            </div>
+        </div><!--调单信息-->
+        <div class="panel panel-default">
+            <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+                <h3 class="panel-title" style=" font-size: 16px">
+                    <a>电路信息
+                        <span class="glyphicon glyphicon-user pull-right"></span>
+                    </a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div id="circuitInfo" style="padding: 15px;">
+                    <div id="noCircuitInfo" style="text-align: center;">无变更记录</div>
+                </div>
+            </div>
+        </div><!--电路信息-->
+
+    </div>
+    <div class="panel panel-default" id="timeInfoDiv">
+        <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+            <h3 class="panel-title" style=" font-size: 16px">
+                <a>变更信息
+                    <span class="glyphicon glyphicon-user pull-right"></span>
+                </a>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div id="timeInfo" style="padding: 15px;">
+                <div id="noTimeInfo" style="text-align: center;">无变更记录</div>
+            </div>
+        </div>
+    </div><!--变更时间-->
+</div>

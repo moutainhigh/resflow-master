@@ -1,0 +1,57 @@
+<div id="isa-operTaskManagement-mainPanel">
+    <div style="padding: 15px 15px 0 15px;">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="operTaskManagement-btn-row" style="margin-bottom: 0">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">电路编号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="circuitCode" name="circuitCode" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="accNbr" name="accNbr" class="form-control" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">产品类型<span style="color: red">*</span></label>
+                            <div class="col-md-8 col-sm-8">
+                                <input class="combobox form-control" name="productType" id="productType">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="custId" name="custId" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <div style="float: right;margin-right: 30px" >
+                           <button type="button" class="btn btn-danger" id="queryLocalApply">查询</button>
+                            <button type="reset" class="btn btn-default" id="resetLocalApply">重置</button>
+                            <button type="button" class="btn btn-danger" id="exportExcel">导出Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="Config-draftG"></div>
+    </div>
+</div>
+

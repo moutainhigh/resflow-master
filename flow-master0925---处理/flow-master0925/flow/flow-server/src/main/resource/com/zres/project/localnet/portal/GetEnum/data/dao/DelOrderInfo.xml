@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.DelOrderInfoDao">
+    <!--删除客户信息-->
+    <delete id="delCustomerInfo" parameterType="java.lang.String">
+       DELETE FROM GOM_BDW_CST_ORD WHERE CST_ORD_ID =#{cstId}
+    </delete>
+    <!--删除订单信息-->
+    <delete id="delOrderInfoBySrvId"  parameterType="java.util.List">
+        DELETE GOM_BDW_SRV_ORD_INFO WHERE srv_ord_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <!--删除电路信息-->
+    <delete id="delOrdAttrInfoBySrvId" parameterType="java.util.List">
+       DELETE gom_BDW_srv_ord_attr_info WHERE srv_ord_id in
+       <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+           #{item}
+       </foreach>
+        AND
+        ATTR_ACTION not in ('ResBusinessCreate')
+    </delete>
+    <delete id="delOrdAttrInfoAll" parameterType="java.util.List">
+        DELETE gom_BDW_srv_ord_attr_info
+        WHERE
+        srv_ord_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>
+

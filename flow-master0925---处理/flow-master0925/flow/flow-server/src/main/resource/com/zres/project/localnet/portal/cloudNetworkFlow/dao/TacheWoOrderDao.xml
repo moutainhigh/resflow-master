@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.cloudNetworkFlow.dao.TacheWoOrderDao">
+
+    <update id="updOrderConfig" parameterType="map">
+        UPDATE GOM_BDW_ORD_SPECIALTY OS
+           SET OS.DELETE_STATE = '2'
+         WHERE OS.ORDER_ID = #{orderId}
+           AND OS.NEW_CREATE_RESOURCE = #{newResRadio}
+    </update>
+
+    <select id="qryChildFlowNumAtLastNew" resultType="int">
+        SELECT COUNT(ORD.ORDER_ID) AS CHILDLASTNUM
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE ORD.PARENT_ORDER_ID = #{parentOrderId}
+           AND ORD.PARENT_ORDER_CODE = #{parentOrderCode}
+           AND UT.TACHE_CODE = #{tacheCode}
+           AND WO.WO_STATE = '290000002'
+    </select>
+
+    <select id="qryChildFlowNumNew" resultType="int">
+        SELECT COUNT(ORD.ORDER_ID) AS CHILDNUM
+          FROM GOM_ORDER ORD
+         WHERE ORD.PARENT_ORDER_ID = #{parentOrderId}
+           AND ORD.PARENT_ORDER_CODE =  #{parentOrderCode}
+           AND ORD.ORDER_STATE != '200000005'
+    </select>
+
+    <select id="qryBackOrderWoId" parameterType="map" resultType="map">
+        SELECT WO.WO_ID
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_ORD_KEY_INFO KI
+            ON KI.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+         WHERE ORD.PARENT_ORDER_ID = #{orderId}
+           AND ORD.PARENT_ORDER_CODE = #{tacheCode}
+           AND KI.REGION_ID = #{regionId}
+           AND KI.SPECIALTY_CODE = #{specialtyCode}
+           AND WO.WO_STATE = '290000002'
+    </select>
+
+    <select id="qryCity"  parameterType="map" resultType="String">
+        SELECT ATTR.ATTR_VALUE FROM GOM_BDW_SRV_ORD_INFO  SRV
+        JOIN  GOM_BDW_SRV_ORD_ATTR_INFO ATTR ON  SRV.SRV_ORD_ID = ATTR.SRV_ORD_ID
+        WHERE SRV.SRV_ORD_ID= (
+                SELECT  ATTR_VAL FROM GOM_ORDER_ATTR  WHERE ORDER_ID=#{orderId} AND ATTR_ID='SRV_ORD_ID'
+            )  AND ATTR_CODE =#{attrCode}
+    </select>
+    <select id="qryAZFlag"  parameterType="map" resultType="map">
+        SELECT SRV.PARALLEL_FLAG FROM GOM_BDW_SRV_ORD_INFO  SRV
+        WHERE SRV.SRV_ORD_ID= (
+                SELECT  ATTR_VAL FROM GOM_ORDER_ATTR  WHERE ORDER_ID=#{orderId} AND ATTR_ID='SRV_ORD_ID'
+            )
+    </select>
+
+    <select id="qryNewOpenOrderInfo"  parameterType="map" resultType="map">
+        SELECT * FROM (
+            SELECT S.ORDER_ID FROM GOM_BDW_SRV_ORD_INFO S
+            JOIN GOM_BDW_SRV_ORD_INFO SRV ON S.SERVICE_ID=SRV.SERVICE_ID AND S.SERIAL_NUMBER=SRV.SERIAL_NUMBER
+            WHERE S.SRV_ORD_STAT='10F' AND S.ORDER_TYPE='101' AND S.ACTIVE_TYPE='101' AND SRV.SRV_ORD_ID= (
+                SELECT  ATTR_VAL FROM GOM_ORDER_ATTR  WHERE ORDER_ID=#{orderId} AND ATTR_ID='SRV_ORD_ID'
+            ) ORDER BY S.SRV_ORD_ID DESC
+        ) WHERE ROWNUM=1
+    </select>
+
+    <select id="qryAttrInfoByOrderId"  parameterType="map" resultType="map">
+        SELECT ATTR.ATTR_VALUE,ATTR.ATTR_CODE FROM GOM_BDW_SRV_ORD_INFO  SRV
+        JOIN  GOM_BDW_SRV_ORD_ATTR_INFO ATTR ON  SRV.SRV_ORD_ID = ATTR.SRV_ORD_ID
+        WHERE SRV.ORDER_ID = =#{orderId} AND ATTR.ATTR_CODE IN('10000462','10000463','10000772','10000773')
+        AND ATTR.ATTR_VALUE IS NOT NULL
+    </select>
+
+</mapper>

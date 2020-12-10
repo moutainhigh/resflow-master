@@ -1,0 +1,54 @@
+.page_all_of_center, .page_grid_content{
+	padding: 0px 4px;
+}
+.page_all_of_center .right_center .btn-toolbar{
+    float: right;
+}
+.page_all_of_center button{
+	margin: 0px 5px;
+}
+.page_left_of_center button{
+	margin: 0px 5px;
+}
+
+.dynamic_query_content .right_center .btn-toolbar, .right_bottom .btn-toolbar, .allright_center .btn-toolbar{
+    float: right;
+}
+.dynamic_query_content .left_center, .right_center{
+	margin: 0px 4px;
+	padding: 4px;
+	height: 34px;
+}
+.dynamic_query_content .allleft_center{
+	padding: 4px;
+	height: 34px;
+}
+.dynamic_query_content .allright_center{
+	padding: 4px;
+	height: 34px;
+}
+.dynamic_query_content .left_bottom, .right_bottom{
+	padding: 4px;
+	height: 34px;
+}
+.dynamic_query_content .row_form_content .cond_form_content{
+	float: left;width: 100%;margin-left: -150px;
+}
+
+.dynamic_query_content .row_form_content .cond_form_content .cond1_form_content{
+	overflow-y: auto;margin-left: 150px;
+}
+
+.dynamic_query_content .row_form_content .cond_right_tool{
+	width: 150px;float: right;padding-left: 10px;
+}
+.form-group .res_form_content > .res_form_range_input {
+	padding-left: 0;
+	padding-right: 0;
+	width: 45%;
+}
+.form-group .res_form_content > .res_form_range_input_c {
+	text-align: center;
+	width: 10%;
+}
+

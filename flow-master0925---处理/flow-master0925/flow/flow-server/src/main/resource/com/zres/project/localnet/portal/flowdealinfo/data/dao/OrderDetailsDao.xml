@@ -1,0 +1,2231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.OrderDetailsDao">
+    <select id="queryConsumerInfo" parameterType="java.lang.String" resultType="java.util.Map">
+        select a.order_type,
+               a.resources,
+               b.cust_name_chinese,
+               b.cust_id,
+               c.code_content as cust_type,
+               b.cust_industry,
+               b.cust_contact_man_name,
+                b.cust_contact_man_tel,
+                b.cust_contact_man_email,
+               b.cust_tel,
+               b.cust_email,
+               b.cust_address,
+               b.apply_ord_name,
+               b.subscribe_id,
+               b.contract_id,
+               b.contract_name,
+               b.rele_b_inspect_order,
+               b.rele_o_inspect_order,
+               b.handle_man_name,
+               b.handle_man_tel,
+              CASE WHEN b.DEPART_NAME IS NOT NULL
+                THEN b.DEPART_NAME
+               ELSE   b.handle_dep end as handle_dep ,
+               b.handle_city,
+               b.handle_time,
+               b.init_am_name,
+               b.cust_manager,
+               b.province_pm_name,
+               b.remark,
+               b.is_group_cust,
+               b.apply_ord_id
+          from GOM_BDW_SRV_ORD_INFO_DIS_VIEW a
+          left join gom_bdw_cst_ord b on a.cst_ord_id = b.cst_ord_id
+          left join gom_BDW_code_info c on b.cust_type = c.code_value and c.code_type = 'CustType'
+         where a.srv_ord_id = #{srv_ord_id}
+    </select>
+
+    <select id="queryConsumerInfoByCustId" parameterType="java.lang.String" resultType="java.util.Map">
+        select distinct
+               a.order_type,
+               a.resources,
+               b.cust_name_chinese,
+               b.cust_id,
+               r.cst_ord_id as renameOrder,
+               c.code_content as cust_type,
+               g.code_content as cust_industry,
+               b.cust_contact_man_name,
+               b.cust_contact_man_tel,
+               b.cust_contact_man_email,
+               b.cust_tel,
+               b.cust_email,
+               b.cust_address,
+               b.apply_ord_name,
+               b.subscribe_id,
+               b.contract_id,
+               b.contract_name,
+               b.rele_b_inspect_order,
+               b.rele_o_inspect_order,
+               b.handle_man_name,
+               b.handle_man_tel,
+               CASE WHEN b.DEPART_NAME IS NOT NULL
+                THEN b.DEPART_NAME
+                ELSE   b.handle_dep end as handle_dep ,
+               b.handle_city,
+               to_char(b.handle_time,'yyyy-MM-dd hh24:mi:ss') handle_time,
+               b.init_am_name,
+               b.cust_manager,
+               b.province_pm_name,
+               b.remark,
+               b.apply_ord_id,
+               b.is_group_cust,
+               b.apply_ord_id,
+               d.code_content as CERTI_TYPE_CODE,
+               b.CERTI_CODE,
+               b.cst_ord_id
+        from GOM_BDW_SRV_ORD_INFO_DIS_VIEW a
+        inner join gom_bdw_cst_ord b on a.cst_ord_id = b.cst_ord_id
+	    left join GOM_BDW_RENAME_LOG_S r on b.cst_ord_id= r.cst_ord_id
+        left join gom_BDW_code_info g on b.cust_industry = g.code_value
+                                             and g.code_type = 'cust_industry'
+        left join gom_BDW_code_info c on b.cust_type = c.code_value and c.code_type = 'CustType'
+ 	    left join GOM_BDW_CODE_INFO_SECOND D on b.CERTI_TYPE_CODE = d.code_value and d.code_type = 'CERTI_TYPE_CODE'
+     
+        where b.cst_ord_id = #{cst_ord_id}
+
+    </select>
+
+    <select id="queryOrderDeatilsInfo" resultType="java.util.Map">
+        select
+            a.order_type,
+            a.resources,
+            b.cust_name_chinese,
+            b.cust_id,
+            c.code_content as cust_type,
+            g.code_content as cust_industry,
+            b.cust_contact_man_name,
+            b.cust_tel,
+            b.cust_email,
+            b.cust_address,
+            b.apply_ord_name,
+            b.subscribe_id,
+            b.contract_id,
+            b.contract_name,
+            b.rele_b_inspect_order,
+            b.rele_o_inspect_order,
+            b.handle_man_name,
+            b.handle_man_tel,
+            CASE WHEN b.DEPART_NAME IS NOT NULL
+            THEN b.DEPART_NAME
+            ELSE   b.handle_dep end as handle_dep ,
+            b.handle_city,
+            to_char(b.handle_time,'yyyy-MM-dd hh24:mi:ss') handle_time,
+            b.init_am_name,
+            b.cust_manager,
+            b.province_pm_name,
+            b.remark,
+            b.apply_ord_id,
+            b.cst_ord_id,
+            b.DEVELOPER_DEPART_NAME,
+            a.service_id,
+            a.active_type,
+            gg.change_flag AS change_flag,
+            d.code_content as operate_type,
+            b.is_group_cust as is_group_cust,
+            f.code_content as product_type
+        from GOM_BDW_SRV_ORD_INFO_DIS_VIEW a
+                 inner join gom_bdw_cst_ord b on a.cst_ord_id = b.cst_ord_id
+                 left join gom_BDW_code_info c on b.cust_type = c.code_value
+                                                and c.code_type = 'CustType'
+                 left join gom_BDW_code_info d on a.active_type = d.code_value
+                                                and d.code_type = 'operate_type'
+                left join gom_BDW_code_info g on b.cust_industry = g.code_value
+                                                 and g.code_type = 'cust_industry'
+                 left join gom_BDW_code_info f on a.service_id = f.code_value
+                                                and f.code_type = 'product_code'
+                LEFT JOIN(select aa.CST_ORD_ID,wm_concat(bb.code_content) change_flag
+        from GOM_BDW_SRV_ORD_INFO aa
+        JOIN GOM_BDW_CODE_INFO_SECOND bb
+        on FIND_IN_SET( bb.code_value,aa.change_flag) = bb.code_value AND bb.code_type = 'change_flag'
+        GROUP BY aa.CST_ORD_ID
+        ORDER BY aa.CST_ORD_ID ) gg on gg.CST_ORD_ID= b.cst_ord_id
+        where 1=1
+        <if test="srv_ord_id != '' and srv_ord_id != null">
+            AND a.SRV_ORD_ID IN
+            <foreach collection="srv_ord_id" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryCircuitInfoGrid" resultType="map">
+        SELECT C.ORDER_TYPE,
+        C.RELATETRADEID,
+        C.DISPATCH_ORDER_ID,
+        C.CST_ORD_ID,
+        C.CHECK_CST_ORD_ID,
+        C.CHECK_SRV_ORD_ID,
+        C.CHECK_ORDER_ID,
+        C.CHECKE_DISPATCH_ORDER_ID,
+        C.SUBSCRIBE_ID,
+        C.SRV_ORD_ID,
+        C.TRADE_ID,
+        min(C.ORDER_ID) as ORDER_ID,
+        C.SERVICE_ID,
+        C.SERIAL_NUMBER,
+        C.CIRCUITCODE,
+        C.CODE_CONTENT as SERVICENAME,
+        C.A_installed_add,
+        C.Z_installed_add,
+        (C.a_city||' ' || c.AregionName) as AREGIONNAME,
+        (C.z_city||' ' || c.ZREGIONNAME) as ZREGIONNAME,
+        C.A_REQ_FIN_DATE,
+        C.Z_REQ_FIN_DATE,
+        C.A_IF_RES_HAVE,
+        C.Z_IF_RES_HAVE,
+        C.WOORDERBACKFLAG
+        ,C.RESOURCES,C.SYSTEM_RESOURCE,C.PS_ID
+        FROM (
+        <include refid="queryCircuitInfo"/>
+        ) C
+        group by C.CST_ORD_ID,
+        C.RELATETRADEID,
+        C.CHECK_CST_ORD_ID,
+        C.CHECK_SRV_ORD_ID,
+        C.CHECK_ORDER_ID,
+        C.CHECKE_DISPATCH_ORDER_ID,
+        C.SUBSCRIBE_ID,
+        C.SRV_ORD_ID,
+        C.TRADE_ID,
+        C.SERVICE_ID,
+        C.CODE_CONTENT,
+        C.SERIAL_NUMBER,
+        C.CIRCUITCODE,
+        C.ORDER_TYPE,
+        C.A_installed_add,
+        C.Z_installed_add,
+        c.DISPATCH_ORDER_ID,
+        C.a_city,
+        C.z_city,
+        c.AregionName,
+        c.ZREGIONNAME,
+        C.A_REQ_FIN_DATE,
+        C.Z_REQ_FIN_DATE,
+        C.A_IF_RES_HAVE,
+        C.Z_IF_RES_HAVE,
+        C.WOORDERBACKFLAG,C.RESOURCES,C.SYSTEM_RESOURCE,C.PS_ID
+        ORDER BY  C.TRADE_ID,C.SERIAL_NUMBER
+    </select>
+
+    <select id="qryExceptionNoticeList" resultType="map">
+        select t.*,v.user_name as DEAL_USER_NAME from gom_bdw_order_notice t
+        left join vw_pub_staff v on t.deal_user_id = v.staff_id
+        where t.srv_ord_id= #{srvOrdId}
+    </select>
+
+
+    <select id="queryCirDispatchOrderIds" resultType="map" parameterType="string">
+        SELECT
+         C.DISPATCH_ORDER_ID
+        FROM (
+        <include refid="queryCircuitInfo"/>
+        ) C
+
+
+    </select>
+
+    <sql id ='queryCircuitInfoDetails'>
+        SELECT
+        SOI.ORDER_TYPE,
+        SOI.DISPATCH_ORDER_ID,
+        CO.CST_ORD_ID,
+        CO.SUBSCRIBE_ID,
+        SOI.SRV_ORD_ID,
+        SOI.TRADE_ID,
+        O.ORDER_ID,
+        SOI.SERVICE_ID,
+        pc.CODE_CONTENT,
+        /* SOI.SERIAL_NUMBER,*/
+        case when SOI.ORDER_TYPE =102 or  SOI.SERVICE_ID='20181221006' then ''
+        else SOI.SERIAL_NUMBER end as SERIAL_NUMBER,
+        ATTR.CIRCUITCODE,
+        ATTR.A_installed_add,
+        ATTR.Z_installed_add,
+        ATTR.AregionName AREGIONNAME,
+        ATTR.ZregionName ZREGIONNAME,
+        O.PARENT_ORDER_ID
+        FROM gom_bdw_cst_ord CO
+        INNER JOIN GOM_BDW_SRV_ORD_INFO_VIEW SOI
+        ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+        INNER JOIN GOM_ORDER O
+        ON O.order_id = SOI.order_id or O.parent_order_id = SOI.order_id
+        LEFT JOIN
+        (select a.srv_ord_id,
+        a.circuitCode,
+        a.Aregion as AregionName,
+        a.Zregion as ZregionName,
+        a.A_installed_add,
+        a.Z_installed_add
+        from ((select SRV_ORD_ID, ATTR_VALUE, ATTR_CODE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO) a
+        pivot(MAX(a.attr_value) FOR
+        attr_code IN ('20000064' circuitCode,
+        '20000080' Aregion,
+        '20000098' Zregion,
+        '20000082' A_installed_add,
+        '20000100' Z_installed_add))) a
+        ) ATTR
+        ON ATTR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        LEFT JOIN (select code_content,code_value from gom_BDW_code_info where CODE_type = 'product_code') pc
+        ON pc.code_value = SOI.SERVICE_ID
+        INNER JOIN GOM_WO w ON O.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_ord_key_info KI
+        ON KI.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = w.PS_ID
+        WHERE CO.CST_ORD_ID = #{cstOrdId}
+        <if test="orderIdSelect != null  and orderIdSelect != '' ">
+            AND O.order_id = #{orderIdSelect}
+        </if>
+        <if test="reginonId !='' and reginonId != null">
+            AND KI.Region_Id = #{reginonId}
+        </if>
+        <if test="specialtyCode !='' and specialtyCode !=null">
+            AND KI.SPECIALTY_CODE = #{specialtyCode}
+        </if>
+        <if test="compUserId == null and compUserId == '' and woState !=290000004">
+            AND (w.COMP_USER_ID IS NULL or w.COMP_USER_ID='')
+        </if>
+        <if test="compUserId != null and compUserId != '' and woState == 290000004">
+            AND w.COMP_USER_ID = #{compUserId}
+        </if>
+        <if test="dispType == 260000001">
+            AND w.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND w.DISP_OBJ_ID IN
+            (SELECT STAFF_GROUP_ID FROM GOM_STAFF_GROUP_RELA_S WHERE STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null"> /*个人待办*/
+            AND w.DISP_OBJ_ID = #{staffId}
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 "> /*处理中*/
+            AND w.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <if test="woState == 290000004">
+            AND w.WO_STATE in ('290000004','290000110','290000006','290000005')
+        </if>
+        <if test="woState == 290000002 ">
+            AND w.WO_STATE = #{woState}
+        </if>
+        <if test="dispObjTye != null and dispObjTye != ''">
+            and w.DISP_OBJ_TYE = #{dispObjTye}
+        </if>
+        <if test="dispObjTyeValue != null and dispObjTyeValue != ''">
+            and w.DISP_OBJ_ID = #{dispObjTyeValue}
+        </if>
+
+    </sql>
+
+    <sql id ='queryCircuitInfo'>
+        SELECT
+        SOI.ORDER_TYPE,
+        SOI.DISPATCH_ORDER_ID,
+        CO.CST_ORD_ID,
+        CO.SUBSCRIBE_ID,
+        SOI.SRV_ORD_ID,
+        SOI.TRADE_ID,
+        O.ORDER_ID,
+        SOI.SERVICE_ID,
+        SOI1.CHECK_CST_ORD_ID,
+        SOI1.CHECK_SRV_ORD_ID,
+        SOI1.CHECK_ORDER_ID,
+        SOI1.CHECKE_DISPATCH_ORDER_ID,
+        pc.CODE_CONTENT,
+       /* SOI.SERIAL_NUMBER,*/
+        CASE
+        when  SOI.SERVICE_ID = '20181221006' THEN
+        ''
+        ELSE
+        SOI.SERIAL_NUMBER
+        END AS SERIAL_NUMBER,
+        ATTR.CIRCUITCODE,
+        ATTR.RELATETRADEID,
+        ATTR.A_installed_add,
+        ATTR.Z_installed_add,
+        ATTR.AregionName AREGIONNAME,
+        ATTR.ZregionName ZREGIONNAME,
+        ATTR.a_city,
+        ATTR.z_city,
+        ATTR.A_REQ_FIN_DATE,
+        ATTR.Z_REQ_FIN_DATE,
+        ATTR.A_IF_RES_HAVE,
+        ATTR.Z_IF_RES_HAVE,
+        O.PARENT_ORDER_ID,
+        OP.PS_ID,/*主流程的流程id*/
+        <choose>
+            <when test="woId != null">
+                woop.WOORDERBACKFLAG as WOORDERBACKFLAG
+            </when>
+            <otherwise>
+                '' as WOORDERBACKFLAG
+            </otherwise>
+        </choose>
+        ,SOI.RESOURCES,SOI.SYSTEM_RESOURCE
+        FROM gom_bdw_cst_ord CO
+        INNER JOIN GOM_BDW_SRV_ORD_INFO_VIEW SOI
+        ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+        INNER JOIN GOM_ORDER O
+        ON O.order_id = SOI.order_id or O.parent_order_id = SOI.order_id
+        <if test="woId != null">
+            LEFT JOIN ( SELECT wo.order_id,woa.attr_val AS WOORDERBACKFLAG, wo.wo_id FROM gom_wo wo
+            LEFT JOIN gom_wo_oper_attr woa ON woa.wo_id = wo.wo_id AND woa.attr_id = 'woOrderBackFlag' ) woop
+            ON woop.order_id = O.ORDER_ID OR woop.order_id = O.PARENT_ORDER_ID
+        </if>
+        LEFT JOIN GOM_ORDER OP ON OP.order_id = SOI.order_id
+        LEFT JOIN
+        (select a.srv_ord_id,
+        a.circuitCode,
+        a.relateTradeId,
+        a.Aregion as AregionName,
+        a.Zregion as ZregionName,
+        a.A_installed_add,
+        a.Z_installed_add,
+        a.a_city,
+        a.z_city,
+        A.A_REQ_FIN_DATE,
+        A.Z_REQ_FIN_DATE,
+        A.A_IF_RES_HAVE,
+        A.Z_IF_RES_HAVE
+        from ((select SRV_ORD_ID, ATTR_VALUE, ATTR_CODE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO) a
+        pivot(MAX(a.attr_value) FOR
+        attr_code IN ('20000064' circuitCode,
+        'ORD10126' relateTradeId,
+        '20000080' Aregion,
+        '20000098' Zregion,
+        '20000078' A_city,
+        '20000096' z_city,
+        '20000082' A_installed_add,
+        '20000100' Z_installed_add,
+        'CON0015' A_REQ_FIN_DATE,
+        'CON0016' Z_REQ_FIN_DATE,
+        'ORD10171' A_IF_RES_HAVE,
+        'ORD10172' Z_IF_RES_HAVE))) a
+        ) ATTR
+        ON ATTR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        left join (SELECT so1.trade_id,
+        so1.srv_ord_id as check_srv_ord_id,
+        so1.cst_ord_id as check_cst_ord_id,
+        so1.DISPATCH_ORDER_ID as checke_DISPATCH_ORDER_ID,
+        so1.order_id as check_order_id
+        FROM gom_bdw_srv_ord_info so1
+        where 1 = 1
+        and so1.order_type = '102'
+        and so1.srv_ord_stat != '10X'
+        -- and so1.active_type='101'
+        and so1.resources = 'jike' )soi1 on attr.relateTradeId=soi1.TRADE_ID
+        LEFT JOIN (select code_content,code_value from gom_BDW_code_info where CODE_type = 'product_code') pc
+        ON pc.code_value = SOI.SERVICE_ID
+        WHERE CO.CST_ORD_ID = #{cstOrdId}
+        <if test="woId != null">
+        AND woop.wo_id IN
+        <foreach collection="woId" item="wId" index="index" open="(" close=")" separator = ",">
+            #{wId}
+        </foreach>
+    </if>
+        <if test="orderIdSelect != null  and orderIdSelect != '' ">
+            AND O.order_id = #{orderIdSelect}
+        </if>
+        AND exists (
+        SELECT o.order_id
+        FROM GOM_WO w
+        LEFT JOIN gom_ord_key_info KI
+        ON KI.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = w.PS_ID
+        WHERE 1=1
+            AND w.ORDER_ID = O.ORDER_ID
+            AND w.WO_STATE != '200000005'
+        <if test="reginonId !='' and reginonId != null">
+            AND KI.Region_Id = #{reginonId}
+        </if>
+        <if test="specialtyCode !='' and specialtyCode !=null">
+            AND KI.SPECIALTY_CODE = #{specialtyCode}
+        </if>
+        <if test="compUserId == null and compUserId == '' and woState !=290000004">
+            AND (w.COMP_USER_ID IS NULL or w.COMP_USER_ID='')
+        </if>
+        <if test="compUserId != null and compUserId != '' and woState == 290000004">
+            AND w.COMP_USER_ID = #{compUserId}
+        </if>
+        <if test="dispType == 260000001">
+            AND w.DISP_OBJ_ID IN (SELECT ORG_ID FROM GOM_USER_S WHERE USER_ID = #{staffId}) /*部门待办*/
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000002">
+            AND w.DISP_OBJ_ID IN
+            (SELECT STAFF_GROUP_ID FROM GOM_STAFF_GROUP_RELA_S WHERE STAFF_ID = #{staffId}) /*岗位待办*/
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dispType == 260000003  and staffId != '' and staffId != null"> /*个人待办*/
+            AND w.DISP_OBJ_ID = #{staffId}
+            AND (w.DEAL_USER_ID IS NULL or w.DEAL_USER_ID='')
+        </if>
+        <if test="dealUserId != null and dealUserId != '' and dispType == 260000003 "> /*处理中*/
+            AND w.DEAL_USER_ID = #{dealUserId}
+        </if>
+        <if test="woState == 290000004">
+            AND w.WO_STATE in ('290000004','290000110','290000006','290000005')
+        </if>
+        <if test="woState == 290000002 ">
+            AND w.WO_STATE = #{woState}
+        </if>
+        <if test="dispObjTye != null and dispObjTye != ''">
+            and w.DISP_OBJ_TYE = #{dispObjTye}
+        </if>
+        <if test="dispObjTyeValue != null and dispObjTyeValue != ''">
+            and w.DISP_OBJ_ID = #{dispObjTyeValue}
+        </if>
+        )
+
+    </sql>
+
+
+
+
+
+    <!--根据业务订单ID  查询 电路信息 公共信息-->
+    <select id="queryCircuitInfo" parameterType="java.lang.String" resultType="java.util.Map">
+      select b.property_name,b.state,b.local_code,
+           case
+             when b.DEFAULT_VALUE is not null then
+                 b.DEFAULT_VALUE
+             when b.selectstat = 1 then
+              (select code_content
+                 from gom_BDW_code_info
+                where code_type = a.attr_code
+                  and code_value = a.attr_value)
+             when b.selectstat = 2 then
+              (select attrvalue_name
+                 from GOM_BDW_PROVINCE_CITY_CODE
+                where attr_code = a.attr_value
+                  )
+             when b.selectstat is null then
+              a.attr_value
+           end as attr_value,
+
+          case WHEN b.selectstat = 1 THEN
+              (
+                  SELECT
+                      code_content
+                  FROM
+                      GOM_BDW_CODE_INFO_SECOND
+                  WHERE
+                      code_type = A .attr_code
+                      AND code_value = A .OLD_ATTR_VALUE
+              )
+          WHEN b.selectstat = 2 THEN
+              (
+                  SELECT
+                      attrvalue_name
+                  FROM
+                      GOM_BDW_PROVINCE_CITY_CODE
+                  WHERE
+                      attr_code = A .OLD_ATTR_VALUE
+                      AND A .attr_code = 'CON0005'
+              )
+          WHEN b.selectstat IS NULL THEN
+              A .OLD_ATTR_VALUE
+          END AS OLD_ATTR_VALUE,
+           b.columsort
+      from gom_BDW_srv_ord_attr_info a
+      join GOM_PROPERTIES_CONF_VIEW b
+        on a.attr_code = b.property_id
+      join GOM_BDW_SRV_ORD_INFO c
+        on a.srv_ord_id = c.srv_ord_id
+        and c.RESOURCES = b.SOURSE
+        and c.service_id = b.srv_id
+     where a.srv_ord_id = #{srv_ord_id}
+       and c.service_id = #{service_id}
+       and b.is_show = 'Y'
+       and b.state = 'PU'
+     order by b.COLUMSORT
+    </select>
+
+    <!--根据业务订单ID  查询 电路信息 AZ端-->
+    <select id="queryCircuitInfoAZ" parameterType="java.lang.String" resultType="java.util.Map">
+        select b.property_name,b.state,b.local_code,
+               case
+                   when b.DEFAULT_VALUE is not null then
+                       b.DEFAULT_VALUE
+                   when b.selectstat = 1 then
+                       (select code_content
+                        from gom_BDW_code_info
+                        where code_type = a.attr_code
+                          and code_value = a.attr_value)
+                   when b.selectstat = 2 then
+                       (select attrvalue_name
+                        from GOM_BDW_PROVINCE_CITY_CODE
+                        where attr_code = a.attr_value
+                        )
+                   when b.selectstat is null then
+                       a.attr_value
+                   end as attr_value,
+            case WHEN b.selectstat = 1 THEN
+                (
+                    SELECT
+                        code_content
+                    FROM
+                        GOM_BDW_CODE_INFO_SECOND
+                    WHERE
+                        code_type = A .attr_code
+                        AND code_value = A .OLD_ATTR_VALUE
+                )
+            WHEN b.selectstat = 2 THEN
+                (
+                    SELECT
+                        attrvalue_name
+                    FROM
+                        GOM_BDW_PROVINCE_CITY_CODE
+                    WHERE
+                        attr_code = A .OLD_ATTR_VALUE
+                )
+            WHEN b.selectstat IS NULL THEN
+                A .OLD_ATTR_VALUE
+            END AS OLD_ATTR_VALUE,
+                  b.columsort
+        from gom_BDW_srv_ord_attr_info a
+        join GOM_PROPERTIES_CONF_VIEW b
+          on a.attr_code = b.property_id
+        join GOM_BDW_SRV_ORD_INFO c
+          on a.srv_ord_id = c.srv_ord_id
+          and c.RESOURCES = b.SOURSE
+          and c.service_id = b.srv_id
+        where a.srv_ord_id = #{srv_ord_id}
+          and b.srv_id = #{service_id}
+          and b.is_show = 'Y'
+          and b.state = #{stateLabel}
+        order by b.COLUMSORT
+    </select>
+
+    <!--根据业务订单ID  查询 电路信息 PE端-->
+    <select id="queryCircuitInfoPE" parameterType="java.lang.String" resultType="java.util.Map">
+        select b.property_name,b.state,b.local_code,
+               case
+                   when b.DEFAULT_VALUE is not null then
+                       b.DEFAULT_VALUE
+                   when b.selectstat = 1 then
+                       (select code_content
+                        from gom_BDW_code_info
+                        where code_type = a.attr_code
+                          and code_value = a.attr_value)
+                   when b.selectstat = 2 then
+                       (select attrvalue_name
+                        from GOM_BDW_PROVINCE_CITY_CODE
+                        where attr_code = a.attr_value
+                          )
+                   when b.selectstat is null then
+                       a.attr_value
+                   end as attr_value,
+            case WHEN b.selectstat = 1 THEN
+                (
+                    SELECT
+                        code_content
+                    FROM
+                        GOM_BDW_CODE_INFO_SECOND
+                    WHERE
+                        code_type = A .attr_code
+                        AND code_value = A .OLD_ATTR_VALUE
+                )
+            WHEN b.selectstat = 2 THEN
+                (
+                    SELECT
+                        attrvalue_name
+                    FROM
+                        GOM_BDW_PROVINCE_CITY_CODE
+                    WHERE
+                        attr_code = A .OLD_ATTR_VALUE
+                )
+            WHEN b.selectstat IS NULL THEN
+                A .OLD_ATTR_VALUE
+            END AS OLD_ATTR_VALUE,
+                b.columsort
+        from gom_BDW_srv_ord_attr_info a
+        join GOM_PROPERTIES_CONF_VIEW b
+          on a.attr_code = b.property_id
+        join GOM_BDW_SRV_ORD_INFO c
+          on a.srv_ord_id = c.srv_ord_id
+          and c.RESOURCES = b.SOURSE
+          and c.service_id = b.srv_id
+        where a.srv_ord_id = #{srv_ord_id}
+          and b.srv_id = #{service_id}
+          and b.is_show = 'Y'
+          and b.state = #{stateLabel}
+        order by b.COLUMSORT
+    </select>
+
+    <select id="queryCircuitInfoBySrvIdY"  parameterType="java.lang.String" resultType="java.util.Map">
+        select a.attr_value_name,a.attr_value
+        from gom_BDW_srv_ord_attr_info a
+                 join gom_BDW_property_info b on a.attr_code = b.property_id
+        where a.srv_ord_id =#{SrvOrdId}
+          and b.is_show = 'Y'
+    </select>
+
+    <select id="queryAttachInfo" parameterType="java.util.Map" resultType="map">
+      WITH resdata AS (
+      SELECT AI.WO_ORD_ID,
+       O.ORDER_ID,
+       O.ORDER_STATE,
+       W.WO_STATE,
+       UT.ID,
+       CASE
+         WHEN UT.TACHE_NAME IS NULL AND AI.ORIGIN != 'YJ' THEN
+          '定单申请'
+         ELSE
+          UT.TACHE_NAME
+       END AS TACHE_NAME,
+       AI.SRV_ORD_ID,
+       AI.FILE_ID,
+       AI.FILE_TYPE,
+       TO_CHAR(AI.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') AS CREATE_DATE,
+       AI.FILE_NAME,
+       AI.FILE_PATH,
+       AI.FILE_SIZE,
+       CASE
+         WHEN AI.ORIGIN = 'JIKE' THEN
+          '集客'
+        WHEN AI.ORIGIN = 'JIKE_4A' THEN
+         '集客追单'
+         WHEN AI.ORIGIN = 'YJ' THEN
+          '阶段性意见'
+         WHEN AI.ORIGIN = 'DISTINCT' OR AI.ORIGIN = 'CUSTOMER' THEN
+          '一干'
+         ELSE
+          CASE
+            WHEN UT.TACHE_NAME IS NULL THEN
+             '本地业务申请'
+            ELSE
+             CONCAT(UT.TACHE_NAME, '环节')
+          END
+       END AS SOURCE,
+       CASE
+         WHEN UT.TACHE_NAME IS NULL AND AI.ORIGIN != 'YJ' THEN
+          U2.USER_NAME
+         WHEN AI.STAFF_ID IS NOT NULL AND AI.ORIGIN = 'HJ' THEN
+          U3.USER_NAME
+         ELSE
+          U.USER_NAME
+       END AS USER_NAME,
+       GBSO.ORDER_ID AS MAIN_ORDER_ID
+          FROM GOM_BDW_ATTACH_INFO AI
+          LEFT JOIN GOM_BDW_SRV_ORD_INFO GBSO ON GBSO.SRV_ORD_ID = AI.SRV_ORD_ID
+          LEFT JOIN VW_PUB_STAFF U2 ON TO_CHAR(U2.STAFF_ID) = TO_CHAR(GBSO.USER_ID)
+          LEFT JOIN GOM_WO W  ON W.WO_ID = AI.WO_ORD_ID
+          LEFT JOIN GOM_ORDER O  ON O.ORDER_ID = W.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = W.PS_ID
+          LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+          LEFT JOIN VW_PUB_STAFF U ON U.STAFF_ID = W.DEAL_USER_ID
+          LEFT JOIN VW_PUB_STAFF U3 ON U3.STAFF_ID = AI.STAFF_ID
+         WHERE AI.SRV_ORD_ID = #{srvOrdId,jdbcType=VARCHAR}
+         ORDER BY AI.CREATE_DATE
+        )
+        SELECT  WO_ORD_ID,
+                ORDER_ID,
+                ID,
+                TACHE_NAME,
+                SRV_ORD_ID,
+                FILE_ID,
+                FILE_TYPE,
+                CREATE_DATE,
+                FILE_NAME,
+                FILE_PATH,
+                FILE_SIZE,
+                SOURCE,
+                USER_NAME,
+                ORDER_ID AS MAIN_ORDER_ID
+        FROM resdata WHERE  order_id is NULL
+        UNION ALL
+        SELECT  WO_ORD_ID,
+                ORDER_ID,
+                ID,
+                TACHE_NAME,
+                SRV_ORD_ID,
+                FILE_ID,
+                FILE_TYPE,
+                CREATE_DATE,
+                FILE_NAME,
+                FILE_PATH,
+                FILE_SIZE,
+                SOURCE,
+                USER_NAME,
+                ORDER_ID AS MAIN_ORDER_ID
+        FROM resdata WHERE ORDER_STATE NOT IN  ('200000005','200000003')
+    </select>
+
+    <!--查询调度单附件-->
+    <select id="queryDispatchAttachInfo" parameterType="java.lang.String" resultType="map">
+      SELECT ai.wo_ord_id,
+               o.order_id,
+               ut.id,
+               ut.tache_name,
+               ai.srv_ord_id,
+               ai.file_id,
+               ai.file_type,
+               to_char(ai.create_date,'yyyy-MM-dd hh24:mi:ss')as create_date,
+               ai.file_name,
+               ai.file_path,
+               ai.file_size,
+               CASE
+                 WHEN  ai.ORIGIN='JIKE' THEN
+                  '集客'
+                 ELSE
+                   case when ut.tache_name is null then ''
+                   else concat(ut.tache_name, '环节') end
+               END AS source,
+              row_number() over (partition by ai.file_name, ai.file_path, ai.file_size order by ai.file_id desc) rn
+          FROM gom_bdw_attach_info ai
+          LEFT JOIN GOM_WO w ON w.wo_id = ai.wo_ord_id
+          LEFT JOIN GOM_ORDER o ON o.order_id = w.order_id
+          LEFT JOIN gom_ps_2_wo_s ws ON WS.id = w.ps_id
+          LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+         WHERE   ai.dispatch_order_id = #{dispatchOrderId}
+    </select>
+    <select id="queryLogInfo" parameterType="java.lang.String" resultType="map">
+      select a.ORDER_ID,
+               a.TRACK_ORG_NAME,
+               a.TRACK_STAFF_NAME,
+               a.TRACK_STAFF_PHONE,
+               to_char(a.TRACK_DATE, 'yyyy-MM-dd hh24:mi:ss') as TRACK_DATE,
+               a.TRACK_MESSAGE,
+               a.TRACK_CONTENT,
+               b.OPER_TYPE_NAME
+          from gom_bdw_log_info a
+          left join gom_order o on o.order_id = a.order_id
+          left join GOM_BDW_TRACK_OPER_TYPE b on b.oper_type = a.oper_type
+         where o.order_id = #{orderId} OR o.parent_order_id = #{orderId}
+         OR o.order_id = (SELECT parent_order_id FROM GOM_ORDER WHERE order_id = #{orderId})
+         order by a.create_date desc
+    </select>
+
+    <select id="queryTaskInfo" resultType="map">
+        SELECT w.wo_id AS woId,o.ORDER_ID AS orderId ,o.order_code AS orderCode,so.serial_number,
+		o.order_title AS orderTitle,ut.id AS tacheId,UT.TACHE_CODE AS TACHE_CODE,
+		CASE WHEN ut.id IN (500001157,500001158) THEN pdss.pub_date_name||UT.TACHE_NAME
+	      ELSE ut.tache_name END AS tacheName,
+		pds.pub_date_name AS orderState, info.track_content AS trackContent,
+	    vps.phone_no AS phone,w.DEAL_USER_ID AS DEAL_USER_ID,pds.PUB_DATE_ID
+		AS PUB_DATE_ID,
+		CASE WHEN UT.ID IN (500001145,500001147,500001146,500001148,500001149,500001150,500001151,500001144,510101020) THEN '本地网'||UT.TACHE_NAME
+					ELSE UT.TACHE_NAME END AS TASKNAME,
+		CASE WHEN w.disp_obj_tye = '260000001' THEN ''
+		      WHEN w.disp_obj_tye = '260000002' THEN (select NAME from Work_Group where WORK_GROUP_ID=w.DISP_OBJ_ID)
+		      WHEN w.disp_obj_tye = '260000003' THEN ''
+				  END AS userJobName,
+		CASE WHEN w.disp_obj_tye = '260000001' THEN (
+		    CASE WHEN w.DEAL_USER_ID is null THEN (select to_char(USER_REAL_NAMES) from (select ORG_ID,wm_concat(USER_REAL_NAME) USER_REAL_NAMES from gom_user_s gos  GROUP BY gos.org_id) b where b.ORG_ID =w.DISP_OBJ_ID)
+		             WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+		             WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id)
+		             END)
+		    WHEN w.disp_obj_tye = '260000002' THEN (
+		        CASE WHEN w.DEAL_USER_ID is null THEN
+                        (SELECT LISTAGG(BF.STAFF_NAME, ',') WITHIN GROUP(ORDER BY WG.WORK_GROUP_ID) STAFFNAMES
+                        FROM WORK_GROUP WG
+                        LEFT JOIN STAFF_WORKGRP SW
+                          ON SW.WORK_GROUP_ID = WG.WORK_GROUP_ID
+                        LEFT JOIN BFM_STAFF BF
+                          ON BF.STAFF_ID = SW.STAFF_ID
+                       WHERE WG.DELETE_STATE = '0'
+                         AND WG.STATE = '90A'
+                         AND WG.WORK_GROUP_ID = W.DISP_OBJ_ID)
+		             WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+		             WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id) END)
+             WHEN w.disp_obj_tye = '260000003' THEN (
+		        CASE WHEN w.DEAL_USER_ID is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DISP_OBJ_ID)
+		             WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+		             WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id) END)
+		             END AS userName,
+		CASE WHEN w.disp_obj_tye = '260000001' THEN (select ORG_NAME from gom_org_s where ORG_ID=w.DISP_OBJ_ID)
+		         WHEN w.disp_obj_tye = '260000002' THEN (
+		              CASE WHEN  w.DEAL_USER_ID is not null THEN (select ORG_NAME from gom_user_s where user_id=w.DEAL_USER_ID)
+                           WHEN w.comp_user_id is not null THEN (select ORG_NAME from gom_user_s where user_id=w.comp_user_id)
+                           END
+		         )
+		          WHEN w.disp_obj_tye = '260000003' THEN (
+		              CASE WHEN w.DEAL_USER_ID is null THEN (select ORG_NAME from gom_user_s where user_id=w.DISP_OBJ_ID)
+		                   WHEN  w.DEAL_USER_ID is not null THEN (select ORG_NAME from gom_user_s where user_id=w.DEAL_USER_ID)
+		                   WHEN w.comp_user_id is not null THEN (select ORG_NAME from gom_user_s where user_id=w.comp_user_id)
+		                   END
+		          )
+		           END AS orgName,
+         to_char(w.deal_date, 'yyyy-MM-dd hh24:mi:ss') as deal_date,
+         to_char(w.create_date, 'yyyy-MM-dd hh24:mi:ss') as create_date,
+        CASE WHEN w.wo_state = '290000002' THEN ''
+                     ELSE to_char(w.state_date, 'yyyy-MM-dd hh24:mi:ss') END AS state_date,
+         to_char(w.alarm_date, 'yyyy-MM-dd hh24:mi:ss') as alarm_date,
+         to_char(w.req_fin_date, 'yyyy-MM-dd hh24:mi:ss') as req_fin_date
+        FROM GOM_WO w
+        JOIN GOM_ORDER o ON o.order_id = w.order_id
+        LEFT JOIN gom_bdw_srv_ord_info so on so.order_id=w.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws on ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut on ut.id = ws.tache_id
+        LEFT JOIN gom_BDW_log_info info on info.wo_ord_id = w.wo_id AND info.oper_type IN (4,5,11,12)
+        left join GOM_PUB_DATE_S pds on pds.pub_date_id = w.wo_state and pds.DF_TYPE = 'WO_STATE'
+        left join gom_ord_key_info ki on ki.order_id = o.order_id
+        left join GOM_PUB_DATE_S pdss on pdss.pub_date_id = ki.specialty_code  and pdss.DF_TYPE = 'SPECIALTY_TYPE'
+        left join vw_pub_staff vps on vps.staff_id = w.DEAL_USER_ID
+        /*LEFT JOIN gom_staff_group_s wg ON wg.id = w.disp_obj_id
+        left join gom_org_s os on os.org_id = vps.site_id*/
+         /*LEFT JOIN (
+         SELECT gs.id ,WM_CONCAT(v.staff_id) staffIds,WM_CONCAT(v.user_name) staffNames
+         FROM gom_staff_group_s gs
+         LEFT JOIN gom_staff_group_rela_s grs ON grs.staff_group_id = gs.id
+         LEFT JOIN vw_pub_staff v ON v.staff_id = grs.staff_id GROUP BY gs.id
+         ) a ON a.id = w.disp_obj_id*/
+         WHERE (o.order_id = #{orderId} or
+               o.order_id = (select parent_order_id
+                                from gom_order
+                               where order_id = #{orderId}) or o.parent_order_id = #{orderId}  or o.parent_order_id = (select parent_order_id
+                                from gom_order
+                               where order_id = #{orderId})) and w.disp_obj_id != -2000
+        ORDER BY w.create_date DESC
+    </select>
+
+    <select id="querySecToLocalTaskInfo" resultType="map">
+        SELECT
+            w.wo_id AS woId,
+            o.ORDER_ID AS orderId ,
+            o.order_code AS orderCode,
+            so.serial_number,
+            o.order_title AS orderTitle,
+            ut.id AS tacheId,
+            CASE WHEN info.ifmainorg != '-1' THEN '本地调度'
+                 WHEN info.ifmainorg = '-1' THEN '本地核查' END AS tacheName,
+            CASE WHEN o.order_state = '200000004' THEN '已完成'
+                 WHEN o.order_state = '200000005' THEN '作废'
+                 WHEN o.order_state = '200000003' THEN '退单二干'
+                 WHEN o.order_state = '200000002' THEN '处理中' END AS orderState,
+            O.ORDER_STATE,
+            '' AS trackContent,
+            '' AS phone,
+            '' AS DEAL_USER_ID,
+            '' AS PUB_DATE_ID,
+            CASE WHEN info.ifmainorg = '1' THEN '本地调度（非主调）'
+                     WHEN info.ifmainorg = '0' THEN '本地调度（主调）'
+                      WHEN info.ifmainorg = '-1' THEN '本地核查' END AS TASKNAME,
+            info.ifmainorg,
+            CASE WHEN w.disp_obj_tye = '260000001' THEN ''
+          WHEN w.disp_obj_tye = '260000002' THEN (select NAME from Work_Group where WORK_GROUP_ID=w.DISP_OBJ_ID)
+          WHEN w.disp_obj_tye = '260000003' THEN '' END AS userJobName,
+            CASE WHEN w.disp_obj_tye = '260000001' THEN (
+                    CASE WHEN w.DEAL_USER_ID is null THEN (select to_char(USER_REAL_NAMES) from (select ORG_ID,wm_concat(USER_REAL_NAME) USER_REAL_NAMES from gom_user_s gos  GROUP BY gos.org_id) b where b.ORG_ID =w.DISP_OBJ_ID)
+                        WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+                        WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id) END)
+          WHEN w.disp_obj_tye = '260000002' THEN (
+                    CASE WHEN w.DEAL_USER_ID is null THEN
+                        (SELECT LISTAGG(BF.STAFF_NAME, ',') WITHIN GROUP(ORDER BY WG.WORK_GROUP_ID) STAFFNAMES
+                            FROM WORK_GROUP WG
+                            LEFT JOIN STAFF_WORKGRP SW
+                              ON SW.WORK_GROUP_ID = WG.WORK_GROUP_ID
+                            LEFT JOIN BFM_STAFF BF
+                              ON BF.STAFF_ID = SW.STAFF_ID
+                           WHERE WG.DELETE_STATE = '0'
+                             AND WG.STATE = '90A'
+                             AND WG.WORK_GROUP_ID = W.DISP_OBJ_ID)
+                        WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+                        WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id) END)
+          WHEN w.disp_obj_tye = '260000003' THEN (
+						CASE WHEN w.DEAL_USER_ID is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DISP_OBJ_ID)
+							 WHEN w.DEAL_USER_ID is not null and w.comp_user_id is null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.DEAL_USER_ID)
+							 WHEN w.comp_user_id is not null THEN (select STAFF_NAME from bfm_staff where STAFF_ID=w.comp_user_id) END)
+				END AS userName,
+				s.org_name AS orgName,
+        to_char(w.deal_date, 'yyyy-MM-dd hh24:mi:ss') as deal_date,
+        to_char(o.create_date, 'yyyy-MM-dd hh24:mi:ss') as create_date,
+				CASE WHEN o.order_state = '200000004' THEN to_char(w.state_date, 'yyyy-MM-dd hh24:mi:ss') ELSE '' END AS state_date,
+				to_char(o.alarm_date, 'yyyy-MM-dd hh24:mi:ss') as alarm_date,
+        '' as req_fin_date,
+        '1' as flag
+        FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_bdw_srv_ord_info so on so.srv_ord_id = info.srv_ord_id
+        JOIN GOM_ORDER o ON o.order_id = info.order_id
+				LEFT JOIN GOM_WO w ON w.order_id = o.order_id
+				LEFT JOIN gom_org_s s ON s.org_id = info.region_id
+        LEFT JOIN GOM_PS_2_WO_S ws on ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut on ut.id = ws.tache_id
+        WHERE info.parent_order_id = #{orderId} and w.disp_obj_id != -2000
+				AND ut.tache_code IN ('CHECK_DISPATCH','CIRCUIT_DISPATCH')
+				AND w.priv_task_type = '220000001'
+				ORDER BY w.deal_date DESC
+    </select>
+
+    <select id="queryIdeaInfoBySrvOrdId" parameterType="string" resultType="map">
+        select b.srv_ord_id,
+               b.wo_id,
+               b.user_name,
+               b.tache_name,
+               b.create_date,
+               b.remark,
+               WM_CONCAT(b.file_name) as file_name,
+               b.REGION_ID,
+               b.pub_date_name
+        from (
+              select a.srv_ord_id,
+                       a.wo_id,
+                       d.user_name,
+                       m.tache_name,
+                       to_char(a.create_date, 'yyyy-MM-dd hh24:mi:ss') as create_date,
+                       a.remark,
+                       KI.REGION_ID,
+                       KI.SPECIALTY_CODE,
+                       pds.pub_date_name,
+                       e.file_name,
+                       e.file_type,
+                       e.file_id,
+                       e.file_path
+                  from gom_bdw_srv_ord_remark a
+                  left join gom_wo b on a.wo_id = b.wo_id
+                  left join gom_order o on b.ORDER_ID = o.ORDER_ID
+                  left join GOM_PS_2_WO_S c on b.ps_id = c.id
+                  left join UOS_TACHE m on m.id = c.tache_id
+                  left join vw_pub_staff d on a.user_id = d.staff_id
+                  LEFT JOIN gom_ord_key_info KI ON KI.ORDER_ID = o.ORDER_ID
+                  LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+                  LEFT join gom_BDW_attach_info e on to_char(a.file_id) = e.file_id
+                 where a.srv_ord_id = #{srvordId}
+                 order by a.create_date desc
+          ) b
+        group by b.srv_ord_id,
+                 b.wo_id,
+                 b.user_name,
+                 b.tache_name,
+                 b.create_date,
+                 b.remark,
+                 b.REGION_ID,
+                 b.pub_date_name
+
+    </select>
+    <select id="queryRelevanceOrderInfo" parameterType="string" resultType="map">
+      select a.ORDER_ID,
+               a.ORDER_TITLE,
+               d.pub_date_name as SYS_CODE,
+               to_char(a.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+               c.pub_date_name,
+               a.AREA_NAME
+          from gom_order a
+          left join GOM_PUB_DATE_S c on a.order_state = c.pub_date_id and c.DF_TYPE = 'ORDER_STATE'
+          left join GOM_PUB_DATE_S d on a.sys_code = d.pub_date_id and d.DF_TYPE = 'SYS_CODE'
+         where (a.parent_order_id = #{orderId} or
+               a.order_id = (select parent_order_id b
+                                from gom_order b
+                               where b.order_id = #{orderId}))
+         order by a.create_date desc
+    </select>
+    <select id="queryWarningInfo" parameterType="string" resultType="map">
+        select wo.order_id,
+           ord.parent_order_id,
+           ut.tache_name,
+           to_char(wo.req_fin_date,'yyyy-MM-dd hh24:mi:ss') as req_fin_date,
+           to_char(wo.alarm_date,'yyyy-MM-dd hh24:mi:ss') as alarm_date,
+        <![CDATA[
+            CASE
+                   WHEN wo.REQ_FIN_DATE <= sysdate then '超时单'
+                   WHEN wo.ALARM_DATE <= sysdate and sysdate < wo.REQ_FIN_DATE then '预警单'
+                   WHEN wo.ALARM_DATE > sysdate then '正常单'
+                   ELSE '正常单'
+                   END limit_state,
+        ]]>
+           case wo.wo_state
+           when '290000004' then t.STAFF_NAME
+           when '290000110' then t.STAFF_NAME
+           when '290000006' then t.STAFF_NAME
+           else f.STAFF_NAME end as deal_user_name,
+           case when wo.deal_user_id is null then '待签收'
+             when pds.pub_date_id = '290000110' then '已派发调单'
+             when ut.tache_name = '起租' and pds.pub_date_id = '290000002' then '待起租'
+             else pds.pub_date_name end as wo_state
+      from gom_order ord
+      join gom_wo wo on (wo.order_id = ord.order_id or ord.parent_order_id = wo.order_id)
+        and ord.order_id = #{orderId}
+      join gom_ps_2_wo_s ws ON wo.ps_id = ws.id
+      JOIN uos_tache ut ON ws.tache_id = ut.id
+      left join bfm_staff f on f.staff_id = wo.deal_user_id
+      left join bfm_staff t on t.staff_id = wo.comp_user_id
+      left join GOM_PUB_DATE_S pds on pds.pub_date_id = wo.wo_state and pds.DF_TYPE = 'WO_STATE'
+      order by wo.order_id asc
+    </select>
+
+    <select id="queryDispatchOrderInfo" resultType="map" parameterType="string">
+        select a.DISPATCH_TITLE,
+               a.DISPATCH_ORDER_ID,
+               a.DISPATCH_TEXT,
+               a.DISPATCH_ORDER_NO,
+               a.SEND_DATE,
+               a.STAFF_ORG,
+               a.STAFF_NAME,
+               a.STAFF_TEL,
+               a.DISPATCH_GRADE,
+               a.DISPATCH_URGENCY,
+               a.REMARK,
+               case when a.DISPATCH_SEND_ORG_NAME is null then a.DISPATCH_SEND_ORG else a.DISPATCH_SEND_ORG_NAME end as DISPATCH_SEND_ORG,
+               case when a.DISPATCH_COPY_ORG_NAME is null then a.DISPATCH_COPY_ORG else a.DISPATCH_COPY_ORG_NAME end as DISPATCH_COPY_ORG,
+               b.code_content as DISPATCH_TYPE,
+               c.code_content as state,
+               d.code_content as dispatch_source,
+               t.RES_ALLOCATE,
+               t.SPECIALTY,
+               t.NETMANAGE
+          from gom_bdw_dispatch_order a
+          left join gom_BDW_code_info b on a.dispatch_type = b.code_value
+                                       and b.code_type = 'dispatch_type'
+          left join gom_BDW_code_info c on a.state = c.code_value
+                                       and c.code_type = 'dispatch_state'
+          left join gom_BDW_code_info d on a.DISPATCH_SOURCE = d.code_value
+                                       and d.code_type = 'dispatch_source'
+          left join GOM_BDW_DISPATCH_DEPT t on a.DISPATCH_ORDER_ID = t.DISPATCH_ORDER_ID
+         where a.cst_ord_id = #{cstOrdId}
+         order by a.send_date desc
+
+    </select>
+
+
+    <select id="queryDispatchOrderInfoByCstOrdId" resultType="map" parameterType="string">
+        select d.code_content as dispatch_source,
+               a.DISPATCH_TITLE,
+               a.DISPATCH_ORDER_ID,
+               a.DISPATCH_TEXT,
+               a.DISPATCH_ORDER_NO,
+               a.SEND_DATE,
+               a.STAFF_ORG,
+               a.STAFF_NAME,
+               a.STAFF_TEL,
+               a.DISPATCH_GRADE,
+               a.DISPATCH_URGENCY,
+               case when a.DISPATCH_SEND_ORG_NAME is null then a.DISPATCH_SEND_ORG else a.DISPATCH_SEND_ORG_NAME end as DISPATCH_SEND_ORG,
+               case when a.DISPATCH_COPY_ORG_NAME is null then a.DISPATCH_COPY_ORG else a.DISPATCH_COPY_ORG_NAME end as DISPATCH_COPY_ORG,
+               b.code_content as DISPATCH_TYPE,
+               a.REMARK,
+               c.code_content as state,
+               t.RES_ALLOCATE,
+               t.SPECIALTY,
+               t.NETMANAGE
+        from gom_bdw_dispatch_order a
+                 left join gom_BDW_code_info b on a.dispatch_type = b.code_value
+                and b.code_type = 'dispatch_type'
+                 left join gom_BDW_code_info c on a.state = c.code_value
+                and c.code_type = 'dispatch_state'
+                 left join gom_BDW_code_info d on a.dispatch_source = d.code_value
+                and d.code_type = 'dispatch_source'
+                left join GOM_BDW_DISPATCH_DEPT t on a.DISPATCH_ORDER_ID = t.DISPATCH_ORDER_ID
+        where a.cst_ord_id = #{cstOrdId}
+        order by a.send_date desc
+
+    </select>
+    <select id="queryDispatchOrderInfoByDispatchId" resultType="map" parameterType="string">
+        select d.code_content as dispatch_source,
+               a.DISPATCH_TITLE,
+               a.DISPATCH_ORDER_ID,
+               a.DISPATCH_TEXT,
+               a.DISPATCH_ORDER_NO,
+               a.SEND_DATE,
+               a.STAFF_ORG,
+               a.STAFF_NAME,
+               a.STAFF_TEL,
+               a.DISPATCH_GRADE,
+               a.DISPATCH_URGENCY,
+               case when a.DISPATCH_SEND_ORG_NAME is null then a.DISPATCH_SEND_ORG else a.DISPATCH_SEND_ORG_NAME end as DISPATCH_SEND_ORG,
+               case when a.DISPATCH_COPY_ORG_NAME is null then a.DISPATCH_COPY_ORG else a.DISPATCH_COPY_ORG_NAME end as DISPATCH_COPY_ORG,
+               b.code_content as DISPATCH_TYPE,
+               a.REMARK,
+               c.code_content as state,
+               t.RES_ALLOCATE,
+               t.SPECIALTY,
+               t.NETMANAGE
+        from gom_bdw_dispatch_order a
+                 left join gom_BDW_code_info b on a.dispatch_type = b.code_value
+                and b.code_type = 'dispatch_type'
+                 left join gom_BDW_code_info c on a.state = c.code_value
+                and c.code_type = 'dispatch_state'
+                 left join gom_BDW_code_info d on a.dispatch_source = d.code_value
+                and d.code_type = 'dispatch_source'
+                left join GOM_BDW_DISPATCH_DEPT t on a.DISPATCH_ORDER_ID = t.DISPATCH_ORDER_ID
+        where a.dispatch_order_id = #{dispatchId}
+        order by a.send_date desc
+
+    </select>
+    <select id="queryDispatchOrderInfoByIds" resultType="map">
+        select a.DISPATCH_TITLE,
+               a.DISPATCH_ORDER_ID,
+               a.DISPATCH_TEXT,
+               a.DISPATCH_ORDER_NO,
+               a.SEND_DATE,
+               a.STAFF_ORG,
+               a.STAFF_NAME,
+               a.STAFF_TEL,
+               a.DISPATCH_GRADE,
+               a.DISPATCH_URGENCY,
+               case when a.DISPATCH_SEND_ORG_NAME is null then a.DISPATCH_SEND_ORG else a.DISPATCH_SEND_ORG_NAME end as DISPATCH_SEND_ORG,
+               case when a.DISPATCH_COPY_ORG_NAME is null then a.DISPATCH_COPY_ORG else a.DISPATCH_COPY_ORG_NAME end as DISPATCH_COPY_ORG,
+               b.code_content as DISPATCH_TYPE,
+               a.REMARK,
+               c.code_content as state,
+               d.code_content as dispatch_source
+        from gom_bdw_dispatch_order a
+                 left join gom_BDW_code_info b on a.dispatch_type = b.code_value
+                and b.code_type = 'dispatch_type'
+                 left join gom_BDW_code_info c on a.state = c.code_value
+                and c.code_type = 'dispatch_state'
+                left join gom_BDW_code_info d on a.dispatch_source = d.code_value
+                and d.code_type = 'dispatch_source'
+        where 1=1
+        <if test="dispatchOrderIds != null and dispatchOrderIds.length > 0">
+              and  a.DISPATCH_ORDER_ID in
+            <foreach collection="dispatchOrderIds" item="dispatchOrderId" index="index" open="(" close=")" separator=",">
+                #{dispatchOrderId}
+            </foreach>
+        </if>
+        <if test="dispatchOrderIds == null or dispatchOrderIds.length == 0">
+          and  a.DISPATCH_ORDER_ID = ''
+        </if>
+        order by a.send_date desc
+
+    </select>
+
+    <select id="queryResourceOrderInfoResOne" resultType="map" parameterType="string">
+        SELECT srv.trade_id,t.*,
+        CASE WHEN cst.HANDLE_DEP_ID IS NULL THEN (
+        SELECT s.org_name FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN GOM_ORG_S s ON s.org_id = info.region_id
+        WHERE  info.relate_info_id = t.srv_ord_id)
+        WHEN cst.HANDLE_DEP_ID IS NOT NULL THEN (
+        SELECT a.ORG_NAME FROM gom_org_s a where a.ORG_ID in (SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+        START WITH  a.ORG_ID= cst.HANDLE_DEP_ID CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID ) END AS HANDLE_DEP
+        FROM (
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID = 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID = 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) b ON b.compId = a.compId AND b.resId = a.resId )
+        ) t
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.srv_ord_id = t.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+        ORDER BY cst.HANDLE_DEP_ID
+    </select>
+
+    <select id="queryResourceOrderInfoBySrvOrdIdResOne" resultType="map" parameterType="string">
+        SELECT srv.trade_id,t.*,
+        CASE WHEN cst.HANDLE_DEP_ID IS NULL THEN (
+        SELECT s.org_name FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN GOM_ORG_S s ON s.org_id = info.region_id
+        WHERE  info.relate_info_id = t.srv_ord_id)
+        WHEN cst.HANDLE_DEP_ID IS NOT NULL THEN (
+        SELECT a.ORG_NAME FROM gom_org_s a where a.ORG_ID in (SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+        START WITH  a.ORG_ID= cst.HANDLE_DEP_ID CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID ) END AS HANDLE_DEP
+        FROM (
+        (SELECT DISTINCT a.*,'' as BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID = 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        '' as  BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID = 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) b ON b.compId = a.compId AND b.resId = a.resId )
+        ) t
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.srv_ord_id = t.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+        ORDER BY cst.HANDLE_DEP_ID
+    </select>
+
+    <select id="queryResourceOrderInfo" resultType="map" parameterType="string">
+        SELECT srv.trade_id,t.*,
+        CASE WHEN cst.HANDLE_DEP_ID IS NULL THEN (
+            SELECT s.org_name FROM gom_bdw_sec_local_relate_info info
+            LEFT JOIN GOM_ORG_S s ON s.org_id = info.region_id
+            WHERE  info.relate_info_id = t.srv_ord_id)
+        WHEN cst.HANDLE_DEP_ID IS NOT NULL THEN (
+            SELECT a.ORG_NAME FROM gom_org_s a where a.ORG_ID in (SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+            START WITH  a.ORG_ID= cst.HANDLE_DEP_ID CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID ) END AS HANDLE_DEP
+        FROM (
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+
+        ) b ON b.compId = a.compId AND b.resId = a.resId )
+        UNION ALL
+        (SELECT DISTINCT a.srv_ord_id, a.resname, a.resId, a.restype,a.compId,
+        a.resname AFTER_ROUTE,a.create_date,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname AFTER_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+         ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname BEFORE_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+         ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId  and a.seq=b.seq )
+        UNION ALL
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  AFTER_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'newResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_ROUTE','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  BEFORE_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'oldResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_ROUTE','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId )
+        UNION ALL
+        (
+        select
+        c.srv_ord_id,
+        c.CIRCUIT_NO as resname,
+        '' as resId,
+        '业务路由' as restype,
+        '' as compId,
+        case when c.ROUTE_INFO is not null then to_char(c.ROUTE_INFO) else '' end as AFTER_ROUTE,
+        c.CREATE_DATE as create_date,
+        '' as BEFORE_ROUTE
+        From gom_bdw_srv_ord_res_circuit c
+        <if test="srvOrdId != '' and srvOrdId != null">
+        where c.srv_ord_id in
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+            AND c.STATE = '10A'
+        </if>
+        )
+          )
+        t
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.srv_ord_id = t.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+        ORDER BY cst.HANDLE_DEP_ID
+    </select>
+    <select id="queryResourceOrderInfoLocal" resultType="map" parameterType="string">
+        SELECT srv.trade_id,t.*,
+        CASE WHEN cst.HANDLE_DEP_ID IS NULL THEN (
+            SELECT s.org_name FROM gom_bdw_sec_local_relate_info info
+            LEFT JOIN GOM_ORG_S s ON s.org_id = info.region_id
+            WHERE  info.relate_info_id = t.srv_ord_id)
+        WHEN cst.HANDLE_DEP_ID IS NOT NULL THEN (
+            SELECT a.ORG_NAME FROM gom_org_s a where a.ORG_ID in (SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+            START WITH  a.ORG_ID= cst.HANDLE_DEP_ID CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID ) END AS HANDLE_DEP
+        FROM (
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'oldResource'
+            AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+
+        ) b ON b.compId = a.compId AND b.resId = a.resId )
+        UNION ALL
+        (SELECT DISTINCT a.srv_ord_id, a.resname, a.resId, a.restype,a.compId,
+        a.resname AFTER_ROUTE,a.create_date,b.BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname AFTER_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'newResource'
+            AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+         ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname BEFORE_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'oldResource'
+            AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+         ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId  and a.seq=b.seq )
+        UNION ALL
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  AFTER_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'newResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  BEFORE_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'oldResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId )
+        UNION ALL
+        (
+        select
+        c.srv_ord_id,
+        c.CIRCUIT_NO as resname,
+        '' as resId,
+        '业务路由' as restype,
+        '' as compId,
+        case when c.ROUTE_INFO is not null then to_char(c.ROUTE_INFO) else '' end as AFTER_ROUTE,
+        c.CREATE_DATE as create_date,
+        '' as BEFORE_ROUTE
+        From gom_bdw_srv_ord_res_circuit c
+        <if test="srvOrdId != '' and srvOrdId != null">
+        where c.srv_ord_id in
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+            AND c.STATE = '10A'
+        </if>
+        )
+          )
+        t
+        LEFT JOIN (SELECT distinct info.relate_info_id srv_ord_id,info.cst_ord_id,so.trade_id FROM gom_bdw_srv_ord_info So
+                    JOIN gom_bdw_sec_local_relate_info INFO
+                    ON info.parent_order_id = So.ORDER_ID and INFO.srv_ord_id = So.SRV_ORD_ID) srv
+        ON srv.srv_ord_id = t.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+        ORDER BY cst.HANDLE_DEP_ID
+    </select>
+
+    <select id="queryResourceOrderInfoBySrvOrdId" resultType="map" parameterType="string">
+        SELECT srv.trade_id,t.*,
+        CASE WHEN cst.HANDLE_DEP_ID IS NULL THEN (
+            SELECT s.org_name FROM gom_bdw_sec_local_relate_info info
+            LEFT JOIN GOM_ORG_S s ON s.org_id = info.region_id
+            WHERE  info.relate_info_id = t.srv_ord_id)
+        WHEN cst.HANDLE_DEP_ID IS NOT NULL THEN (
+            SELECT a.ORG_NAME FROM gom_org_s a where a.ORG_ID in (SELECT ORG_ID  FROM GOM_ORG_S  WHERE PARENT_ORG_ID='1')
+            START WITH  a.ORG_ID= cst.HANDLE_DEP_ID CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID ) END AS HANDLE_DEP
+        FROM (
+        (SELECT DISTINCT a.*,'' as BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        dbms_lob.substr(route.attr_value,4000) as AFTER_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'newResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) a
+        LEFT JOIN (
+        select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        '' as  BEFORE_ROUTE,info.create_date
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        LEFT JOIN GOM_BDW_SRV_ORD_RES_ROUTE route ON route.rfsid = info.rfsid
+        AND route.srv_ord_id = info.srv_ord_id AND route.RESID = info.RESID
+        and route.resources = 'oldResource' AND route.attr_code NOT IN ('ALL_ROUTE','BEFORE_ROUTE')
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid  IN ('20000007','20000001','19921201','20110718','12010817','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ) b ON b.compId = a.compId AND b.resId = a.resId )
+        UNION ALL
+        (SELECT DISTINCT a.srv_ord_id, a.resname, a.resId, a.restype,a.compId,
+        a.resname AFTER_ROUTE,a.create_date,'' as BEFORE_ROUTE FROM
+        (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname AFTER_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'newResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (select info.srv_ord_id, info.resname, info.resId, info.restype,info.compId,
+        info.resname BEFORE_ROUTE,info.create_date,info.seq
+        FROM GOM_BDW_SRV_ORD_RES_INFO info
+        WHERE info.resources = 'oldResource'
+        AND info.RESSPECID != 'onedry'
+        AND info.compid NOT IN ('20000007','20000001','19921201','20000010','20000011')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND info.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId and a.seq=b.seq )
+        UNION ALL
+        (SELECT DISTINCT a.*,b.BEFORE_ROUTE FROM
+        (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  AFTER_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'newResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) a
+        LEFT JOIN (
+        select route.srv_ord_id, dbms_lob.substr(route.attr_value,4000) as resname, '' resId, route.ATTR_NAME restype,route.compId,
+        dbms_lob.substr(route.attr_value,4000)  BEFORE_ROUTE,route.create_date
+        FROM  GOM_BDW_SRV_ORD_RES_ROUTE route
+        WHERE route.resources = 'oldResource' and route.attr_code  IN  ('TEXT_IP','TEXT_VLAN','TEXT_VRF','TEXT_DATA_PORT','TEXT_EXCHANGE_PORT','PORT_BIND_TERM')
+        <if test="srvOrdId != '' and srvOrdId != null">
+            AND route.SRV_ORD_ID IN
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY CREATE_DATE DESC) b ON a.compId = b.compId )
+        UNION ALL
+          (
+        select
+        c.srv_ord_id,
+        c.CIRCUIT_NO as resname,
+        '' as resId,
+        '业务路由' as restype,
+        '' as compId,
+        case when c.ROUTE_INFO is not null then to_char(c.ROUTE_INFO) else '' end as AFTER_ROUTE,
+        c.CREATE_DATE as create_date,
+        '' as BEFORE_ROUTE
+        From gom_bdw_srv_ord_res_circuit c
+        <if test="srvOrdId != '' and srvOrdId != null">
+            where c.srv_ord_id in
+            <foreach collection="srvOrdId" item="id" index="index" open="(" close=")" separator = ",">
+                #{id}
+            </foreach>
+            AND c.STATE = '10A'
+        </if>
+          )
+        )
+        t
+        LEFT JOIN gom_bdw_srv_ord_info srv ON srv.srv_ord_id = t.srv_ord_id
+        LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+        ORDER BY cst.HANDLE_DEP_ID
+    </select>
+
+    <select id="queryFeedbackAInfo" parameterType="string" resultType="map">
+          SELECT US.USER_REAL_NAME,
+               UT.TACHE_NAME,
+               WG.NAME WORK_GROUP_NAME,
+               A.SRV_ORD_ID,
+               A.WO_ID,
+               A.A_CONSTRUCT_SCHEME as CONSTRUCT_SCHEME,
+               A.A_ACCESS_ROOM as ACCESS_ROOM,
+               A.A_INVESTMENT_AMOUNT as INVESTMENT_AMOUNT,
+               A.A_CONSTRUCT_PERIOD as CONSTRUCT_PERIOD,
+               A.A_RES_SATISFY as RES_SATISFY,
+               A.CREATE_DATE,
+            /*   gas.NAME*/ D.DEPT_NAME AS AREAID,
+              A.AREAA AS AREA
+          FROM GOM_BDW_CHECK_FEEDBACK A
+          LEFT JOIN GOM_WO WO ON A.WO_ID = WO.WO_ID
+          LEFT JOIN GOM_USER_S US ON WO.DEAL_USER_ID = US.USER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+          LEFT JOIN WORK_GROUP WG ON WO.DISP_OBJ_ID = WG.WORK_GROUP_ID
+                                 AND WO.DISP_OBJ_TYE = '260000002'
+         /* left join gom_area_s gas on a.areaid = gas.id*/
+         LEFT JOIN  GOM_WO_OPER_ATTR GWOA  ON  GWOA.ATTR_ID='areaId'  AND GWOA.WO_ID=A.WO_ID
+         LEFT JOIN DEPARTMENT D ON D.DEPT_ID=GWOA.ATTR_VAL
+         WHERE A.SRV_ORD_ID = #{srvOrdId}
+         or A.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID=#{srvOrdId})
+         ORDER BY A.CREATE_DATE
+    </select>
+    <select id="queryFeedbackZInfo" parameterType="string" resultType="map">
+          SELECT US.USER_REAL_NAME,
+               UT.TACHE_NAME,
+               WG.NAME WORK_GROUP_NAME,
+               A.SRV_ORD_ID,
+               A.WO_ID,
+               A.Z_CONSTRUCT_SCHEME as CONSTRUCT_SCHEME,
+               A.Z_ACCESS_ROOM as ACCESS_ROOM,
+               A.Z_INVESTMENT_AMOUNT as INVESTMENT_AMOUNT,
+               A.Z_CONSTRUCT_PERIOD as CONSTRUCT_PERIOD,
+               A.Z_RES_SATISFY as RES_SATISFY,
+               A.CREATE_DATE,
+             /* gas.NAME*/ D.DEPT_NAME AS AREAID,
+              A.AREAA AS AREA
+          FROM GOM_BDW_CHECK_FEEDBACK A
+          LEFT JOIN GOM_WO WO ON A.WO_ID = WO.WO_ID
+          LEFT JOIN GOM_USER_S US ON WO.DEAL_USER_ID = US.USER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+          LEFT JOIN WORK_GROUP WG ON WO.DISP_OBJ_ID = WG.WORK_GROUP_ID
+                                 AND WO.DISP_OBJ_TYE = '260000002'
+         /* left join gom_area_s gas on a.areaid = gas.id*/
+         LEFT JOIN  GOM_WO_OPER_ATTR GWOA  ON  GWOA.ATTR_ID='areaId'  AND GWOA.WO_ID=A.WO_ID
+         LEFT JOIN DEPARTMENT D ON D.DEPT_ID=GWOA.ATTR_VAL
+         WHERE A.SRV_ORD_ID = #{srvOrdId}
+         or A.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID=#{srvOrdId})
+         ORDER BY A.CREATE_DATE
+    </select>
+    <select id="queryRelevanceSrvOrdId" parameterType="string" resultType="map">
+        SELECT *
+        FROM GOM_BDW_SRV_ORD_INFO D
+        WHERE D.SRV_ORD_ID =
+        (SELECT MAX(SRV_ORD_ID)
+        FROM (SELECT T.SRV_ORD_ID
+        FROM (SELECT SRV.SRV_ORD_ID,
+        (SELECT R.DEPT_ID
+        FROM DEPARTMENT R
+        WHERE R.DEPT_ID IN
+        (SELECT E.DEPT_ID
+        FROM DEPARTMENT E
+        WHERE E.PARENT_ID = '1')
+        START WITH R.DEPT_ID = CST.HANDLE_DEP_ID
+        CONNECT BY PRIOR R.PARENT_ID = R.DEPT_ID) HANDLE_DEP_ID
+        FROM GOM_BDW_SRV_ORD_INFO SRV
+        LEFT JOIN GOM_BDW_CST_ORD CST
+        ON CST.CST_ORD_ID = SRV.CST_ORD_ID
+        WHERE SRV.ACTIVE_TYPE IN ('101', '102', '103', '106')
+        <if test="orderType != null and orderType != ''">
+            AND SRV.ORDER_TYPE = #{orderType}
+        </if>
+        AND SRV.SRV_ORD_STAT <![CDATA[ <> ]]> '10X'
+        AND SRV.SRV_ORD_ID  <![CDATA[ <> ]]> #{srvOrdId}
+        AND SRV.INSTANCE_ID =
+        (SELECT SRVO.INSTANCE_ID
+        FROM GOM_BDW_SRV_ORD_INFO SRVO
+        LEFT JOIN GOM_BDW_CST_ORD CSTO
+        ON CSTO.CST_ORD_ID = SRVO.CST_ORD_ID
+        WHERE SRVO.SRV_ORD_ID = #{srvOrdId})) T
+        WHERE T.HANDLE_DEP_ID =
+        (SELECT (SELECT R.DEPT_ID
+        FROM DEPARTMENT R
+        WHERE R.DEPT_ID IN
+        (SELECT E.DEPT_ID
+        FROM DEPARTMENT E
+        WHERE E.PARENT_ID = '1')
+        START WITH R.DEPT_ID = CSTO.HANDLE_DEP_ID
+        CONNECT BY PRIOR R.PARENT_ID = R.DEPT_ID) HANDLE_DEP_ID
+        FROM GOM_BDW_SRV_ORD_INFO SRVO
+        LEFT JOIN GOM_BDW_CST_ORD CSTO
+        ON CSTO.CST_ORD_ID = SRVO.CST_ORD_ID
+        WHERE SRVO.SRV_ORD_ID = #{srvOrdId})
+        GROUP BY SRV_ORD_ID))
+    </select>
+    <select id="queryAddProductInfoBySrvOrdId" parameterType="map" resultType="map">
+        select gbci.code_content as product_name, prod.START_DATE, prod.END_DATE
+          from gom_BDW_add_prod_info prod
+          left join GOM_BDW_CODE_INFO gbci on prod.B_PRODUCT_ID = gbci.CODE_VALUE
+         where prod.SRV_ORD_ID = #{srvOrdId}
+           AND gbci.code_type = 'add_product'
+    </select>
+    <select id="querySrvOrdIdsByCstOrdId" parameterType="map" resultType="map">
+        SELECT listagg(srv_ord_id, ',') WITHIN
+         GROUP(
+         order by srv_ord_id) srvOrdIds
+          FROM GOM_BDW_SRV_ORD_INFO
+         where cst_ord_id = #{cstOrdId}
+    </select>
+    <select id="queryApplyAttachInfo" parameterType="map" resultType="map">
+        select DISTINCT t.file_id,t.file_name,t.file_path,t.file_type from(
+        SELECT *
+        FROM GOM_BDW_ATTACH_INFO A
+        WHERE (A.ORIGIN = 'FQ'
+        OR A.ORIGIN = 'JIKE')
+        <if test="srvOrdIds != '' and srvOrdIds != null">
+            AND A.SRV_ORD_ID IN
+            <foreach collection="srvOrdIds" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        UNION
+        SELECT *
+        FROM GOM_BDW_ATTACH_INFO B
+        WHERE B.CST_ORD_ID = #{cstOrdId}
+        AND B.ORIGIN = 'CUSTOMER'
+        ) t
+    </select>
+    <select id="querySystemSourceByCstOrdId" parameterType="string" resultType="map">
+        select distinct system_resource from gom_bdw_srv_ord_info where cst_ord_id = #{cstOrdId}
+    </select>
+    <select id="queryDispatchIdByCstOrdId" parameterType="string" resultType="map">
+        select distinct dispatch_order_id from gom_bdw_srv_ord_info where cst_ord_id = #{cstOrdId}
+    </select>
+    <select id="queryDispatchIdFromOneDryByCstOrdId" parameterType="string" resultType="map">
+        select distinct dispatch_order_id from gom_bdw_dispatch_order where cst_ord_id = #{cstOrdId} and dispatch_source = 'onedry'
+    </select>
+    <select id="queryTacheInfoByOrderId" parameterType="string" resultType="map">
+         select ut.ID,ut.TACHE_CODE,ut.TACHE_CODE from gom_wo wo
+             left join gom_ps_2_wo_s ws on wo.ps_id = ws.ID
+             left join uos_tache ut on ws.TACHE_ID = ut.ID
+             where wo.wo_id = (
+                    select Max(gw.wo_id) from gom_wo gw where gw.order_id = #{orderId}
+             )
+    </select>
+    <select id="queryAttachInfo2" parameterType="map" resultType="map">
+        SELECT ai.wo_ord_id,
+               o.order_id,
+               ut.id,
+               CASE
+                  when ut.tache_name is null and ai.ORIGIN != 'YJ' then
+                   '定单申请'
+                  else
+                   ut.tache_name
+               END AS tache_name,
+               ai.srv_ord_id,
+               ai.file_id,
+               ai.file_type,
+               to_char(ai.create_date,'yyyy-MM-dd hh24:mi:ss')as create_date,
+               ai.file_name,
+               ai.file_path,
+               ai.file_size,
+               CASE
+                 WHEN ai.ORIGIN = 'JIKE' THEN
+                  '集客'
+                 when ai.ORIGIN = 'YJ' THEN
+                  '阶段性意见'
+                 when ai.ORIGIN = 'DISTINCT' or ai.ORIGIN = 'CUSTOMER' THEN
+                  '一干'
+                 else
+                  case
+                    when ut.tache_name is null then
+                     '本地业务申请'
+                    else
+                     concat(ut.tache_name, '环节')
+                  end
+               END AS source,
+               CASE
+                 when ut.tache_name is null and ai.ORIGIN != 'YJ' then
+                  u2.user_name
+                 else
+                  u.user_name
+               END AS user_name,
+               gbso.order_id as main_order_id
+          FROM gom_bdw_attach_info ai
+          LEFT JOIN GOM_BDW_SRV_ORD_INFO gbso on gbso.srv_ord_id = ai.srv_ord_id
+          LEFT JOIN vw_pub_staff u2  on to_char(u2.staff_id) = to_char(gbso.user_id)
+          LEFT JOIN GOM_WO w ON w.wo_id = ai.wo_ord_id
+          LEFT JOIN GOM_ORDER o ON o.order_id = w.order_id
+          LEFT JOIN gom_ps_2_wo_s ws ON WS.id = w.ps_id
+          LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+          LEFT JOIN vw_pub_staff u on u.staff_id = w.deal_user_id
+         WHERE  o.order_id = #{orderId} OR ai.srv_ord_id = #{srvOrdId}
+    </select>
+    <select id="queryTaskInfoByTacheCode" parameterType="map" resultType="map">
+        SELECT UT.TACHE_NAME,
+               UT.TACHE_CODE,
+               VPS.PHONE_NO,
+               PDS.PUB_DATE_NAME AS ORDERSTATE,
+               INFO.TRACK_CONTENT AS TRACKCONTENT,
+               GW.DEAL_USER_ID,
+               PDS.PUB_DATE_ID,
+               TO_CHAR(GW.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') AS CREATE_DATE,
+               TO_CHAR(GW.DEAL_DATE, 'yyyy-MM-dd hh24:mi:ss') AS DEAL_DATE,
+               CASE
+                 WHEN GW.WO_STATE != '290000002' THEN
+                  TO_CHAR(GW.STATE_DATE, 'yyyy-MM-dd hh24:mi:ss')
+                 ELSE
+                  ''
+               END AS STATE_DATE,
+               CASE
+                 WHEN DT.DEPT_NAME IS NULL THEN
+                  (CASE
+                    WHEN GW.DISP_OBJ_TYE = '260000003' THEN
+                     (SELECT ORG_NAME
+                        FROM GOM_USER_S
+                       WHERE USER_ID = (SELECT USER_ID
+                                          FROM BFM_STAFF
+                                         WHERE STAFF_ID = GW.DISP_OBJ_ID))
+                  END)
+                 WHEN DT.DEPT_NAME IS NOT NULL THEN
+                  DT.DEPT_NAME
+               END AS DEPT_NAME,
+               CASE
+                 WHEN GW.DISP_OBJ_TYE = '260000001' THEN
+                  ''
+                 WHEN GW.DISP_OBJ_TYE = '260000002' THEN
+                  (SELECT NAME FROM WORK_GROUP WHERE WORK_GROUP_ID = GW.DISP_OBJ_ID)
+                 WHEN GW.DISP_OBJ_TYE = '260000003' THEN
+                  ''
+               END AS USERJOBNAME,
+               CASE
+                 WHEN GW.DISP_OBJ_TYE = '260000001' THEN
+                  (CASE
+                    WHEN GW.DEAL_USER_ID IS NULL THEN
+                     (SELECT TO_CHAR(USER_REAL_NAMES)
+                        FROM (SELECT ORG_ID, WM_CONCAT(USER_REAL_NAME) USER_REAL_NAMES
+                                FROM GOM_USER_S GOS
+                               GROUP BY GOS.ORG_ID) B
+                       WHERE B.ORG_ID = GW.DISP_OBJ_ID)
+                    WHEN GW.DEAL_USER_ID IS NOT NULL AND GW.COMP_USER_ID IS NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.DEAL_USER_ID)
+                    WHEN GW.COMP_USER_ID IS NOT NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.COMP_USER_ID)
+                  END)
+                 WHEN GW.DISP_OBJ_TYE = '260000002' THEN
+                  (CASE
+                    WHEN GW.DEAL_USER_ID IS NULL THEN
+                     (SELECT LISTAGG(BF.STAFF_NAME, ',') WITHIN GROUP(ORDER BY WG.WORK_GROUP_ID) STAFFNAMES
+                        FROM WORK_GROUP WG
+                        LEFT JOIN STAFF_WORKGRP SW
+                          ON SW.WORK_GROUP_ID = WG.WORK_GROUP_ID
+                        LEFT JOIN BFM_STAFF BF
+                          ON BF.STAFF_ID = SW.STAFF_ID
+                       WHERE WG.DELETE_STATE = '0'
+                         AND WG.STATE = '90A'
+                         AND WG.WORK_GROUP_ID = GW.DISP_OBJ_ID)
+                    WHEN GW.DEAL_USER_ID IS NOT NULL AND GW.COMP_USER_ID IS NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.DEAL_USER_ID)
+                    WHEN GW.COMP_USER_ID IS NOT NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.COMP_USER_ID)
+                  END)
+                 WHEN GW.DISP_OBJ_TYE = '260000003' THEN
+                  (CASE
+                    WHEN GW.DEAL_USER_ID IS NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.DISP_OBJ_ID)
+                    WHEN GW.DEAL_USER_ID IS NOT NULL AND GW.COMP_USER_ID IS NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.DEAL_USER_ID)
+                    WHEN GW.COMP_USER_ID IS NOT NULL THEN
+                     (SELECT STAFF_NAME FROM BFM_STAFF WHERE STAFF_ID = GW.COMP_USER_ID)
+                  END)
+               END AS USERNAME
+          FROM (SELECT ORD.ORDER_ID
+                  FROM GOM_ORDER ORD
+                 WHERE ORD.PARENT_ORDER_ID = #{orderId}
+                 OR ORD.ORDER_ID = #{orderId}
+                UNION ALL
+                SELECT ORD.ORDER_ID
+                  FROM GOM_BDW_SEC_LOCAL_RELATE_INFO REL
+                  LEFT JOIN GOM_ORDER_ATTR OA
+                    ON REL.PARENT_ORDER_ID = OA.ATTR_VAL
+                   AND OA.ATTR_ID = 'ORDER_ID'
+                  LEFT JOIN GOM_ORDER ORD
+                    ON ORD.ORDER_ID = OA.ORDER_ID
+                   AND ORD.ORDER_STATE = '200000003'
+                  LEFT JOIN GOM_ORD_KEY_INFO KI
+                    ON KI.ORDER_ID = ORD.ORDER_ID
+                 WHERE REL.ORDER_ID = #{orderId}
+                   AND REL.REGION_ID = KI.REGION_ID) GO
+          LEFT JOIN GOM_WO GW
+            ON GO.ORDER_ID = GW.ORDER_ID
+           AND GW.DISP_OBJ_ID != '-2000'
+          LEFT JOIN GOM_PUB_DATE_S PDS
+            ON PDS.PUB_DATE_ID = GW.WO_STATE
+           AND PDS.DF_TYPE = 'WO_STATE'
+          LEFT JOIN GOM_BDW_LOG_INFO INFO
+            ON INFO.WO_ORD_ID = GW.WO_ID
+           AND INFO.OPER_TYPE IN (4, 5, 11, 12)
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON GW.PS_ID = WS.ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+          LEFT JOIN VW_PUB_STAFF VPS
+            ON GW.DEAL_USER_ID = VPS.STAFF_ID
+          LEFT JOIN DEPARTMENT DT
+            ON DT.DEPT_ID = VPS.DEPARTMENT
+         WHERE UT.TACHE_CODE =  #{tachCode}
+    </select>
+    <select id="queryParentOrderIdByOrderId" parameterType="string" resultType="map">
+        select * from gom_order where order_id = #{orderId}
+    </select>
+
+    <select id="queryIfTrackData" parameterType="string" resultType="map">
+        SELECT col.chg_order_id FROM gom_bdw_srv_ord_info srv
+        LEFT JOIN gom_change_order_log_s col
+        ON srv.order_id = col.src_order_id AND srv.cst_ord_id = col.src_cst_order_id
+        WHERE srv.order_id = #{orderId}
+        AND srv.cst_ord_id = #{cstOrdId}
+        AND col.chg_type = '104' AND col.state IN ('760000001','760000002')
+        AND col.is_delete = '0'
+    </select>
+
+    <select id="qryTacheWoOrderState" parameterType="string" resultType="map">
+        SELECT * FROM
+        (SELECT wo.order_id, wo.wo_id, wo.wo_state, wo.create_date, ut.id, ut.tache_name, ut.tache_code
+        FROM gom_wo wo
+        LEFT JOIN gom_ps_2_wo_s ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE wo.order_id = #{orderId}  AND ut.tache_code = #{tacheCode}
+        ORDER BY wo.create_date DESC) WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryToLocalOrderChg" parameterType="string" resultType="map">
+        SELECT ord.order_id,ord.order_state,r.attr_val
+        FROM GOM_ORDER ord
+        LEFT JOIN gom_order_attr r ON r.order_id = ord.order_id AND r.attr_id = 'REGION_ID'
+        where ord.parent_order_id = #{orderIdChg}
+        AND r.attr_val = #{regionId}
+    </select>
+    <!--电路详情-核查信息Tab-查询反馈信息-->
+    <select id="queryFeedbackInfo" parameterType="string" resultType="map">
+
+				SELECT * FROM (SELECT US.USER_REAL_NAME,
+        UT.TACHE_NAME,WS.TACHE_ID,
+        WG.NAME WORK_GROUP_NAME,
+        A.SRV_ORD_ID,'' AS CHILD_ORDER_ID,
+        A.WO_ID,
+        A.A_CONSTRUCT_SCHEME,A.A_ACCESS_ROOM,A.A_INVESTMENT_AMOUNT,A.A_CONSTRUCT_PERIOD, A.A_RES_SATISFY,
+        A.Z_CONSTRUCT_SCHEME,A.Z_ACCESS_ROOM,A.Z_INVESTMENT_AMOUNT,A.Z_CONSTRUCT_PERIOD, A.Z_RES_SATISFY,
+        A.L_CONSTRUCT_SCHEME,A.L_INVESTMENT_AMOUNT,A.L_CONSTRUCT_PERIOD, A.L_RES_SATISFY,
+        A.CREATE_DATE,
+        D.DEPT_NAME as AREAID,
+        A.AREAA ,A.AREAZ,
+				A.Z_RES_PROVIDE_STAND,A.A_RES_PROVIDE_STAND,
+					(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='RES_PROVIDE_STAND' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_RES_PROVIDE_STAND) Z_RES_PROVIDE_STAND_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='RES_PROVIDE_STAND' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_RES_PROVIDE_STAND) A_RES_PROVIDE_STAND_NAME,
+        A.A_BOARD_READY,A.Z_BOARD_READY,
+					(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='BOARD_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_BOARD_READY) Z_BOARD_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='BOARD_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_BOARD_READY) A_BOARD_READY_NAME,
+		A.A_TRANS_READY,A.Z_TRANS_READY,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='TRANS_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_TRANS_READY) Z_TRANS_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='TRANS_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_TRANS_READY) A_TRANS_READY_NAME,
+		A.A_OPTICAL_READY,A.Z_OPTICAL_READY,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='OPTICAL_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_OPTICAL_READY) Z_OPTICAL_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='OPTICAL_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_OPTICAL_READY) A_OPTICAL_READY_NAME,
+		A.A_BOARD_PERIOD,A.Z_BOARD_PERIOD,A.A_BOARD_AMOUNT,A.Z_BOARD_AMOUNT,
+		A.A_BOARD_TYPE,A.Z_BOARD_TYPE,A.A_BOARD_MODEL,A.Z_BOARD_MODEL,
+		A.A_TRANS_PERIOD,A.Z_TRANS_PERIOD,A.A_TRANS_AMOUNT,A.Z_TRANS_AMOUNT,
+		A.A_TRANS_TYPE,A.Z_TRANS_TYPE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='TRANS_TYPE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_TRANS_TYPE) Z_TRANS_TYPE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='TRANS_TYPE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_TRANS_TYPE) A_TRANS_TYPE_NAME,
+		A.A_OTHER_TYPE,A.Z_OTHER_TYPE,
+		A.A_TRANS_MODEL,A.Z_TRANS_MODEL,A.A_OPTICAL_PERIOD,A.Z_OPTICAL_PERIOD,
+		A.A_OPTICAL_AMOUNT,A.Z_OPTICAL_AMOUNT,A.A_CONSTRUCT_PERIOD_STAND,A.Z_CONSTRUCT_PERIOD_STAND,
+		A.A_PROJECT_AMOUNT,A.Z_PROJECT_AMOUNT,A.A_PROJECT_OVERVIEW,A.Z_PROJECT_OVERVIEW,
+		A.A_MUNICIPAL_APPROVAL,Z_MUNICIPAL_APPROVAL,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='MUNICIPAL_APPROVAL' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_MUNICIPAL_APPROVAL) Z_MUNICIPAL_APPROVAL_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='MUNICIPAL_APPROVAL' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_MUNICIPAL_APPROVAL) A_MUNICIPAL_APPROVAL_NAME,
+		A.A_APPROVAL_PERIOD,A.Z_APPROVAL_PERIOD,
+        A.A_RES_DESC,A.Z_RES_DESC,A.A_PROPERTY_REDLINE,A.Z_PROPERTY_REDLINE,
+        (select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='PROPERTY_REDLINE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_PROPERTY_REDLINE) Z_PROPERTY_REDLINE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='PROPERTY_REDLINE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_PROPERTY_REDLINE) A_PROPERTY_REDLINE_NAME,
+		A.A_PROPERTY_DESC,A.Z_PROPERTY_DESC,
+		A.A_CUST_ROOM,A.Z_CUST_ROOM,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='CUST_ROOM' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_CUST_ROOM) Z_CUST_ROOM_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='CUST_ROOM' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_CUST_ROOM) A_CUST_ROOM_NAME,
+		A.A_ACCESS_PROJECT_SCHEME,A.Z_ACCESS_PROJECT_SCHEME,A.A_RES_EXPLORER,A.Z_RES_EXPLORER,
+		A.A_RES_EXPLOR_CONTACT,A.Z_RES_EXPLOR_CONTACT,
+		A.A_RES_HAVE,A.Z_RES_HAVE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='RES_HAVE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_RES_HAVE) Z_RES_HAVE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='RES_HAVE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_RES_HAVE) A_RES_HAVE_NAME,
+		A.A_TOTAL_AMOUNT,A.Z_TOTAL_AMOUNT,A.A_LONGEST_PERIOD,A.Z_LONGEST_PERIOD,
+		A.A_UNABLE_RELOVE,A.Z_UNABLE_RELOVE,
+		A.ACCESS_CIR_TYPE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='ACCESS_CIR_TYPE' AND IS_SHOW=1
+		AND CODE_VALUE= A.ACCESS_CIR_TYPE) ACCESS_CIR_TYPE_NAME,
+		A.OTHER_ACE_CIR_TYPE,
+		A.UPLINK_NODE_PORT
+        FROM GOM_BDW_CHECK_FEEDBACK A
+        LEFT JOIN GOM_WO WO ON A.WO_ID = WO.WO_ID
+        LEFT JOIN GOM_USER_S US ON WO.DEAL_USER_ID = US.USER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN WORK_GROUP WG ON WO.DISP_OBJ_ID = WG.WORK_GROUP_ID  AND WO.DISP_OBJ_TYE = '260000002'
+        LEFT JOIN  GOM_WO_OPER_ATTR GWOA  ON  GWOA.ATTR_ID='areaId'  AND GWOA.WO_ID=A.WO_ID
+        LEFT JOIN DEPARTMENT D ON D.DEPT_ID=GWOA.ATTR_VAL
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+        union all
+        SELECT US.USER_REAL_NAME,
+        UT.TACHE_NAME,WS.TACHE_ID,
+        WG.NAME WORK_GROUP_NAME,
+        A.SRV_ORD_ID,TO_CHAR(LOCALINFO.ORDER_ID) AS CHILD_ORDER_ID,
+        A.WO_ID,
+        A.A_CONSTRUCT_SCHEME,A.A_ACCESS_ROOM,A.A_INVESTMENT_AMOUNT,A.A_CONSTRUCT_PERIOD, A.A_RES_SATISFY,
+        A.Z_CONSTRUCT_SCHEME,A.Z_ACCESS_ROOM,A.Z_INVESTMENT_AMOUNT,A.Z_CONSTRUCT_PERIOD, A.Z_RES_SATISFY,
+        A.L_CONSTRUCT_SCHEME,A.L_INVESTMENT_AMOUNT,A.L_CONSTRUCT_PERIOD, A.L_RES_SATISFY,
+        A.CREATE_DATE,
+        case when UT.Tache_Code ='CHECK_DISPATCH' or UT.Tache_Code ='INVESTMENT_ESTIMATION' or UT.Tache_Code ='CHECK_TOTAL' then to_char(gas.dept_name)
+        else  to_char( D.DEPT_NAME) end as AREAID,
+        A.AREAA ,A.AREAZ,
+        A.Z_RES_PROVIDE_STAND,A.A_RES_PROVIDE_STAND,
+					(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='RES_PROVIDE_STAND' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_RES_PROVIDE_STAND) Z_RES_PROVIDE_STAND_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='RES_PROVIDE_STAND' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_RES_PROVIDE_STAND) A_RES_PROVIDE_STAND_NAME,
+        A.A_BOARD_READY,A.Z_BOARD_READY,
+					(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='BOARD_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_BOARD_READY) Z_BOARD_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='BOARD_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_BOARD_READY) A_BOARD_READY_NAME,
+		A.A_TRANS_READY,A.Z_TRANS_READY,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='TRANS_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_TRANS_READY) Z_TRANS_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='TRANS_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_TRANS_READY) A_TRANS_READY_NAME,
+		A.A_OPTICAL_READY,A.Z_OPTICAL_READY,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='OPTICAL_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_OPTICAL_READY) Z_OPTICAL_READY_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='OPTICAL_READY' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_OPTICAL_READY) A_OPTICAL_READY_NAME,
+		A.A_BOARD_PERIOD,A.Z_BOARD_PERIOD,A.A_BOARD_AMOUNT,A.Z_BOARD_AMOUNT,
+		A.A_BOARD_TYPE,A.Z_BOARD_TYPE,A.A_BOARD_MODEL,A.Z_BOARD_MODEL,
+		A.A_TRANS_PERIOD,A.Z_TRANS_PERIOD,A.A_TRANS_AMOUNT,A.Z_TRANS_AMOUNT,
+		A.A_TRANS_TYPE,A.Z_TRANS_TYPE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='TRANS_TYPE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_TRANS_TYPE) Z_TRANS_TYPE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='TRANS_TYPE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_TRANS_TYPE) A_TRANS_TYPE_NAME,
+		A.A_OTHER_TYPE,A.Z_OTHER_TYPE,
+		A.A_TRANS_MODEL,A.Z_TRANS_MODEL,A.A_OPTICAL_PERIOD,A.Z_OPTICAL_PERIOD,
+		A.A_OPTICAL_AMOUNT,A.Z_OPTICAL_AMOUNT,A.A_CONSTRUCT_PERIOD_STAND,A.Z_CONSTRUCT_PERIOD_STAND,
+		A.A_PROJECT_AMOUNT,A.Z_PROJECT_AMOUNT,A.A_PROJECT_OVERVIEW,A.Z_PROJECT_OVERVIEW,
+		A.A_MUNICIPAL_APPROVAL,Z_MUNICIPAL_APPROVAL,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='MUNICIPAL_APPROVAL' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_MUNICIPAL_APPROVAL) Z_MUNICIPAL_APPROVAL_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='MUNICIPAL_APPROVAL' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_MUNICIPAL_APPROVAL) A_MUNICIPAL_APPROVAL_NAME,
+		A.A_APPROVAL_PERIOD,A.Z_APPROVAL_PERIOD,
+        A.A_RES_DESC,A.Z_RES_DESC,A.A_PROPERTY_REDLINE,A.Z_PROPERTY_REDLINE,
+        (select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='PROPERTY_REDLINE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_PROPERTY_REDLINE) Z_PROPERTY_REDLINE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='PROPERTY_REDLINE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_PROPERTY_REDLINE) A_PROPERTY_REDLINE_NAME,
+		A.A_PROPERTY_DESC,A.Z_PROPERTY_DESC,
+		A.A_CUST_ROOM,A.Z_CUST_ROOM,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='CUST_ROOM' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_CUST_ROOM) Z_CUST_ROOM_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='CUST_ROOM' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_CUST_ROOM) A_CUST_ROOM_NAME,
+		A.A_ACCESS_PROJECT_SCHEME,A.Z_ACCESS_PROJECT_SCHEME,A.A_RES_EXPLORER,A.Z_RES_EXPLORER,
+		A.A_RES_EXPLOR_CONTACT,A.Z_RES_EXPLOR_CONTACT,
+		A.A_RES_HAVE,A.Z_RES_HAVE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   WHERE  code_type='RES_HAVE' AND IS_SHOW=1
+				AND CODE_VALUE= A.Z_RES_HAVE) Z_RES_HAVE_NAME,
+				(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='RES_HAVE' AND IS_SHOW=1
+				AND CODE_VALUE= A.A_RES_HAVE) A_RES_HAVE_NAME,
+		A.A_TOTAL_AMOUNT,A.Z_TOTAL_AMOUNT,A.A_LONGEST_PERIOD,A.Z_LONGEST_PERIOD,
+		A.A_UNABLE_RELOVE,A.Z_UNABLE_RELOVE,
+		A.ACCESS_CIR_TYPE,
+		(select CODE_CONTENT FROM gom_bdw_code_info   where  code_type='ACCESS_CIR_TYPE' AND IS_SHOW=1
+		AND CODE_VALUE= A.ACCESS_CIR_TYPE) ACCESS_CIR_TYPE_NAME,
+		A.OTHER_ACE_CIR_TYPE,
+		A.UPLINK_NODE_PORT
+        FROM GOM_BDW_CHECK_FEEDBACK A
+        LEFT JOIN GOM_WO WO ON A.WO_ID = WO.WO_ID
+        LEFT JOIN GOM_USER_S US ON WO.DEAL_USER_ID = US.USER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN WORK_GROUP WG ON WO.DISP_OBJ_ID = WG.WORK_GROUP_ID  AND WO.DISP_OBJ_TYE = '260000002'
+        left join gom_bdw_sec_local_relate_info localInfo on localInfo.RELATE_INFO_ID=A.SRV_ORD_ID and localInfo.order_id=wo.order_id
+        left join department gas on gas.dept_id=localInfo.region_id
+        LEFT JOIN  GOM_WO_OPER_ATTR GWOA  ON  GWOA.ATTR_ID='areaId'  AND GWOA.WO_ID=A.WO_ID
+        LEFT JOIN DEPARTMENT D ON D.DEPT_ID=GWOA.ATTR_VAL
+        where  A.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID=#{srvOrdId})
+        )
+        ORDER BY CREATE_DATE
+
+    </select>
+    <!--开通单 ,查找上次调度的核查单信息，-->
+    <select id="qryLastCheck" parameterType="string" resultType="map">
+        SELECT SRV_ORD_ID FROM (
+            SELECT REL.SRV_ORD_ID FROM GOM_BDW_SRV_ORD_INFO SRV
+            JOIN GOM_BDW_SRV_ORD_INFO REL ON SRV.INSTANCE_ID=REL.INSTANCE_ID AND SRV.ACTIVE_TYPE=REL.ACTIVE_TYPE
+            WHERE SRV.SRV_ORD_ID=#{srvOrdId} AND REL.ORDER_TYPE='102' AND SRV.ORDER_TYPE='101'
+            AND REL.SRV_ORD_ID <![CDATA[ < ]]> SRV.SRV_ORD_ID ORDER BY REL.SRV_ORD_ID DESC
+        ) WHERE ROWNUM=1
+        union all
+        SELECT RELCHECK.RELATE_INFO_ID SRV_ORD_ID FROM (
+            SELECT REGION_ID,SRV_ORD_ID  FROM (
+                SELECT REL.REGION_ID,SRVCHECK.SRV_ORD_ID FROM GOM_BDW_SEC_LOCAL_RELATE_INFO REL
+                JOIN GOM_BDW_SRV_ORD_INFO SRV  ON REL.SRV_ORD_ID=SRV.SRV_ORD_ID
+                JOIN GOM_BDW_SRV_ORD_INFO SRVCHECK ON SRV.INSTANCE_ID=SRVCHECK.INSTANCE_ID AND SRV.ACTIVE_TYPE=SRVCHECK.ACTIVE_TYPE
+                WHERE  SRVCHECK.ORDER_TYPE='102' AND SRV.ORDER_TYPE='101'  AND SRVCHECK.SRV_ORD_ID <![CDATA[ < ]]> SRV.SRV_ORD_ID
+                AND  REL.RELATE_INFO_ID=#{srvOrdId} ORDER BY REL.SRV_ORD_ID DESC
+                )
+            WHERE ROWNUM=1) A
+        JOIN GOM_BDW_SEC_LOCAL_RELATE_INFO RELCHECK ON  RELCHECK.SRV_ORD_ID=A.SRV_ORD_ID AND A.REGION_ID=RELCHECK.REGION_ID
+
+    </select>
+      <select id="queryRenameLogByCstOrdId" parameterType="String" resultType="map">
+        select a.ID,
+                a.CHG_VERSION,
+                a.CHANGE_DATA,
+                a.CHANGE_MESSAGE,
+                a.STATE_TIME,
+                a.IS_DELETE,
+                a.CREATE_TIME
+        from GOM_BDW_RENAME_LOG_S a
+        where a.IS_DELETE = '0'
+        and a.CST_ORD_ID = #{cstOrdId}
+        order by a.CHG_VERSION desc
+    </select>
+</mapper>

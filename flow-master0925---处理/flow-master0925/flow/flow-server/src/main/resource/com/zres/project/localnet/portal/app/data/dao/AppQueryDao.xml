@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.app.data.dao.AppQueryDao">
+    <!--获取序列-->
+    <select id="countOrderNum" resultType="map">
+        SELECT
+        <![CDATA[
+            count(CASE WHEN WO.REQ_FIN_DATE <= sysdate then  '超时单' else null end)  as norMalOrderNum,
+            count(CASE WHEN WO.ALARM_DATE <= sysdate and sysdate < WO.REQ_FIN_DATE then  '预警单' else null end)  as warnOrderNum,
+            count(CASE  WHEN WO.ALARM_DATE > sysdate then  '正常单' else null end)  as overdueOrderNum
+        ]]>
+        FROM GOM_BDW_CST_ORD CO
+        JOIN GOM_BDW_SRV_ORD_INFO_VIEW SOI ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+        LEFT JOIN GOM_ORDER O  ON O.ORDER_ID = SOI.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        INNER JOIN (SELECT ORG_ID
+        FROM GOM_ORG_S
+        START WITH ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID = 1
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = #{staffId} )
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID) B
+        ON to_number(REGEXP_REPLACE(substr(CO.HANDLE_DEP_ID,0,10),'[^0-9]','')) = B.ORG_ID
+        where soi.SRV_ORD_STAT not in('10X','10F','10C')
+        and wo.wo_state='290000002'
+
+    </select>
+
+
+    <select id="queryWorkOrders" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT Z.*
+        FROM (SELECT ROW_NUMBER() OVER(ORDER BY y.CST_ORD_ID DESC, y.ORDER_ID DESC, y.WO_ID) AS rowindex,
+                y.CST_ORD_ID,
+                y.SUBSCRIBE_ID,
+                y.CUST_NAME_CHINESE,
+                y.SERIAL_NUMBER,
+                y.SRV_ORD_ID,
+                y.WO_STATE,
+                y.PS_ID,
+                y.APPLY_ORD_ID,
+                y.APPLY_ORD_NAME,
+                y.TACHE_CODE,
+                y.SERVICETYPE,
+                y.SERVICE_ID,
+                y.ORDER_ID,
+                y.ACTIVETYPENAME,
+                y.SYSTEM_RESOURCE,
+                y.RESOURCES,
+                y.ITEMTYPE,
+                y.WO_COMPLETE_STATE,
+                y.TACHE_NAME,
+                y.REQ_FIN_DATE,
+                y.QCFINSHDATE
+                FROM (SELECT DISTINCT
+                CO.CST_ORD_ID,
+                CO.SUBSCRIBE_ID,
+                CO.APPLY_ORD_ID,
+                CO.APPLY_ORD_NAME,
+                CO.CUST_NAME_CHINESE,
+                SOI.SERIAL_NUMBER,
+                SOI.SRV_ORD_ID,
+                SOI.SERVICE_ID,
+                SOI.SYSTEM_RESOURCE,
+                SOI.RESOURCES,
+                O.ORDER_ID,
+                WO.WO_ID,
+                WO.WO_STATE,
+                WS.ORD_PS_ID AS  PS_ID,
+                ut.TACHE_NAME,
+                ut.TACHE_CODE,
+                PC.CODE_CONTENT as SERVICETYPE,
+                PT.CODE_CONTENT ACTIVETYPENAME,
+                ITEM.CODE_CONTENT ITEMTYPE,
+                pub.pub_date_name as WO_COMPLETE_STATE,
+                WO.REQ_FIN_DATE,
+                QC.QCFINSHDATE
+                FROM GOM_BDW_CST_ORD CO
+                JOIN GOM_BDW_SRV_ORD_INFO_VIEW SOI ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+                LEFT JOIN GOM_BDW_DISPATCH_ORDER DO ON DO.CST_ORD_ID=CO.CST_ORD_ID
+                LEFT JOIN GOM_ORDER O ON O.ORDER_ID = SOI.ORDER_ID
+                LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_WO_OPER_ATTR WOA ON WOA.WO_ID = WO.WO_ID AND WOA.ATTR_ID = 'woOrderBackFlag'
+                LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+                LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+                LEFT JOIN (SELECT SRV_ORD_ID,TO_DATE(ATTR_VALUE,  'yyyy-MM-dd hh24:mi:ss') as  QCFINSHDATE
+                            FROM GOM_BDW_SRV_ORD_ATTR_INFO
+                            WHERE ATTR_CODE IN ('20000073', '20000132', 'CON0014')
+                            GROUP BY SRV_ORD_ID, ATTR_VALUE) QC
+                on qc.SRV_ORD_ID=soi.SRV_ORD_ID
+                left join (SELECT PUB_DATE_ID , PUB_DATE_NAME FROM GOM_PUB_DATE_S WHERE DF_TYPE = 'WO_STATE') pub on
+                pub.pub_date_id = wo.Wo_State
+                left join (select CODE_CONTENT, CODE_VALUE from GOM_BDW_CODE_INFO where CODE_TYPE = 'product_code') PC on
+                SOI.SERVICE_ID = PC.CODE_VALUE
+                left join ( SELECT code_value,code_content FROM gom_bdw_code_info where code_type='ITEM_TYPE') ITEM on
+                ITEM.CODE_VALUE= SOI.ORDER_TYPE
+                left join (select CODE_CONTENT, CODE_VALUE from GOM_BDW_CODE_INFO where CODE_TYPE = 'operate_type') PT on
+                SOI.ACTIVE_TYPE = PT.CODE_VALUE
+
+                INNER JOIN (SELECT ORG_ID
+                FROM GOM_ORG_S
+                START WITH ORG_ID =
+                (SELECT ORG_ID
+                FROM GOM_ORG_S A
+                WHERE A.PARENT_ORG_ID = 1
+                START WITH A.ORG_ID =
+                (SELECT ORG_ID
+                FROM GOM_USER_S
+                WHERE USER_ID = #{staffId})
+                CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+                CONNECT BY PARENT_ORG_ID = PRIOR ORG_ID) B
+                ON CO.HANDLE_DEP_ID =  TO_CHAR(B.ORG_ID)
+                where 1=1
+                    AND soi.SRV_ORD_STAT !='10C'
+                <!--申请单编号 -->
+                <if test="applyOrdId != null and applyOrdId != '' ">
+                    and CO.APPLY_ORD_ID like '%'|| #{applyOrdId}||'%'
+                </if>
+                <!--申请单标题 -->
+                <if test="orderTitle != null and orderTitle != '' ">
+                    and CO.APPLY_ORD_NAME like '%'||#{orderTitle}||'%'
+                </if>
+                <!--客户名称-->
+                <if test="custName != null and custName != '' ">
+                    and CO.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+                </if>
+                <!-- 产品类型 -->
+                <if test="productType != null and productType != '' ">
+                    and SOI.SERVICE_ID like  '%'|| #{productType}||'%'
+                </if>
+                <if test="subscribeId != null and subscribeId != '' ">
+                    and CO.SUBSCRIBE_ID like  '%'||#{subscribeId}||'%'
+                </if>
+                <if test="actType != null and actType != '' ">
+                    and SOI.ACTIVE_TYPE like  '%'||#{actType}||'%'
+                </if>
+
+                <if test="serialNumber != null and serialNumber != '' ">
+                    and SOI.SERIAL_NUMBER like  '%'||#{serialNumber}||'%'
+                </if>
+                <if test="woState != null and woState != '' ">
+                    AND wo.wo_state = #{woState}
+                </if>
+                <if test="teacheName != null and teacheName != '' ">
+                    and UT.TACHE_NAME like '%'||#{teacheName}||'%'
+                </if>
+                <if test="dispatchOrderId != null and dispatchOrderId != '' ">
+                    and DO.DISPATCH_ORDER_NO like  '%'|| #{dispatchOrderId}||'%'
+                </if>
+                <if test="orderType !=null and orderType !=''">
+                    AND SOI.ORDER_TYPE = #{orderType}
+                </if>
+                <if test="resourceType != null and resourceType != '' ">
+                    AND SOI.RESOURCES = #{resourceType}
+                </if>
+                 <if test="woOrderBackFlag != null and woOrderBackFlag != '' ">
+                    AND WOA.ATTR_VAL = #{woOrderBackFlag}
+                </if>
+                <!-- 完成开始时间、结束时间-->
+                <if test="tacheStartTime != null and tacheStartTime != '' and tacheEndTime != null and tacheEndTime != '' ">
+                    AND WO.REQ_FIN_DATE BETWEEN to_date( #{tacheStartTime},'yyyy-mm-dd hh24:mi:ss') AND
+                    to_date(#{tacheEndTime},'yyyy-mm-dd hh24:mi:ss')
+                </if>
+
+                <if test="reqComplateStartTime != null and reqComplateStartTime != '' and reqComplateEndTime != null and reqComplateEndTime != '' ">
+                    AND QC.QCFINSHDATE BETWEEN to_date( #{reqComplateStartTime},'yyyy-mm-dd hh24:mi:ss') AND
+                    to_date(#{reqComplateEndTime},'yyyy-mm-dd hh24:mi:ss')
+                </if>
+                )Y
+        )Z
+        where 1=1
+        <![CDATA[
+            and z.rowindex > #{pageIndex}
+            and z.rowindex <= #{pageEnd}
+        ]]>
+    </select>
+
+
+    <select id="queryWoOrderLog" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT DISTINCT
+                O.ORDER_ID,
+                o.ORDER_STATE,
+                WO.WO_ID,
+                WO.WO_STATE,
+                wo.ps_id,
+                ut.TACHE_NAME,
+                ut.TACHE_CODE
+                FROM  GOM_ORDER O
+                LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+                LEFT JOIN GOM_WO_OPER_ATTR WOA ON WOA.WO_ID = WO.WO_ID AND WOA.ATTR_ID = 'woOrderBackFlag'
+                LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+                LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+                where 1=1
+                and o.order_id= #{orderId}
+                 or o.parent_order_id = #{orderId}
+                ORDER BY wo.wo_id
+    </select>
+
+</mapper>

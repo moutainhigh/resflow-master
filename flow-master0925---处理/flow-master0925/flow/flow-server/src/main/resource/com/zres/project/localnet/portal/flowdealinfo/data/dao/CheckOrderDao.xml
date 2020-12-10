@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.CheckOrderDao">
+
+    <select id="qryCheckDispatchWoOrder" parameterType="string" resultType="map">
+        SELECT WO.WO_ID, WO.ORDER_ID, UT.TACHE_NAME
+          FROM GOM_ORDER ORD
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE ORD.ORDER_ID = #{orderId}
+           AND UT.ID = #{tacheId}
+           AND wo.disp_obj_id <![CDATA[ <> ]]> '-2000'
+           AND WO.WO_STATE not in ('290000005', '290000006')
+    </select>
+
+    <update id="updateWoOrderStateByWoId">
+        UPDATE GOM_WO
+          SET WO_STATE = #{woState},
+              STATE_DATE = TO_DATE(TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD HH24:MI:SS')
+        WHERE WO_ID = #{woId}
+    </update>
+
+    <select id="qryALLSpecialCheckWoOrder" resultType="string" parameterType="string">
+        SELECT WO.WO_ID
+        FROM GOM_ORDER ORD
+        LEFT JOIN GOM_WO WO
+        ON WO.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        WHERE ORD.ORDER_ID = #{orderId}
+        AND UT.ID IN
+        (500001145, 500001146, 500001147, 500001148, 500001149, 510101020)
+        AND WO.WO_STATE not in ('290000005', '290000006')
+    </select>
+
+    <select id="qryMaxWoId" resultType="string" parameterType="string">
+        SELECT *
+          FROM (SELECT WO.WO_ID
+                  FROM GOM_WO WO
+                 WHERE WO.ORDER_ID = #{orderId}
+                   AND WO.DISP_OBJ_ID <![CDATA[ <> ]]> '-2000'
+                 ORDER BY WO.WO_ID DESC)
+         WHERE ROWNUM = 1
+    </select>
+
+    <select id="qrySecALLSpecialCheckWoOrder" resultType="string" parameterType="string">
+        SELECT WO.WO_ID
+        FROM GOM_ORDER ORD
+        LEFT JOIN GOM_WO WO
+        ON WO.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS
+        ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT
+        ON UT.ID = WS.TACHE_ID
+        WHERE ORD.ORDER_ID = #{orderId}
+        AND UT.ID IN (510101061, 510101062, 510101063, 510101064, 510101065)
+        AND WO.WO_STATE not in ('290000005', '290000006')
+    </select>
+
+    <select id="qrySpecialData" resultType="map" parameterType="string">
+        SELECT DISTINCT UT.TACHE_NAME, UT.ID
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.ORDER_ID = #{orderId}
+           AND wo.disp_obj_id <![CDATA[ <> ]]> '-2000'
+           AND UT.ID IN
+               (500001145, 500001146, 500001147, 500001148, 500001149, 510101020)
+           AND WO.WO_STATE = '290000004'
+    </select>
+
+    <select id="getSecLocalRelateInfo" parameterType="string" resultType="map">
+        SELECT O.ORDER_ID, O.ORDER_STATE
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO RI
+        LEFT JOIN GOM_ORDER O
+        ON RI.ORDER_ID = O.ORDER_ID
+        WHERE RI.PARENT_ORDER_ID IN
+        (SELECT PARENT_ORDER_ID
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO
+        WHERE ORDER_ID = #{orderId})
+        AND RI.CONFIGSTATE <![CDATA[ <> ]]> '10X'
+    </select>
+
+    <select id="qryLocalCheckAtWaitTacheNum" parameterType="string" resultType="int">
+        SELECT COUNT(0)
+          FROM GOM_BDW_SEC_LOCAL_RELATE_INFO SRI
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = SRI.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WO.PS_ID = WS.ID
+          LEFT JOIN UOS_TACHE UT
+            ON WS.TACHE_ID = UT.ID
+         WHERE SRI.PARENT_ORDER_ID =
+               (SELECT PARENT_ORDER_ID
+                  FROM GOM_BDW_SEC_LOCAL_RELATE_INFO
+                 WHERE ORDER_ID = #{orderId})
+           AND UT.TACHE_CODE = 'CHECK_WAIT'
+           AND WO.WO_STATE = '290000002'
+    </select>
+
+    <select id="qrySecLocalCheckTache" parameterType="string" resultType="map">
+        SELECT WO.WO_ID, ORD.ORDER_ID, UT.TACHE_NAME
+          FROM GOM_BDW_SEC_LOCAL_RELATE_INFO SEC
+          LEFT JOIN GOM_ORDER ORD
+            ON ORD.ORDER_ID = SEC.PARENT_ORDER_ID
+          LEFT JOIN GOM_WO WO
+            ON WO.ORDER_ID = ORD.ORDER_ID
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE SEC.ORDER_ID = #{orderId}
+           AND UT.TACHE_CODE = 'LOCAL_NETWORK_CHECK'
+           AND WO.WO_STATE = '290000112'
+    </select>
+
+    <select id="qrySpecialtyCheckDoing" parameterType="string" resultType="int">
+        SELECT COUNT(0)
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S PS
+            ON PS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = PS.TACHE_ID
+          LEFT JOIN GOM_WO_OPER_ATTR WA
+            ON WA.WO_ID = WO.WO_ID
+           AND WA.ATTR_ID = 'areaId'
+         WHERE WO.ORDER_ID = #{orderId}
+           AND UT.TACHE_CODE = #{tacheCode}
+           AND WA.ATTR_VAL = #{areaId}
+           AND WO.WO_STATE IN ('290000002','290000004')
+    </select>
+    <select id="qryCompleteCheckSpecInfo" resultType="map" parameterType="string">
+        SELECT DISTINCT WO.WO_ID,UT.TACHE_NAME, UT.ID
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.ORDER_ID = #{orderId}
+           AND UT.ID IN
+               (500001145, 500001146, 500001147, 500001148, 500001149, 510101020)
+           AND WO.WO_STATE = '290000004' AND WO.DISP_OBJ_ID !='-2000'
+    </select>
+    <select id = "queryProvinceName" parameterType="map" resultType="map">
+        SELECT ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID = #{srvOrdId} AND ATTR_CODE = #{attrCode}
+    </select>
+    <select id="queryProvinceConf" resultType="map">
+        SELECT REMARK FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE = 'province_conf'
+    </select>
+    <select id="queryCircuitCodeInfo" parameterType="map" resultType="map">
+        SELECT * FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID = #{srvOrdId} AND ATTR_CODE = #{attrCode}
+    </select>
+    <update id="updateCircuitCode" parameterType="map">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO SET ATTR_VALUE =#{param.attrValue} WHERE SRV_ORD_ID =#{param.srvOrdId} AND ATTR_CODE =#{param.attrCode}
+    </update>
+    <insert id="insertCircuitInfo" parameterType="map">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (ATTR_INFO_ID, SRV_ORD_ID, ATTR_ACTION, ATTR_CODE, ATTR_VALUE, ATTR_NAME, ATTR_VALUE_NAME, CREATE_DATE)
+        VALUES(SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL, #{param.srvOrdId}, #{param.attrAction}, #{param.attrCode}, #{param.attrValue}, #{param.attrName}, #{param.attrValueName}, sysdate)
+    </insert>
+    <select id="qryCurrentCompleteCheckSpecInfo" resultType="map" parameterType="string">
+        SELECT DISTINCT WO.WO_ID,UT.TACHE_NAME, UT.ID
+          FROM GOM_WO WO
+          LEFT JOIN GOM_PS_2_WO_S WS
+            ON WS.ID = WO.PS_ID
+          LEFT JOIN UOS_TACHE UT
+            ON UT.ID = WS.TACHE_ID
+         WHERE WO.ORDER_ID = #{orderId}
+           AND UT.ID = #{tacheId}
+           AND WO.WO_STATE = '290000004' AND WO.DISP_OBJ_ID !='-2000'
+    </select>
+    <select id="queryProvinceAutoConf" resultType="map" parameterType="string">
+        SELECT REMARK FROM GOM_BDW_CODE_INFO WHERE CODE_TYPE = 'PROVINCE_AUTO_CONF' and CODE_VALUE=#{areaId}
+    </select>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zres.project.localnet.portal.task.workTask.dao.WorkTaskDao">
+
+    <!--预警(84000002)查询sql(已签收、未签收，派发类型:个人) -->
+    <select id="queryWarnWoByDealUIdAndByPId" resultType="map">
+    select APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME from (
+        select wo.WO_ID,wo.ORDER_ID,wo.DISP_OBJ_ID,wo.DISP_OBJ_TYE,wo.DEAL_USER_ID,
+               case when wo.REQ_FIN_DATE is not null then to_char(wo.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+               nvl(r.DISPATCH_ORDER_ID,'0') as DISPATCH_ORDER_ID,c.APPLY_ORD_ID,c.APPLY_ORD_NAME,UT.TACHE_NAME,
+               s.USER_NAME,WS.TACHE_ID,c.CUST_NAME_CHINESE
+        from (select * from GOM_WO w
+              where w.ALARM_DATE is not null
+                and w.DEAL_USER_ID is not null
+                and w.wo_state in ('290000002', '290000003')
+                <![CDATA[
+                and w.ALARM_DATE <= sysdate and sysdate < w.REQ_FIN_DATE
+                ]]>
+          ) wo
+        join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+        join GOM_USER_S s on wo.DEAL_USER_ID = s.USER_ID
+        join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+        join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID or r.order_id = o.parent_order_id
+        join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID
+      union all
+        select wo.WO_ID,wo.ORDER_ID,wo.DISP_OBJ_ID,wo.DISP_OBJ_TYE,wo.DISP_OBJ_ID as DEAL_USER_ID,
+               case when wo.REQ_FIN_DATE is not null then to_char(wo.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+               nvl(r.DISPATCH_ORDER_ID,'0') as DISPATCH_ORDER_ID,c.APPLY_ORD_ID,c.APPLY_ORD_NAME,UT.TACHE_NAME,
+               s.USER_NAME,WS.TACHE_ID,c.CUST_NAME_CHINESE
+        from (select * from GOM_WO w
+              where w.ALARM_DATE is not null
+                and w.DISP_OBJ_TYE = '260000003'
+                and w.DEAL_USER_ID is null
+                and w.wo_state in ('290000002', '290000003')
+                <![CDATA[
+                and w.ALARM_DATE <= sysdate and sysdate < w.REQ_FIN_DATE
+                ]]>
+          ) wo
+        join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+        join GOM_USER_S s on wo.DISP_OBJ_ID = s.USER_ID
+        join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+        join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID or r.order_id = o.parent_order_id
+        join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID
+    ) group by APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME
+    </select>
+
+    <!--预警(84000002)查询sql(未签收，派发类型:岗位) -->
+    <select id="queryWarnWoByPost" resultType="map">
+    select APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME from (
+        select listagg(t.DEAL_USER_ID, ',') WITHIN GROUP (order by t.DEAL_USER_ID) as DEAL_USER_ID,
+               listagg(t.USER_NAME, ',') WITHIN GROUP (order by t.DEAL_USER_ID)    as USER_NAME,
+                                                       t.WO_ID,
+                                                       t.ORDER_ID,
+                                                       t.DISP_OBJ_ID,
+                                                       t.DISP_OBJ_TYE,
+                                                       case when t.REQ_FIN_DATE is not null then to_char(t.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+                                                       t.DISPATCH_ORDER_ID,
+                                                       t.APPLY_ORD_ID,
+                                                       t.APPLY_ORD_NAME,
+                                                       t.TACHE_ID,
+                                                       t.TACHE_NAME,
+                                                       t.CUST_NAME_CHINESE
+        from (select wo.WO_ID,
+              wo.ORDER_ID,
+              wo.DISP_OBJ_ID,
+              wo.DISP_OBJ_TYE,
+              rs.STAFF_ID                   as DEAL_USER_ID,
+              wo.REQ_FIN_DATE,
+              nvl(r.DISPATCH_ORDER_ID, '0') as DISPATCH_ORDER_ID,
+              c.APPLY_ORD_ID,
+              c.APPLY_ORD_NAME,
+              s.USER_NAME,
+              UT.TACHE_NAME,
+              WS.TACHE_ID,
+              c.CUST_NAME_CHINESE
+              from (select * from GOM_WO w
+                where w.wo_state in ('290000002', '290000003')
+                and w.ALARM_DATE is not null
+                and w.DISP_OBJ_TYE = '260000002' and w.DEAL_USER_ID is null
+                <![CDATA[
+                and w.ALARM_DATE <= sysdate and sysdate < w.REQ_FIN_DATE
+                ]]>
+                ) wo
+              join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+              join (select r.STAFF_ID, r.STAFF_GROUP_ID from GOM_STAFF_GROUP_RELA_S r group by r.STAFF_ID, r.STAFF_GROUP_ID) rs on rs.STAFF_GROUP_ID = wo.DISP_OBJ_ID
+              join GOM_USER_S s on rs.STAFF_ID = s.USER_ID
+              join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+              join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+              LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+              join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID or r.order_id = o.parent_order_id
+              join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID) t
+        group by t.WO_ID, t.ORDER_ID, t.DISP_OBJ_ID, t.DISP_OBJ_TYE, t.REQ_FIN_DATE, t.DISPATCH_ORDER_ID, t.APPLY_ORD_ID,
+              t.APPLY_ORD_NAME,t.TACHE_ID,t.TACHE_NAME,t.CUST_NAME_CHINESE
+    ) group by APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME
+    </select>
+
+
+    <!--超时(84000003)查询sql(已签收、未签收，派发类型:个人) -->
+    <select id="queryTimeOutWoByDealUIdAndByPId" resultType="map">
+    select APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME from (
+        select wo.WO_ID,wo.ORDER_ID,wo.DISP_OBJ_ID,wo.DISP_OBJ_TYE,wo.DEAL_USER_ID,
+               case when wo.REQ_FIN_DATE is not null then to_char(wo.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+               nvl(r.DISPATCH_ORDER_ID,'0') as DISPATCH_ORDER_ID,c.APPLY_ORD_ID,c.APPLY_ORD_NAME,UT.TACHE_NAME,
+               s.USER_NAME,WS.TACHE_ID,c.CUST_NAME_CHINESE
+        from (select * from GOM_WO w
+              where w.wo_state in ('290000002', '290000003')
+                and w.DEAL_USER_ID is not null
+                <![CDATA[
+                  and w.REQ_FIN_DATE <= sysdate
+                ]]>
+             ) wo
+                 join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+                 join GOM_USER_S s on wo.DEAL_USER_ID = s.USER_ID
+                 join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+                 join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+                 LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+                 join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID or r.order_id = o.parent_order_id
+                 join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID
+        union all
+        select wo.WO_ID,wo.ORDER_ID,wo.DISP_OBJ_ID,wo.DISP_OBJ_TYE,wo.DISP_OBJ_ID as DEAL_USER_ID,
+               case when wo.REQ_FIN_DATE is not null then to_char(wo.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+               nvl(r.DISPATCH_ORDER_ID,'0') as DISPATCH_ORDER_ID,c.APPLY_ORD_ID,c.APPLY_ORD_NAME,UT.TACHE_NAME,
+               s.USER_NAME,WS.TACHE_ID,c.CUST_NAME_CHINESE
+        from (select * from GOM_WO w
+              where w.wo_state in ('290000002', '290000003')
+                and w.DISP_OBJ_TYE = '260000003'
+                and w.DEAL_USER_ID is null
+                <![CDATA[
+                  and w.REQ_FIN_DATE <= sysdate
+                ]]>
+            ) wo
+                 join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+                 join GOM_USER_S s on wo.DISP_OBJ_ID = s.USER_ID
+                 join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+                 join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+                 LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+                 join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID  or r.order_id = o.parent_order_id
+                 join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID
+    ) group by APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME
+    </select>
+
+    <!--超时(84000003)查询sql(未签收，派发类型:岗位) -->
+    <select id="queryTimeOutWoByPost" resultType="map">
+    select APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME from (
+        select listagg(t.DEAL_USER_ID, ',') WITHIN GROUP (order by t.DEAL_USER_ID) as DEAL_USER_ID,
+               listagg(t.USER_NAME, ',') WITHIN GROUP (order by t.DEAL_USER_ID)    as USER_NAME,
+                                                       t.WO_ID,
+                                                       t.ORDER_ID,
+                                                       t.DISP_OBJ_ID,
+                                                       t.DISP_OBJ_TYE,
+                                                       case when t.REQ_FIN_DATE is not null then to_char(t.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as REQ_FIN_DATE,
+        t.DISPATCH_ORDER_ID,
+        t.APPLY_ORD_ID,
+        t.APPLY_ORD_NAME,
+        t.TACHE_ID,
+        t.TACHE_NAME,
+        t.CUST_NAME_CHINESE
+        from (select wo.WO_ID,
+        wo.ORDER_ID,
+        wo.DISP_OBJ_ID,
+        wo.DISP_OBJ_TYE,
+        rs.STAFF_ID                   as DEAL_USER_ID,
+        wo.REQ_FIN_DATE,
+        nvl(r.DISPATCH_ORDER_ID, '0') as DISPATCH_ORDER_ID,
+        c.APPLY_ORD_ID,
+        c.APPLY_ORD_NAME,
+        s.USER_NAME,
+        UT.TACHE_NAME,
+        WS.TACHE_ID,
+        c.CUST_NAME_CHINESE
+        from (select * from GOM_WO w
+          where w.wo_state in ('290000002', '290000003')
+          and w.DISP_OBJ_TYE = '260000002'
+          and w.DEAL_USER_ID is null
+          <![CDATA[
+            and w.REQ_FIN_DATE <= sysdate
+          ]]>
+        ) wo
+        join GOM_ORDER o on wo.ORDER_ID = o.ORDER_ID
+        join (select r.STAFF_ID, r.STAFF_GROUP_ID from GOM_STAFF_GROUP_RELA_S r group by r.STAFF_ID, r.STAFF_GROUP_ID) rs on rs.STAFF_GROUP_ID = wo.DISP_OBJ_ID
+        join GOM_USER_S s on rs.STAFF_ID = s.USER_ID
+        join (select g.ID,g.ISSEND from GOM_CONTAB_AREA_CONFIG g where g.ISSEND = '1') g on g.id = s.AREA_ID
+        join GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        join GOM_BDW_SRV_ORD_INFO_VIEW r on o.ORDER_ID = r.ORDER_ID  or r.order_id = o.parent_order_id
+        join GOM_BDW_CST_ORD c on r.CST_ORD_ID = c.CST_ORD_ID) t
+        group by t.WO_ID, t.ORDER_ID, t.DISP_OBJ_ID, t.DISP_OBJ_TYE, t.REQ_FIN_DATE, t.DISPATCH_ORDER_ID, t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.TACHE_ID,t.TACHE_NAME,t.CUST_NAME_CHINESE
+    ) group by APPLY_ORD_NAME,APPLY_ORD_ID,REQ_FIN_DATE,USER_NAME,DISPATCH_ORDER_ID,CUST_NAME_CHINESE,TACHE_ID,TACHE_NAME
+    </select>
+
+
+</mapper>

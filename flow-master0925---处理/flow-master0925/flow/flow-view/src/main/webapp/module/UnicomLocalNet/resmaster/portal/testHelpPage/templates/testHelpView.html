@@ -1,0 +1,124 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="applicat-Page-Title">开发/测试人员辅助工具</h3>
+</div>
+<div class="modal-body" style="background-color: #ab5f5f40;">
+    <form class="form-horizontal" >
+        <div id="accordion" class="ui-accordion" style="position: relative">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color: #fff;background-color: #b653b9">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <a>业务创建接口回滚
+                            <span class="glyphicon glyphicon-certificate pull-right"></span>
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">实例id：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="col-md-10"  id="instanceId" name="instanceId" placeholder="请输入实例号" type="text">
+                                    <button class="btn btn-default" type="button" id="businessRollback">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="row" style="color: #ea421b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        此方法只有在单子流转中遇到实例创建问题时辅助解决问题使用，切勿随意执行！</span>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">反馈报文：</label>
+                                <div class="col-md-8 col-sm-8">
+										<textarea id="returnRollbackJson" name="returnRollbackJson" style="width: 400%;height: 200px;background-color: black;color: white"
+                                                  class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color: #fff;background-color: #b653b9">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <a>删除申请单
+                            <span class="glyphicon glyphicon-certificate pull-right"></span>
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单号：</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="col-md-10"  id="applicationId" name="applicationId" placeholder="请输入申请单编号" type="text">
+                                    <button class="btn btn-default" type="button" id="delApplication">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="row" style="color: #ea421b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        可以填写多个，用英文","隔开，例如：QH-2019-0001,QH-2019-0002,QH-2019-0003</span>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"></label>
+                                <div class="col-md-8 col-sm-8">
+                                    <marquee direction="up" scrollamount="1" onmouseover="this.stop()" onmouseout="this.start()" style="width: 400%;height: 50px ;background-color: black;color: white">
+                                        <p id="applicationLog1"></p>
+                                        <p id="applicationLog2"></p>
+                                    </marquee>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">执行结果：</label>
+                                <div class="col-md-8 col-sm-8">
+										<textarea id="returnDelApplication" name="returnDelApplication" style="width: 400%;height: 200px ;background-color: black;color: white"
+                                                  class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color: #fff;background-color: #b653b9">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <a>socketTest
+                            <span class="glyphicon glyphicon-certificate pull-right"></span>
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">WebSocketTest&nbsp;&nbsp;</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <button class="btn btn-default" type="button" id="submit">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">反馈报文：</label>
+                                <div class="col-md-8 col-sm-8">
+										<textarea id="return" name="return" style="width: 400%;height: 200px;background-color: black;color: white"
+                                                  class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
