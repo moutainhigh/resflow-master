@@ -1,0 +1,693 @@
+<div  class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">工单处理</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <!-- 测试结果 -->
+                    <div class="row form-group" id="testDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">测试结果：</label>
+                        <div class="col-md-10 col-sm-8" id="testResult">
+                            <label class="radio-inline">
+                                <input type="radio" name="testRadio" id="testPass" value="0" data-rule="checked"
+                                       checked="true">通过</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="testRadio" id="testNoPass" value="1">不通过</label>
+                        </div>
+                    </div>
+                    <!-- 审核结果 -->
+                    <div class="row form-group" id="checkDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">审核结果：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="checkRadio" id="checkPass" value="0" data-rule="checked"
+                                       checked="true">通过</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="checkRadio" id="checkNoPass" value="1">不通过</label>
+                        </div>
+                    </div>
+                    <!-- 是否选专业 -->
+                    <div class="row form-group" id="selectSpecialDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">是否选择专业：</label>
+                        <div class="col-md-10 col-sm-8" id="selectSpecial">
+                            <label class="radio-inline">
+                                <input type="radio" name="resRadio" id="resPass" value="0" checked="true">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="resRadio" id="resNoPass" value="1">否</label>
+                        </div>
+                    </div>
+                    <!-- 是否新建资源 -->
+                    <div class="row form-group" id="newResourceDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">是否新建资源：</label>
+                        <div class="col-md-10 col-sm-8" id="newResource">
+                            <label class="radio-inline">
+                                <input type="radio" name="newResRadio" id="newResPass" value="0">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="newResRadio" id="newResNoPass" value="1"
+                                       checked="true">否</label>
+                        </div>
+                    </div>
+                    <!-- 资源配置按钮 -->
+                    <div class="row form-group" id="configBtnDiv" hidden>
+                        <div class="col-md-12">
+                            <button type="button" id="configBtn" class="btn btn-danger">配置</button>
+                        </div>
+                    </div>
+                    <!-- 电路信息 -->
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+                    <!-- 需要退单的子流程 -->
+                    <div class="row form-group" id="childFlowDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label">调单信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="childFlowGrid"></div>
+                        </div>
+                    </div>
+                    <!-- 核查调度 -->
+                    <div class="row form-group" id="specialDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">选择专业核查：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="outsideSpecial"
+                                                       id="outsideSpecial" value="outside"
+                                                       data-rule="checked">光纤专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="outsidePopedit" name="outsidePopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="dataSpecial"
+                                                       id="dataSpecial" value="data"
+                                                       data-rule="checked">数据专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="dataPopedit" name="dataPopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="transSpecial"
+                                                       id="transSpecial" value="trans"
+                                                       data-rule="checked">传输专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="transPopedit" name="transPopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="changeSpecial"
+                                                       id="changeSpecial" value="change"
+                                                       data-rule="checked">交换专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="changePopedit" name="changePopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="accessSpecial"
+                                                       id="accessSpecial" value="access"
+                                                       data-rule="checked">接入专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="accessPopedit" name="accessPopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="otherSpecial"
+                                                       id="otherSpecial" value="other"
+                                                       data-rule="checked">其他专业</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="otherPopedit" name="otherPopedit" value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row form-group" style="text-align: right;" hidden id="specialSaveBtnDiv">
+                        <button type="button" id="specialSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存
+                        </button>
+                    </div>
+                    <!-- 主调局选择 -->
+                    <div class="row form-group" id="masterSelectDiv" hidden>
+                        <label class=" col-md-2 col-sm-4 control-label" style="padding-right: 0;">主调局选择：</label>
+                        <div class="col-md-10 col-sm-8" >
+                            <div id="masterSelectAZProtDiv" class="col-md-8 col-sm-8" style="width: auto !important;display: inline-block;">
+                            </div>
+                            <div class="col-md-4 col-sm-4" style="padding-left: 0;">
+                                <div class="col-md-4 col-sm-4" style="padding-left: 0;">
+                                    <label class="radio-inline" id="OTHERNAME_LABEL">
+                                        <input type="radio" name="masterSelectRadio" id="OTHERNAME" value="other">其他
+                                    </label>
+                                </div>
+                                <div class="col-md-8 col-sm-8" style="padding-left: 0;">
+                                    <div class="input-group popedit" style="width: 130px;">
+                                        <input id="otherMaster" name="otherMaster" class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<label class="radio-inline" id="aPortDiv" style="display: none">-->
+                            <!--<input type="radio" name="masterSelectRadio" id="aPort" value="0">A端</label>-->
+                            <!--<label class="radio-inline" id="zPortDiv" style="display: none">-->
+                            <!--<input type="radio" name="masterSelectRadio" id="zPort" value="1">Z端</label>-->
+                            <!--<label class="radio-inline">-->
+                            <!--<input type="radio" name="masterSelectRadio" id="provincePort" value="2" checked="true">省/市端</label>-->
+                        </div>
+
+                    </div>
+                    <!-- 电路调度 -->
+                    <div class="row" id="childSendDiv" hidden>
+                        <div class="clearfix" style="margin-left: 23px;">
+                            <div id="COMPLEX_1" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="complexCfg"
+                                               id="complexCfg" value="complex"
+                                               data-rule="checked">综合（全专业）</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="complexCfgPopedit" name="complexCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="OPTICAL_2" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="opticalCfg"
+                                               id="opticalCfg" value="optical"
+                                               data-rule="checked">光纤</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="opticalCfgPopedit" name="opticalCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--</div>-->
+                            <!--<div class="row" style="margin-bottom: 10px;">-->
+                            <div id="TRANS_3" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="transCfg"
+                                               id="transCfg" value="trans"
+                                               data-rule="checked">传输</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="transCfgPopedit" name="transCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="TRANS_IPRAN_13" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="transIPRANCfg"
+                                               id="transIPRANCfg" value="transIPRAN"
+                                               data-rule="checked">传输-IPRAN</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="transIPRANCfgPopedit" name="transIPRANCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="TRANS_MSAP_14" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="transMSAPCfg"
+                                               id="transMSAPCfg" value="transMSAP"
+                                               data-rule="checked">传输-MSAP</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="transMSAPCfgPopedit" name="transMSAPCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="DATA_4" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="dataCfg"
+                                               id="dataCfg" value="data"
+                                               data-rule="checked">数据</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="dataCfgPopedit" name="dataCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--</div>-->
+                            <!--<div class="row" style="margin-bottom: 10px;">-->
+                            <div id="EXCHANGE_5" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="exchangeCfg"
+                                               id="exchangeCfg" value="exchange"
+                                               data-rule="checked">交换</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="exchangeCfgPopedit" name="exchangeCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ACCESS_6" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="accessCfg"
+                                               id="accessCfg" value="access"
+                                               data-rule="checked">接入</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="accessCfgPopedit" name="accessCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--</div>-->
+                            <!--<div id="insideDiv" hidden>-->
+                            <!--<div class="row" style="margin-bottom: 10px;">-->
+                            <div id="WIRELESS_7" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="wirelessCfg"
+                                               id="wirelessCfg" value="wireless"
+                                               data-rule="checked">无线</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="wirelessCfgPopedit" name="wirelessCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="MOBILE_8" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="mobileCfg"
+                                               id="mobileCfg" value="mobile"
+                                               data-rule="checked">移动核心</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="mobileCfgPopedit" name="mobileCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--</div>-->
+                            <!--<div class="row" style="margin-bottom: 10px;">-->
+                            <div id="SYN_9" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="synCfg"
+                                               id="synCfg" value="syn"
+                                               data-rule="checked">同步网</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="synCfgPopedit" name="synCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="IMS_10" class="col-md-6" style="margin-bottom: 10px; display: none">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="IMSCfg"
+                                               id="IMSCfg" value="IMS"
+                                               data-rule="checked">IMS</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="IMSCfgPopedit" name="IMSCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="row">-->
+                            <div class="col-md-6" style="margin-bottom: 10px;">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="otherCfg"
+                                               id="otherCfg" value="other"
+                                               data-rule="checked">其他</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input id="otherCfgPopedit" name="otherCfgPopedit"
+                                               class="form-control" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--</div>-->
+                        </div>
+                        <div class="clearfix" style="text-align: right;" hidden id="saveBtnDiv">
+                            <button type="button" id="saveBtn" class="btn btn-danger" style="margin-right:20px;margin-bottom:15px;">保存
+                            </button>
+                        <div class="clearfix mgb-15" id="oneDryDev" hidden>
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">是否复用一干调单号：</label>
+                            <div class="col-md-10 col-sm-8" id="oneDry">
+                                <label class="radio-inline">
+                                    <input type="radio" name="oneDry" id="oneDrya" value="0" checked="true">是</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="oneDry" id="oneDryb" value="1">否</label>
+                            </div>
+                        </div>
+                        <div class="clearfix mgb-15">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">电路调单号：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <input id="dispatchOrderNum" name="dispatchOrderNum" class="form-control"
+                                       data-rule="required" style="width: 516px;">
+                            </div>
+                        </div>
+                        <div class="clearfix mgb-15">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"><span
+                                    style="color: red">*</span>调度单标题：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <input id="dispatchOrderName" name="dispatchOrderName" class="form-control"
+                                       data-rule="required" style="width: 516px;" value="">
+                            </div>
+                        </div>
+                        <div class="clearfix mgb-15">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">调单正文：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="dispatchOrderText" name="dispatchOrderText" class="form-control" rows="6"
+                                          style="width: 516px;" data-rule="required;length[10~, true]"></textarea>
+                            </div>
+                        </div>
+
+                        </div>
+                    <!-- 转派 -->
+                    <div class="row form-group" id="tranStaffDiv" hidden>
+                        <div id="tranStaff">
+                            <label class="col-md-2 col-sm-4 control-label"  style="padding-right: 0;">转派对象：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <div class="input-group">
+                                    <input id="tranStaffPopedit" name="tranStaffpopedit"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 是否投资估算 -->
+                    <div class="row form-group" id="estimateDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label"  style="padding-right: 0;">是否投资估算：</label>
+                        <div class="col-md-10 col-sm-8" id="estimate">
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimatePass" value="0">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimateNoPass" value="1" checked="true" >否</label>
+                        </div>
+                    </div>
+                    <!-- 核查反馈 A端   masterRetDiv-->
+                    <div class="row form-group" id="feedBackADiv" hidden>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">A端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="A_CONSTRUCT_SCHEME" name="A_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label" id ="a"><span style="color: red">*</span>A端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_RES_SATISFY" name="A_RES_SATISFY" class="form-control"  data-rule="required">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomADiv">
+                                <label class="col-md-4 col-sm-4 control-label">A端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="A_ACCESS_ROOM" name="A_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                <label class="control-label" id="amountA">A端投资金额(万):</label>
+                                <label class="control-label" id="amount" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_INVESTMENT_AMOUNT" name="A_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="required; amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodA">A端建设工期(工作日):</label>
+                                    <label class="control-label" id="period" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="A_CONSTRUCT_PERIOD" name="A_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- 核查反馈 Z端-->
+                    <div class="row form-group" id="feedBackZDiv" hidden>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">Z端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="Z_CONSTRUCT_SCHEME" name="Z_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_RES_SATISFY" name="Z_RES_SATISFY" class="form-control"  data-rule="required ">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6" id="accessRoomZDiv">
+                                <label class="col-md-4 col-sm-4 control-label">Z端局端接入机房:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="Z_ACCESS_ROOM" name="Z_ACCESS_ROOM" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountZ">Z端投资金额(万):</label>
+                                    <label class="control-label" id="amountLabel" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_INVESTMENT_AMOUNT" name="Z_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="required; amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodZ">Z端建设工期(工作日):</label>
+                                    <label class="control-label" id="periodLabel" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="Z_CONSTRUCT_PERIOD" name="Z_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 核查反馈 本地端-->
+                    <div class="row form-group" id="feedBackLDiv" hidden>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label">本地端接入建设方案、资源情况:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="L_CONSTRUCT_SCHEME" name="L_CONSTRUCT_SCHEME" class="form-control" rows="4" data-rule="required" style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <div class="col-md-6 col-sm-6">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>本地资源是否满足:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="L_RES_SATISFY" name="L_RES_SATISFY" class="form-control"  data-rule="required ">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="amountL">本地投资金额(万):</label>
+                                    <label class="control-label" id="amountLabelL" hide>投资金额(万):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="L_INVESTMENT_AMOUNT" name="L_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="required; amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4 control-label">
+                                    <label class="control-label" id="periodL">本地建设工期(工作日):</label>
+                                    <label class="control-label" id="periodLabelL" hide>建设工期(工作日):</label>
+                                </div>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="L_CONSTRUCT_PERIOD" name="L_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="required;integer[+];range[~100]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="text-align: right;" hidden id="checkSaveBtnDiv">
+                        <button type="button" id="checkSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存</button>
+                    </div>
+                    <!-- 数据制作，资源施工环节派单 -->
+                    <div class="row" id="dispObjOtherDiv" hidden>
+                        <div class="form-group requireds">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">数据制作：</label>
+                            <div class="col-md-5 col-sm-8">
+                                <div class="input-group">
+                                    <input name="dataMakeSelectJob" id="dataMake" placeholder="请选择要派发的岗位"
+                                           class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-sm-8">
+                                <div class="input-group">
+                                    <input name="dataMakeSelectUser" id="dataMakeUser" placeholder="请选择要派发的人员"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group requireds" id="childFlowresConstructDiv">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">资源施工：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <div class="input-group">
+                                    <input name="resSelectJob" id="resConstruct" placeholder="请选择要派发的岗位"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="text-align: right;" id="resourceSaveBtnDiv">
+                            <button type="button" id="resourceSaveBtn" class="btn btn-danger" style="margin-right:20px;margin-top:10px;">保存</button>
+                        </div>
+                    </div>
+                    <!-- 外线施工环节派单 -->
+                    <div class="row form-group requireds" id="dispObjDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label"  style="padding-right: 0;">外线施工：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div class="input-group">
+                                <input name="outsideSelectJob" id="outside" placeholder="请选择要派发的岗位"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group" style="text-align: right;" id="outsideSaveBtnDiv">
+                            <button type="button" id="outsideSaveBtn" class="btn btn-danger" style="margin-right:20px;margin-top:10px;">保存</button>
+                        </div>
+                    </div>
+                    <!-- 一干跨域全程调测环节退单 -->
+                    <div class="row form-group" id="crossAZAreaDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label">退单省份：</label>
+                        <div class="col-md-10 col-sm-8" id="backAZProvinceDiv"></div>
+                    </div>
+                    <!-- 附件上传 -->
+                    <div class="row form-group" id="fileUpdateDiv">
+                        <div id="attach" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8" style="width: 70%">
+                                <form id="displaySource">
+                                    <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="" data-rule="required">
+                                        </span>
+                                    </div>
+                                <div id="fileGrid"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                    <!-- 说明 -->
+                    <div class="row form-group" id="remarkDiv">
+                        <div id="remarkGoRoll" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"> 说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                          data-rule="required;length[10~, true]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>
+

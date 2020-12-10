@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zres.project.localnet.portal.local.dao.SrvOrdAttrDao">
+
+    <select id="countSrvOrdAttr" resultType="int" parameterType="string">
+        select count(1) from GOM_BDW_SRV_ORD_ATTR_INFO
+        where srv_ord_id = #{srvordId}
+        <if test="attrcode != '' and attrcode != null">
+            and attr_code = #{attrcode}
+        </if>
+        <if test="sourse != '' and sourse != null">
+            and sourse = #{sourse}
+        </if>
+
+    </select>
+
+    <insert id="insertSrvOrdAttr" parameterType="String">
+        insert into GOM_BDW_SRV_ORD_ATTR_INFO S
+        (s.ATTR_INFO_ID,
+        s.srv_ord_id,
+        s.attr_action,
+        s.attr_code,
+        s.attr_name,
+        s.attr_value,
+        s.create_date,
+        s.sourse
+        )
+        values
+        (SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL,#{srvordId},'0',#{attrcode},#{attrCodeName},#{attrCodeValue},sysdate,#{sourse})
+    </insert>
+
+    <update id="updateSrvOrdAttr">
+        update GOM_BDW_SRV_ORD_ATTR_INFO
+        set attr_code = #{attrcode}
+        <if test="attrCodeName != '' and attrCodeName != null">
+            , attr_name = #{attrCodeName}
+        </if>
+        <if test="attrCodeValue != '' and attrCodeValue != null">
+            , attr_Value = #{attrCodeValue}
+        </if>
+        where srv_ord_id = #{srvordId}
+        <if test="attrcode != '' and attrcode != null">
+            and attr_code = #{attrcode}
+        </if>
+        <if test="sourse != '' and sourse != null">
+            and sourse = #{sourse}
+        </if>
+    </update>
+
+
+
+</mapper>

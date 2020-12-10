@@ -1,0 +1,54 @@
+<div id="draftScheduleDiv">
+    <div class="modal-header">
+        <h4 style="font-size: 16px;font-weight:bold;" class="modal-title">起草调单</h4>
+    </div>
+    <div class="modal-body">
+        <div id="draft-disp-main">
+            <div id="dispGrid">
+            </div>
+            <div style="float: right; display: none; margin-top:5px;" id="batchSaveDiv">
+                <button type="button" id="batchSave" class="btn btn-danger">批量处理</button>
+            </div>
+            <div style="padding: 10px;width:100%; margin-top: 10px;margin-bottom: 15px;" id="orgDiv">
+                <div class="title_left">
+                    <span class="title_left_span">派单部门</span>
+                </div>
+                <div class="row" id="dispOrg"></div>
+            </div>
+            <div style="padding: 10px;width: 100%;">
+                <div class="title_left" style="margin-top: 0px;">
+                    <span class="title_left_span">调度单信息</span>
+                </div>
+                <div class="row" id="dispDetail"></div>
+                <!-- 附件上传 -->
+                <div class="form-group" id="fileUpdateDiv">
+                    <div id="attach" class="row">
+                        <label class="col-md-3 col-sm-3 control-label" style="width:12.5%;text-align: right;margin-bottom: 0;padding-top: 6px;font-weight: normal;color: #4A4A4A;">上传附件</label>
+                        <div class="col-md-9 col-sm-9" style="width: 87.5%;">
+                            <form id="displaySource" style="padding:0 10px;">
+                                <div style="margin-bottom: 10px;">
+                                            <span class="btn btn-default fileinput-button">
+                                                <i class="glyphicon glyphicon-plus"></i>
+                                                <span style="line-height: 23px;">选择文件...</span>
+                                                <input class="js-select-file" id="selectFiles" type="file"
+                                                       name="selectFiles" multiple="" data-rule="required">
+                                            </span>
+                                </div>
+                                <div id="fileGrid"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="col-md-12 col-sm-12" id="BtnDiv">
+            <div style="text-align: center">
+                <!--<button id="saveDraft" type="button" class="btn btn-default">保存草稿</button>-->
+                <button id="submit" type="button" class="btn btn-danger">提交</button>
+                <button id="cancelThisBtn" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>

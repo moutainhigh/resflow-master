@@ -1,0 +1,61 @@
+<div class="modal-header">
+    <h4 class="modal-title">机房信息配置</h4>
+</div>
+<div class="modal-body">
+    <div id="isa-operTaskManagement-mainPanel" style="overflow-x: hidden"><!-- background-color: #EDEDED;-->
+        <div style="margin:10px 2px;padding: 0;height: 20%">
+            <form class="form-horizontal" id="operTaskManagement-Qryform">
+                <div class="operTaskManagement-btn-row" id="operTaskManagement-searchCodeDiv">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">机房名称:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="resourceName" name="resourceName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">归属省份:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="provinceName" name="provinceName" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label" >归属地市:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="cityName" name="cityName" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-sm-12">
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger" id="queryLocalApply">查询</button>
+                                <button type="button" class="btn btn-default" id="resetLocalApply">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="localResApplyTab" class="ui-tabs">
+            <ul class="ui-tabs-nav">
+                <li class="ui-tabs-active">
+                    <a href="#local_apply_tabs_completed" id="local_apply_tabs_completed_link">机房信息<span class="redge pull-right clearfix"  id="completespan">0</span></a>
+                </li>
+            </ul>
+            <div style="padding: 10px;">
+                 <div id="Config-draft"></div>
+            </div>
+        </div>
+    </div>
+</div>

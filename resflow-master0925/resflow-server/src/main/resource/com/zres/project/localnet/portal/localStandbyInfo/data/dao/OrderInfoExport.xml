@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.localStanbdyInfo.data.dao.OrderStandbyDao">
+    <select id="qryCustInfo" parameterType="String" resultType="map">
+           SELECT distinct CO.APPLY_ORD_ID,
+                   SIO.CODE_CONTENT as ORDER_TYPE,
+                   CO.APPLY_ORD_NAME,
+                   CO.HANDLE_MAN_NAME,
+                   CO.HANDLE_DEP,
+                   co.CUST_NAME,
+                   CO.CUST_NAME_CHINESE,
+                   CO.COOPERATION_MODE,
+                   CO.OTHER_OPERA_SER_NUM,
+                   CO.HANDLE_TIME,
+                   CO.HANDLE_MAN_TEL,
+                   CO.REMARK,
+                   CO.BATCH,
+                   CO.GROUP_PM_NAME,
+                   CO.PROVINCE_PM_NAME,
+                   CO.CUST_ID,
+                   CO.CUST_NAME_CHINESE,
+                   CO.CONTRACT_ID,
+                   CO.INIT_AM_NAME,
+                   CO.INIT_AM_TEL,
+                   CO.CUST_ADDRESS,
+                   CO.CUST_INDUSTRY,
+                   co.IS_GROUP_CUST,
+                   CO.CUST_CONTACT_MAN_NAME,
+                   CO.CUST_CONTACT_MAN_TEL,
+                   CO.CUST_OPERATOR_EMAIL
+      FROM GOM_BDW_CST_ORD CO
+      LEFT JOIN (SELECT SO.CST_ORD_ID, GCO.CODE_CONTENT
+               FROM GOM_BDW_SRV_ORD_INFO SO
+               LEFT JOIN GOM_BDW_CODE_INFO GCO
+                 ON SO.ACTIVE_TYPE = GCO.CODE_VALUE
+                AND GCO.CODE_TYPE = 'operate_type'
+              group by SO.CST_ORD_ID, GCO.CODE_CONTENT) SIO
+     ON CO.CST_ORD_ID = SIO.CST_ORD_ID
+     WHERE 1 = 1
+       AND CO.CST_ORD_ID = #{cstOrdId}
+    </select>
+    <select id="qrySrvOrderInfo" parameterType="String" resultType="map">
+           SELECT SO.SRV_ORD_ID, SO.SERVICE_ID ,so.SERIAL_NUMBER
+              FROM GOM_BDW_CST_ORD CO
+              LEFT JOIN GOM_BDW_SRV_ORD_INFO SO
+                ON CO.CST_ORD_ID = SO.CST_ORD_ID
+             WHERE CO.CST_ORD_ID = #{cstOrdId}
+             order by so.SERIAL_NUMBER
+    </select>
+    <select id="qryDispatchOrderInfo" parameterType="String" resultType="map">
+           SELECT (SELECT CO.CODE_CONTENT
+                     FROM GOM_BDW_CODE_INFO_SECOND CO
+                    WHERE CO.CODE_TYPE = 'dispatch_type'
+                      AND CO.CODE_VALUE = DO.DISPATCH_TYPE ) as DISPATCH_TYPE,
+                   DO.STAFF_NAME,
+                   DO.STAFF_TEL,
+                   DO.STAFF_ORG,
+                   DO.ISSUER,
+                   DO.SEND_DATE,
+                   DO.DISPATCH_ORDER_NO,
+                   DO.DISPATCH_GRADE,
+                   DO.DISPATCH_URGENCY,
+                   t.RES_ALLOCATE,
+                   t.SPECIALTY,
+                   t.NETMANAGE,
+                  /* DO.DISPATCH_SEND_ORG,
+                   DO.DISPATCH_COPY_ORG,*/
+                   nvl(DO.DISPATCH_SEND_ORG_NAME,DO.DISPATCH_SEND_ORG) DISPATCH_SEND_ORG,
+                   nvl(DO.DISPATCH_COPY_ORG_NAME,DO.DISPATCH_COPY_ORG) DISPATCH_COPY_ORG,
+                   DO.DISPATCH_TITLE,
+                   DO.DISPATCH_TEXT
+           FROM GOM_BDW_DISPATCH_ORDER DO
+           left join GOM_BDW_DISPATCH_DEPT t on DO.DISPATCH_ORDER_ID = t.DISPATCH_ORDER_ID
+           WHERE DO.CST_ORD_ID = #{cstOrdId}
+           AND DO.STATE = '10A'
+    </select>
+ <select id="queryOrderCircuitInfo" parameterType="java.util.Map" resultType="map">
+          SELECT A.ATTR_NAME,
+               CASE
+               WHEN B.SELECTSTAT = 1 THEN
+                  (SELECT CODE_CONTENT
+                     FROM GOM_BDW_CODE_INFO_SECOND
+                    WHERE CODE_TYPE = A.ATTR_CODE
+                      AND CODE_VALUE = A.ATTR_VALUE)
+                WHEN B.SELECTSTAT IS NULL THEN
+                  A.ATTR_VALUE
+                END AS ATTR_VALUE
+          FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+          LEFT JOIN GOM_BDW_SRV_ORD_INFO so on so.SRV_ORD_ID=a.SRV_ORD_ID
+          left join gom_order o on o.order_id=so.order_id or so.order_id=o.parent_order_id
+          LEFT JOIN GOM_BDW_PROPERTY_INFO B
+          ON A.ATTR_CODE = B.PROPERTY_ID AND B.IS_SHOW = 'Y'
+         WHERE A.SRV_ORD_ID=#{srvOrdId,jdbcType=VARCHAR}
+        and  B.SRV_ID = #{serviceId,jdbcType=VARCHAR}
+
+
+ </select>
+    <select id="queryCircuitInfoByIds" parameterType="java.util.Map" resultType="map">
+        SELECT A.ATTR_NAME,
+        CASE
+        WHEN B.SELECTSTAT = 1 THEN
+        (SELECT CODE_CONTENT
+        FROM GOM_BDW_CODE_INFO_SECOND
+        WHERE CODE_TYPE = A.ATTR_CODE
+        AND CODE_VALUE = A.ATTR_VALUE)
+        WHEN B.SELECTSTAT IS NULL THEN
+        A.ATTR_VALUE
+        END AS ATTR_VALUE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO so on so.SRV_ORD_ID=a.SRV_ORD_ID
+        left join gom_order o on o.order_id=so.order_id or so.order_id=o.parent_order_id
+        LEFT JOIN GOM_BDW_PROPERTY_INFO B
+        ON A.ATTR_CODE = B.PROPERTY_ID AND B.IS_SHOW = 'Y'
+        WHERE B.SRV_ID = #{serviceId,jdbcType=VARCHAR}
+        <if test="orderId != null and orderId != ''">
+            and  O.ORDER_ID = #{orderId,jdbcType=VARCHAR}
+        </if>
+
+    </select>
+
+    <!--根据业务订单ID  查询 电路信息 公共信息-->
+    <select id="queryCircuitInfo" parameterType="java.lang.String" resultType="java.util.Map">
+      select a.srv_ord_id,b.property_name,b.state,b.local_code,
+           case
+             when b.DEFAULT_VALUE is not null then
+                 b.DEFAULT_VALUE
+             when b.selectstat = 1 then
+              (select code_content
+                 from gom_BDW_code_info
+                where code_type = a.attr_code
+                  and code_value = a.attr_value)
+             when b.selectstat = 2 then
+              (select attrvalue_name
+                 from GOM_BDW_PROVINCE_CITY_CODE
+                where attr_code = a.attr_value
+                  )
+             when b.selectstat is null then
+              a.attr_value
+           end as attr_value,
+           b.columsort
+      from gom_BDW_srv_ord_attr_info a
+      join GOM_PROPERTIES_CONF_VIEW b
+        on a.attr_code = b.property_id
+      join GOM_BDW_SRV_ORD_INFO c
+        on a.srv_ord_id = c.srv_ord_id
+        and c.RESOURCES = b.SOURSE
+        and c.service_id = b.srv_id
+      LEFT JOIN gom_order o ON o.order_id=c.order_id OR c.order_id=o.parent_order_id
+     where  O.ORDER_ID = #{orderId,jdbcType=VARCHAR}
+       and c.service_id = #{serviceId}
+       and b.is_show = 'Y'
+       and b.state = 'PU'
+     order by b.COLUMSORT
+    </select>
+
+    <!--根据业务订单ID  查询 电路信息 AZ端-->
+    <select id="queryCircuitInfoAZ" parameterType="java.lang.String" resultType="java.util.Map">
+        select b.property_name,b.state,b.local_code,
+               case
+                   when b.DEFAULT_VALUE is not null then
+                       b.DEFAULT_VALUE
+                   when b.selectstat = 1 then
+                       (select code_content
+                        from gom_BDW_code_info
+                        where code_type = a.attr_code
+                          and code_value = a.attr_value)
+                   when b.selectstat = 2 then
+                       (select attrvalue_name
+                        from GOM_BDW_PROVINCE_CITY_CODE
+                        where attr_code = a.attr_value
+
+                        )
+                   when b.selectstat is null then
+                       a.attr_value
+                   end as attr_value,
+                  b.columsort
+        from gom_BDW_srv_ord_attr_info a
+        join GOM_PROPERTIES_CONF_VIEW b
+          on a.attr_code = b.property_id
+        join GOM_BDW_SRV_ORD_INFO c
+          on a.srv_ord_id = c.srv_ord_id
+          and c.RESOURCES = b.SOURSE
+          and c.service_id = b.srv_id
+          LEFT JOIN gom_order o ON o.order_id=c.order_id OR c.order_id=o.parent_order_id
+     where  O.ORDER_ID = #{orderId,jdbcType=VARCHAR}
+          and b.srv_id = #{serviceId}
+          and b.is_show = 'Y'
+          and b.state = #{stateLabel}
+        order by b.COLUMSORT
+    </select>
+
+    <!--根据业务订单ID  查询 电路信息 PE端-->
+    <select id="queryCircuitInfoPE" parameterType="java.lang.String" resultType="java.util.Map">
+        select b.property_name,b.state,b.local_code,
+               case
+                   when b.DEFAULT_VALUE is not null then
+                       b.DEFAULT_VALUE
+                   when b.selectstat = 1 then
+                       (select code_content
+                        from gom_BDW_code_info
+                        where code_type = a.attr_code
+                          and code_value = a.attr_value)
+                   when b.selectstat = 2 then
+                       (select attrvalue_name
+                        from GOM_BDW_PROVINCE_CITY_CODE
+                        where attr_code = a.attr_value
+                         -- and a.attr_code = 'CON0005'
+                          )
+                   when b.selectstat is null then
+                       a.attr_value
+                   end as attr_value,
+                b.columsort
+        from gom_BDW_srv_ord_attr_info a
+        join GOM_PROPERTIES_CONF_VIEW b
+          on a.attr_code = b.property_id
+        join GOM_BDW_SRV_ORD_INFO c
+          on a.srv_ord_id = c.srv_ord_id
+          and c.RESOURCES = b.SOURSE
+          and c.service_id = b.srv_id
+         LEFT JOIN gom_order o ON o.order_id=c.order_id OR c.order_id=o.parent_order_id
+     where  O.ORDER_ID = #{orderId,jdbcType=VARCHAR}
+          and b.srv_id = #{serviceId}
+          and b.is_show = 'Y'
+          and b.state = #{stateLabel}
+        order by b.COLUMSORT
+    </select>
+
+</mapper>

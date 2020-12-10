@@ -1,0 +1,31 @@
+<!--
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zres.project.localnet.portal.orderAbnormal.dao.ExceptionOrderDispRulesDAO">
+
+    <select id="getSrcOrderId" resultType="java.lang.String">
+        SELECT SRC_ORDER_ID
+        FROM GOM_CHANGE_ORDER_LOG_S
+        WHERE CHG_ORDER_ID = #{chgOrderId}
+          AND SRC_ORDER_ID IS NOT NULL
+    </select>
+    <select id="getDispCanditates" resultType="java.lang.String">
+        SELECT NVL(COMP_USER_ID, DEAL_USER_ID) DISP_ID, wo_id, WO_STATE, DISP_OBJ_ID
+        FROM GOM_WO
+        WHERE DEAL_USER_ID IS NOT NULL
+          and WIID IN (select max(WIID)
+                       from GOM_WO a
+                       WHERE A.ORDER_ID = #{orderId}
+                         AND A.PS_ID = #{woPsId}
+                         AND A.WO_TYPE = '620000001'
+                         AND A.WO_STATE in ('290000004', '290000002'))
+    </select>
+    <select id="getSrcCldOrderId" resultType="java.lang.String">
+        select b.SRC_ORDER_ID
+        from gom_order a
+               join GOM_ORD_KEY_INFO b on b.ORDER_ID = a.ORDER_ID
+        where a.ORDER_STATE = '200000002'
+          and a.ORDER_ID = #{chgOrderId}
+    </select>
+</mapper>
+-->

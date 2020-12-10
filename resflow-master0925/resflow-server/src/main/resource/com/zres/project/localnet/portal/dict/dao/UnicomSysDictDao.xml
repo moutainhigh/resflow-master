@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.dict.dao.UnicomSysDictDao">
+    <select id="querySysDictData"  resultType="com.zres.project.localnet.portal.local.domain.BaseObject">
+        SELECT CODE_VALUE as value,
+               CODE_CONTENT as name
+                FROM GOM_BDW_CODE_INFO_SECOND
+          where 1=1
+        <if test="codeType != null and codeType != '' ">
+            and CODE_TYPE = #{codeType}
+        </if>
+        <if test="codeTypeName != null and codeTypeName != '' ">
+            and CODE_TYPE_NAME = #{codeTypeName}
+        </if>
+        <if test="areaId != null and areaId != '' ">
+            and JIKE_ACT_TYPE = #{areaId}
+        </if>
+        <if test="userId != null and userId != '' ">
+            and CODE_VALUE in (select sp.prod_id
+            from gom_staff_prod sp
+            where
+            ( sp.staff_id =#{userId}
+            or sp.dept_id in
+            (select sw.work_group_id
+            from staff_workgrp sw
+            where sw.staff_id = #{userId})))
+        </if>
+        order by ORDER_NO,CODE_INFO_ID
+
+    </select>
+
+    <select id="querySysDictDataByName"  resultType="com.zres.project.localnet.portal.local.domain.BaseObject">
+        SELECT CODE_VALUE as value,
+        CODE_CONTENT as name
+        FROM GOM_BDW_CODE_INFO_SECOND
+        where 1=1
+        <if test="codeType != null and codeType != '' ">
+            and CODE_TYPE = #{codeType}
+        </if>
+        <if test="codeName != null and codeName != '' ">
+            and trim(CODE_CONTENT) = #{codeName}
+        </if>
+    </select>
+
+    <select id="querySysDictDataName"  resultType="String">
+        SELECT trim(CODE_CONTENT) as name
+        FROM GOM_BDW_CODE_INFO_SECOND
+        where 1=1 and CODE_TYPE = #{codeType}
+    </select>
+
+    <select id="queryAreaIdByName" resultType="map">
+        select id from gom_area_s s where trim(s.NAME) = #{areaName} and s.REC_STATE='170000001'
+    </select>
+
+    <select id="queryDeptIdByName" resultType="map">
+        select to_char(dept_id) id from department s where trim(s.dept_NAME) = #{areaName} and delete_state=0
+    </select>
+
+</mapper>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.UpdateOrderInfoDao">
+    <update id="updOrderIdBySrvID">
+        UPDATE  GOM_BDW_SRV_ORD_INFO
+        SET ORDER_ID=#{orderId}
+        <if test="#{srvOrdStat}!=null"> ,SRV_ORD_STAT=#{srvOrdStat}</if>
+        WHERE SRV_ORD_ID =#{srvId}
+
+    </update>
+
+    <update id="UpdateCustomerInfo" parameterType="java.util.Map" >
+        update GOM_BDW_CST_ORD
+        <set>
+            <if test = "NETWORK_LEVEL!=null">NETWORK_LEVEL=#{NETWORK_LEVEL},</if>
+            <if test = "DEAL_AREA_CODE!=null">DEAL_AREA_CODE=#{DEAL_AREA_CODE},</if>
+            <if test = "GROUP_PM_ID!=null">GROUP_PM_ID=#{GROUP_PM_ID},</if>
+            <if test = "GROUP_PM_NAME!=null">GROUP_PM_NAME=#{GROUP_PM_NAME},</if>
+            <if test = "GROUP_PM_TEL!=null">GROUP_PM_TEL=#{GROUP_PM_TEL},</if>
+            <if test = "GROUP_PM_EMAIL!=null">GROUP_PM_EMAIL=#{GROUP_PM_EMAIL},</if>
+            <if test = "PROVINCE_PM_ID!=null">PROVINCE_PM_ID=#{PROVINCE_PM_ID},</if>
+            <if test = "PROVINCE_PM_NAME!=null">PROVINCE_PM_NAME=#{PROVINCE_PM_NAME},</if>
+            <if test = "PROVINCE_PM_TEL!=null">PROVINCE_PM_TEL=#{PROVINCE_PM_TEL},</if>
+            <if test = "PROVINCE_PM_EMAIL!=null">PROVINCE_PM_EMAIL=#{PROVINCE_PM_EMAIL},</if>
+            <if test = "INIT_AM_ID!=null">INIT_AM_ID=#{INIT_AM_ID},</if>
+            <if test = "INIT_AM_NAME!=null">INIT_AM_NAME=#{INIT_AM_NAME},</if>
+            <if test = "INIT_AM_TEL!=null">INIT_AM_TEL=#{INIT_AM_TEL},</if>
+            <if test = "INIT_AM_EMAIL!=null">INIT_AM_EMAIL=#{INIT_AM_EMAIL},</if>
+            <if test = "REMARK!=null">REMARK=#{REMARK},</if>
+            <if test = "CUST_ID!=null">CUST_ID=#{CUST_ID},</if>
+            <if test = "CONTRACT_ID!=null">CONTRACT_ID= #{CONTRACT_ID},</if>
+            <if test = "CUST_NAME_CHINESE!=null">CUST_NAME_CHINESE=#{CUST_NAME_CHINESE},</if>
+            <if test = "CUST_NAME_ENGLISH!=null">CUST_NAME_ENGLISH=#{CUST_NAME_ENGLISH},</if>
+            <if test = "CUST_ADDRESS!=null">CUST_ADDRESS=#{CUST_ADDRESS},</if>
+            <if test = "CUST_INDUSTRY!=null">CUST_INDUSTRY=#{CUST_INDUSTRY},</if>
+            <if test = "CUST_PROVINCE!=null">CUST_PROVINCE=#{CUST_PROVINCE},</if>
+            <if test = "CUST_CITY!=null">CUST_CITY=#{CUST_CITY},</if>
+            <if test = "CUST_TEL!=null">CUST_TEL=#{CUST_TEL},</if>
+            <if test = "CUST_FAX!=null">CUST_FAX=#{CUST_FAX},</if>
+            <if test = "CUST_EMAIL!=null">CUST_EMAIL=#{CUST_EMAIL},</if>
+            <if test = "CUST_CONTACT_MAN_ID!=null">CUST_CONTACT_MAN_ID=#{CUST_CONTACT_MAN_ID},</if>
+            <if test = "CUST_CONTACT_MAN_NAME!=null">CUST_CONTACT_MAN_NAME=#{CUST_CONTACT_MAN_NAME},</if>
+            <if test = "CUST_CONTACT_MAN_TEL!=null">CUST_CONTACT_MAN_TEL=#{CUST_CONTACT_MAN_TEL},</if>
+            <if test = "CUST_CONTACT_MAN_EMAIL!=null">CUST_CONTACT_MAN_EMAIL=#{CUST_CONTACT_MAN_EMAIL},</if>
+            <if test = "CUST_OPERATOR_NAME!=null">CUST_OPERATOR_NAME=#{CUST_OPERATOR_NAME},</if>
+            <if test = "CUST_OPERATOR_TEL!=null">CUST_OPERATOR_TEL=#{CUST_OPERATOR_TEL},</if>
+            <if test = "CUST_OPERATOR_EMAIL!=null">CUST_OPERATOR_EMAIL=#{CUST_OPERATOR_EMAIL},</if>
+
+            <!--<if test = "CREATE_DATE!=null">TO_DATE(#{CREATE_DATE}, 'yyyy-mm-dd hh24:mi:ss'),</if>-->
+
+            <if test = "SUBSCRIBE_ID!=null">SUBSCRIBE_ID=#{SUBSCRIBE_ID},</if>
+            <if test = "SUBSCRIBE_ID_RELA!=null">SUBSCRIBE_ID_RELA=#{SUBSCRIBE_ID_RELA},</if>
+            <if test = "SERVICELEVEL!=null">SERVICELEVEL=#{SERVICELEVEL},</if>
+            <if test = "UPPERCODE!=null">UPPERCODE=#{UPPERCODE},</if>
+            <if test = "UPPERNAME!=null">UPPERNAME=#{UPPERNAME},</if>
+            <if test = "INIT_AM_ORG!=null">INIT_AM_ORG=#{INIT_AM_ORG},</if>
+            <if test = "APPLY_ORD_ID!=null">APPLY_ORD_ID=#{APPLY_ORD_ID},</if>
+            <if test = "APPLY_ORD_NAME!=null">APPLY_ORD_NAME=#{APPLY_ORD_NAME},</if>
+            <if test = "CUST_MANAGER!=null">CUST_MANAGER=#{CUST_MANAGER},</if>
+            <if test = "CUST_MANAGER_TEL!=null">CUST_MANAGER_TEL=#{CUST_MANAGER_TEL},</if>
+
+            <if test = "CONTRACT_NAME!=null">CONTRACT_NAME=#{CONTRACT_NAME},</if>
+            <if test = "CUST_NAME!=null">CUST_NAME=#{CUST_NAME},</if>
+            <if test = "CUST_TYPE!=null">CUST_TYPE=#{CUST_TYPE},</if>
+            <if test = "FLOW_TYPE!=null">FLOW_TYPE=#{FLOW_TYPE},</if>
+            <if test = "RELE_B_INSPECT_ORDER!=null">RELE_B_INSPECT_ORDER=#{RELE_B_INSPECT_ORDER},</if>
+            <if test = "RELE_O_INSPECT_ORDER!=null">RELE_O_INSPECT_ORDER=#{RELE_O_INSPECT_ORDER},</if>
+            <if test = "HANDLE_MAN_NAME!=null">HANDLE_MAN_NAME=#{HANDLE_MAN_NAME},</if>
+            <if test = "HANDLE_MAN_TEL!=null">HANDLE_MAN_TEL=#{HANDLE_MAN_TEL},</if>
+            <if test = "HANDLE_DEP!=null">HANDLE_DEP=#{HANDLE_DEP},</if>
+            <if test = "HANDLE_CITY!=null">HANDLE_CITY=#{HANDLE_CITY},</if>
+            <if test = "HANDLE_DEP_ID!=null">HANDLE_DEP_ID=#{HANDLE_DEP_ID},</if>
+            <if test = "HANDLE_CITY_ID!=null">HANDLE_CITY_ID=#{HANDLE_CITY_ID},</if>
+            <if test = "HANDLE_TIME!=null">HANDLE_TIME = TO_DATE(#{HANDLE_TIME}, 'yyyy-mm-dd hh24:mi:ss'),</if>
+            <if test = "COOPERATION_MODE!=null">COOPERATION_MODE=#{COOPERATION_MODE},</if>
+            <if test = "OTHER_OPERA_SER_NUM!=null">OTHER_OPERA_SER_NUM=#{OTHER_OPERA_SER_NUM},</if>
+            <if test = "BUSINESS_COORD_DEP!=null">BUSINESS_COORD_DEP=#{BUSINESS_COORD_DEP},</if>
+            <if test = "BATCH!=null">BATCH=#{BATCH},</if>
+            <if test = "CREATE_ORD_MODE!=null">CREATE_ORD_MODE=#{CREATE_ORD_MODE},</if>
+            <if test = "ANNEX!=null">ANNEX=#{ANNEX},</if>
+            <if test = "NOTES!=null">NOTES=#{NOTES},</if>
+            <if test = "AUTIT_NAME!=null">AUTIT_NAME=#{AUTIT_NAME},</if>
+            <if test = "AUTIT_ID!=null">AUTIT_ID=#{AUTIT_ID},</if>
+            <if test = "IS_GROUP_CUST!=null">IS_GROUP_CUST=#{IS_GROUP_CUST},</if>
+            <if test = "RELE_CREATE_APPLICATION!=null">RELE_CREATE_APPLICATION=#{RELE_CREATE_APPLICATION},</if>
+        </set>
+        where CST_ORD_ID=#{CST_ORD_ID,jdbcType=INTEGER}
+    </update>
+
+
+    <update id="UpdateSrvOrderInfo" parameterType="java.util.Map">
+        UPDATE  GOM_BDW_SRV_ORD_INFO
+        <set>
+        <if test = "SERVICE_ID!=null">SERVICE_ID=#{SERVICE_ID},</if>
+        <if test = "TRADE_TYPE_CODE!=null">TRADE_TYPE_CODE=#{TRADE_TYPE_CODE},</if>
+        <if test = "ACTIVE_TYPE!=null">ACTIVE_TYPE=#{ACTIVE_TYPE},</if>
+        <if test = "SERVICE_OFFER_ID!=null">SERVICE_OFFER_ID=#{SERVICE_OFFER_ID},</if>
+        <if test = "REQ_FIN_TIME!=null">REQ_FIN_TIME=#{REQ_FIN_TIME},</if>
+        <if test = "SERIAL_NUMBER!=null">SERIAL_NUMBER=#{SERIAL_NUMBER},</if>
+        <if test = "TRADE_ID!=null">TRADE_ID=#{TRADE_ID},</if>
+        <if test = "TRADE_ID_RELA!=null">TRADE_ID_RELA=#{TRADE_ID_RELA},</if>
+        <if test = "FLOW_ID!=null">FLOW_ID=#{FLOW_ID},</if>
+        <if test = "SRV_ORD_STAT!=null">SRV_ORD_STAT=#{SRV_ORD_STAT},</if>
+        <if test = "ORDER_ID!=null">ORDER_ID=#{ORDER_ID},</if>
+        </set>
+        WHERE SRV_ORD_ID =#{SRV_ORD_ID,jdbcType=INTEGER}
+
+    </update>
+</mapper>

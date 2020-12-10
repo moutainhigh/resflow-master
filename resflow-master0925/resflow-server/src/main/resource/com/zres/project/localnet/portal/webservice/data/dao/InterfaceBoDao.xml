@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.webservice.data.dao.InterfaceBoDao">
+    <!--添加附加产品记录(GOM_IDC_ADD_PROD_INFO)-->
+    <insert id="addGomAddProdInfo" parameterType="map" keyColumn="ADD_PROD_INFO_ID" keyProperty="ADD_PROD_INFO_ID">
+        <selectKey resultType="String" order="BEFORE" keyProperty="ADD_PROD_INFO_ID">
+            SELECT SEQ_GOM_BDW_ADD_PROD_INFO.NEXTVAL from dual
+        </selectKey>
+        INSERT INTO GOM_BDW_ADD_PROD_INFO (ADD_PROD_INFO_ID, SRV_ORD_ID, B_PRODUCT_ID, START_DATE, END_DATE, CREATE_DATE)
+        VALUES (
+        #{ADD_PROD_INFO_ID}, #{SRV_ORD_ID},#{B_PRODUCT_ID}
+        ,to_char(to_date(#{START_DATE}, 'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd hh24:mi:ss')
+        ,to_char(to_date(#{END_DATE}, 'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd hh24:mi:ss')
+        ,to_date(to_char(sysdate,'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd hh24:mi:ss'))
+    </insert>
+    <insert id="bachAddGomAddProdAttrInfo">
+        <selectKey resultType="int" order="BEFORE" keyProperty="ATTR_INFO_ID_AA">
+            SELECT SEQ_GOM_BDW_ADD_PROD_ATTR_INFO.NEXTVAL from dual
+        </selectKey>
+        insert into GOM_BDW_ADD_PROD_ATTR_INFO (ADD_PROD_ATTR_INFO_ID, ADD_PROD_INFO_ID, ATTR_ACTION, ATTR_CODE, ATTR_NAME, ATTR_VALUE, ATTR_VALUE_NAME, CREATE_DATE)
+        SELECT SEQ_ADD_PROD_ATTR_INFO_ID.NEXTVAL, ADD_PROD_INFO_ID, ATTR_ACTION, ATTR_CODE, ATTR_NAME, ATTR_VALUE, ATTR_VALUE_NAME, to_char(sysdate, 'yyyy-MM-dd hh24:mi:ss')
+        from (
+        <foreach collection="addAttrList" item="soa" separator="UNION">
+            SELECT
+            #{soa.ADD_PROD_INFO_ID} ADD_PROD_INFO_ID , #{soa.ATTR_ACTION} ATTR_ACTION, #{soa.ATTR_CODE} ATTR_CODE, #{soa.ATTR_NAME} ATTR_NAME,
+            #{soa.ATTR_VALUE} ATTR_VALUE, #{soa.ATTR_VALUE_NAME} ATTR_VALUE_NAME
+            FROM dual
+        </foreach>
+        ) t
+    </insert>
+
+    <select id="getAttrFileMsgInfo" parameterType="java.lang.String" resultType="java.util.Map">
+        select t.file_name,t.file_path,t.file_id,t.file_type
+        from gom_bdw_attach_info t
+        WHERE t.srv_ord_id = #{srvOrdId} AND t.wo_ord_id in(
+            select wo_id from GOM_BDW_SRV_ORD_INFO o
+            LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+            LEFT JOIN GOM_PS_2_WO_S WS ON WO.PS_ID=WS.ID
+            where  srv_ord_id = #{srvOrdId} and ws.TACHE_ID ='510101051'
+            union
+            select wo_id from GOM_BDW_SEC_LOCAL_RELATE_INFO o
+            LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+            LEFT JOIN GOM_PS_2_WO_S WS ON WO.PS_ID=WS.ID
+            where  o.srv_ord_id = #{srvOrdId} and ws.TACHE_ID ='500001168'
+        )
+    </select>
+    <select id="queryWoIdBySrvOrdId" parameterType="java.lang.String" resultType="map">
+        SELECT W.WO_ID,F.Z_CONSTRUCT_SCHEME,F.A_CONSTRUCT_SCHEME FROM GOM_WO W
+        LEFT JOIN GOM_BDW_CHECK_FEEDBACK F ON F.WO_ID=W.WO_ID
+        WHERE W.WO_ID IN (SELECT MAX(WO_ID) FROM GOM_WO w
+           LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+           LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+           WHERE  ut.TACHE_CODE='CHECK_SUMMARY' AND w.ORDER_ID IN(
+              SELECT MAX(ORDER_ID) FROM GOM_BDW_SRV_ORD_INFO WHERE SRV_ORD_ID=#{srvOrdId})
+        )
+    </select>
+    <select id="getCheckBackInfo" resultType="map">
+        SELECT S.ATTR_CODE ,TMP.ATTR_VALUE FROM GOM_BDW_ATTR_CODE_SWITCH S
+        LEFT JOIN (SELECT SRV_ORD_ID,LIE ,ATTR_VALUE FROM  GOM_BDW_CHECK_FEEDBACK
+            UNPIVOT (ATTR_VALUE FOR LIE IN (
+            <if test = 'type=="A"'> A_EQUIP_READY,A_RES_ACCESS,A_RES_PROVIDE,A_RES_SATISFY,A_ACCESS_ROOM</if>
+            <if test = 'type=="Z"'> Z_EQUIP_READY,Z_RES_ACCESS,Z_RES_PROVIDE,Z_RES_SATISFY,Z_ACCESS_ROOM</if>
+            ))
+          WHERE WO_ID=#{woId}
+        ) TMP  ON S.COL_NAME=TMP.LIE
+        WHERE S.TYPE=#{type}
+    </select>
+    <!-- 查询通用信息 A端、Z端、全程（B）都需要 -->
+    <select id="queryGeneralInfo" resultType="map">
+        SELECT S.ATTR_CODE ,nvl(TMP.ATTR_VALUE,'') ATTR_VALUE,'0' ATTR_ACTION FROM GOM_BDW_ATTR_CODE_SWITCH S
+        LEFT  JOIN  (SELECT wo_id,col_name ,ATTR_VALUE FROM  (
+        select w.wo_id,s.USER_NAME,s.PHONE_NO from gom_wo w left join VW_PUB_STAFF s on w.deal_user_id =s.staff_id
+        ) UNPIVOT (ATTR_VALUE FOR col_name IN (USER_NAME,PHONE_NO) )
+        WHERE WO_ID=#{woId}) TMP  ON S.COL_NAME=TMP.col_name WHERE S.TYPE='B'
+    </select>
+    <select id="querySrvInfoByTradeId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT MAX(SRV_ORD_ID) SRVORDID FROM GOM_BDW_SRV_ORD_INFO WHERE TRADE_ID = #{tradeId}
+    </select>
+    <select id="querySrvOrdId" resultType="java.lang.String">
+        SELECT MAX(SRV_ORD_ID) FROM GOM_BDW_SRV_ORD_INFO A JOIN GOM_BDW_CST_ORD B ON A.CST_ORD_ID = B.CST_ORD_ID
+        WHERE
+        A.SERIAL_NUMBER= #{serialNumber}
+        and
+        a.trade_id = #{tradeId} AND A.SRV_ORD_STAT='10N'
+        order by srv_ord_id desc
+    </select>
+    <select id="queryWoInfo" resultType="java.util.Map">
+        SELECT WO.WO_ID ,WO.ORDER_ID FROM GOM_BDW_SRV_ORD_INFO O
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WO.PS_ID=WS.ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID=WS.TACHE_ID
+        WHERE  SRV_ORD_ID = #{srvOrdId} AND UT.TACHE_CODE  IN('NOTICE_OF_RENT_CONFIRMATION_2')
+    </select>
+	 <select id="qryAttrInfo" resultType="java.util.Map">
+        SELECT LOCAL_CODE AS ATTR_CODE,TYPE,
+        CASE WHEN TYPE='areaName' THEN  (SELECT NAME FROM GOM_AREA_S  WHERE CRM_REGION =#{attrValue})
+          WHEN TYPE='areaId' THEN  (SELECT id FROM GOM_AREA_S  WHERE CRM_REGION =#{attrValue})
+          WHEN TYPE='deptId' THEN  (SELECT DEPT_ID FROM GOM_BDW_CITY_TRAS_DEPART WHERE AREA_CODE = #{attrValue})
+          WHEN TYPE='deptName' THEN  (SELECT DEPT_NAME FROM DEPARTMENT  WHERE DEPT_ID IN(
+            SELECT DEPT_ID FROM GOM_BDW_CITY_TRAS_DEPART WHERE AREA_CODE = #{attrValue}))
+          WHEN TYPE='codeContent' THEN  (SELECT CODE_CONTENT FROM GOM_BDW_CODE_INFO_SECOND WHERE CODE_TYPE =#{attrCode} AND CODE_VALUE=#{attrValue})
+          ELSE   #{attrValue}  END ATTR_VALUE,
+        CASE WHEN TYPE='areaName' THEN  (SELECT NAME FROM GOM_AREA_S  WHERE CRM_REGION =#{oldAttrValue})
+                  WHEN TYPE='areaId' THEN  (SELECT id FROM GOM_AREA_S  WHERE CRM_REGION =#{oldAttrValue})
+                  WHEN TYPE='deptId' THEN  (SELECT DEPT_ID FROM GOM_BDW_CITY_TRAS_DEPART WHERE AREA_CODE = #{oldAttrValue})
+                  WHEN TYPE='deptName' THEN  (SELECT DEPT_NAME FROM DEPARTMENT  WHERE DEPT_ID IN(
+                    SELECT DEPT_ID FROM GOM_BDW_CITY_TRAS_DEPART WHERE AREA_CODE = #{oldAttrValue}))
+                  WHEN TYPE='codeContent' THEN  (SELECT CODE_CONTENT FROM GOM_BDW_CODE_INFO_SECOND WHERE CODE_TYPE =#{attrCode} AND CODE_VALUE=#{oldAttrValue})
+        ELSE   #{oldAttrValue}  END OLD_ATTR_VALUE
+        FROM GOM_BDW_JIKE_SWITCH WHERE JIKE_CODE=#{attrCode} AND SERVICE_ID=#{serviceId}
+    </select>
+    <!--查询二干下发本地网后本地网的电路id-->
+    <select id="qryLocalInfo" parameterType="string" resultType="java.util.Map" >
+        SELECT RELATE_INFO_ID FROM GOM_BDW_SEC_LOCAL_RELATE_INFO WHERE SRV_ORD_ID =#{srvOrdId}
+    </select>
+    <!--核查单查询核查汇总环节上传的附件 -->
+    <select id="getAttrFileMsgInfoCheck" parameterType="java.lang.String" resultType="java.util.Map">
+        select t.file_name,t.file_path,t.file_id,t.file_type
+        from gom_bdw_attach_info t
+        WHERE t.srv_ord_id = #{srvOrdId} AND t.wo_ord_id in(
+        select wo_id from GOM_BDW_SRV_ORD_INFO o
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = O.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WO.PS_ID=WS.ID
+        where  srv_ord_id = #{srvOrdId} and ws.TACHE_ID ='510101060'
+        )
+    </select>
+    <update id="updateApplyOrdName">
+        UPDATE GOM_BDW_CST_ORD
+        set APPLY_ORD_NAME = #{APPLY_ORD_NAME}
+        WHERE CST_ORD_ID = #{cstOrdId}
+    </update>
+
+    <select id="qryActName" resultType="String">
+        select CODE_CONTENT from GOM_BDW_CODE_INFO
+        where  code_type=#{CODE_TYPE} and code_value=#{CODE_VALUE}
+    </select>
+    <update id="updateSrvOrdId">
+        UPDATE GOM_BDW_INTERF_LOG_INFO set SRV_ORD_ID = #{srvOrdId}
+        WHERE ID = (
+            select max(ID) from GOM_BDW_INTERF_LOG_INFO
+            WHERE ORDER_NO=#{subscribeId} AND URL='/receiveJsonServiceIntf/interfaceBDW/receiveJson.spr'
+        )
+    </update>
+    <select id="qryCstOrdId" resultType="java.util.Map">
+        SELECT MAX(CST.CST_ORD_ID) CST_ORD_ID
+        FROM GOM_BDW_CST_ORD  CST
+        JOIN GOM_BDW_SRV_ORD_INFO SRV ON CST.CST_ORD_ID=SRV.CST_ORD_ID
+        WHERE  CST.SUBSCRIBE_ID= #{SUBSCRIBE_ID} AND CST.CUST_ID= #{CUST_ID}
+        AND SRV.SYSTEM_RESOURCE=#{SYSTEM_RESOURCE} AND SRV.TRADE_TYPE_CODE = #{TRADE_TYPE_CODE}
+        AND SRV.SERVICE_ID=#{SERVICE_ID} AND SRV.RE_ACTIVE_TYPE = #{RE_ACTIVE_TYPE}
+        AND SRV.SERVICE_OFFER_ID=#{SERVICE_OFFER_ID}
+    </select>
+
+    <update id="updateOrderIdBySrvOrdId">
+        UPDATE GOM_BDW_SRV_ORD_INFO set ORDER_ID = #{orderId}
+        WHERE SRV_ORD_ID = #{srvOrdId}
+    </update>
+    <update id="updateActTypeBySrvOrdId">
+        UPDATE GOM_BDW_SRV_ORD_INFO set ACTIVE_TYPE= #{activeType}
+        WHERE SRV_ORD_ID = #{srvOrdId}
+    </update>
+    <!--增加接口日志-->
+    <insert id="insertInterfLog" parameterType="map">
+        INSERT INTO GOM_BDW_INTERF_LOG_INFO (INTERF_NAME, URL, CONTENT, CREATE_DATE, ORDER_NO, ID, REMARK, UPDATE_DATE, RETURN_CONTENT,SRV_ORD_ID)
+        VALUES
+        (#{INTERFNAME}, #{URL}, #{CONTENT}, sysdate, #{ORDERNO}, SEQ_GOM_BDW_INTERF_LOG_INFO.NEXTVAL, #{REMARK}, sysdate, #{RETURNCONTENT}, #{srvOrdId} )
+    </insert>
+
+
+
+    <select id="checkSummary" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT S.ATTR_CODE, TMP.ATTR_VALUE
+          FROM GOM_BDW_ATTR_CODE_SWITCH S
+          LEFT JOIN (SELECT SRV_ORD_ID, LIE, ATTR_VALUE
+                       FROM (SELECT SRV_ORD_ID,
+                                    WO_ID,
+                                    CAST(Z_CONSTRUCT_PERIOD as varchar2(4000)) as Z_CONSTRUCT_PERIOD,
+                                    CAST(Z_INVESTMENT_AMOUNT as varchar2(4000)) as Z_INVESTMENT_AMOUNT,
+                                    CAST(Z_CONSTRUCT_SCHEME as varchar2(4000)) as Z_CONSTRUCT_SCHEME,
+                                    CAST(Z_RES_SATISFY as varchar2(4000)) as Z_RES_SATISFY
+                       FROM GOM_BDW_CHECK_FEEDBACK)
+        UNPIVOT(ATTR_VALUE
+           FOR LIE IN(Z_CONSTRUCT_PERIOD,
+                      Z_INVESTMENT_AMOUNT,
+                       Z_CONSTRUCT_SCHEME,
+                      Z_RES_SATISFY))
+         WHERE WO_ID = #{woId}
+         ) TMP ON S.COL_NAME = TMP.LIE
+         WHERE S.TYPE = #{type}
+    </select>
+    <!--查询AZ端核查标准化信息 -->
+    <select id="queryCheckStandInfo" resultType="map">
+        SELECT S.ATTR_CODE ,TMP.ATTR_VALUE FROM GOM_BDW_ATTR_CODE_SWITCH S
+        JOIN (SELECT SRV_ORD_ID,LIE ,ATTR_VALUE
+        FROM (SELECT SRV_ORD_ID, WO_ID
+        <if test = 'type=="A"'>,A_RES_PROVIDE_STAND
+            ,A_BOARD_READY
+            ,A_TRANS_READY
+            ,A_OPTICAL_READY
+            ,CAST(A_BOARD_PERIOD as varchar2(30)) as A_BOARD_PERIOD
+            ,CAST(A_BOARD_AMOUNT as varchar2(30)) as A_BOARD_AMOUNT
+            ,A_BOARD_TYPE
+            ,A_BOARD_MODEL
+            ,CAST(A_TRANS_PERIOD as varchar2(30)) as A_TRANS_PERIOD
+            ,CAST(A_TRANS_AMOUNT as varchar2(30)) as A_TRANS_AMOUNT
+            ,A_TRANS_TYPE
+            ,A_OTHER_TYPE
+            ,A_TRANS_MODEL
+            ,CAST(A_OPTICAL_PERIOD as varchar2(30)) as A_OPTICAL_PERIOD
+            ,CAST(A_OPTICAL_AMOUNT as varchar2(30)) as A_OPTICAL_AMOUNT
+            ,CAST(A_CONSTRUCT_PERIOD_STAND as varchar2(30)) as A_CONSTRUCT_PERIOD_STAND
+            ,CAST(A_PROJECT_AMOUNT as varchar2(30)) as A_PROJECT_AMOUNT
+            ,CAST(A_PROJECT_OVERVIEW as varchar2(4000)) as A_PROJECT_OVERVIEW
+            ,A_MUNICIPAL_APPROVAL
+            ,CAST(A_APPROVAL_PERIOD as varchar2(30)) as A_APPROVAL_PERIOD
+            ,CAST(A_RES_DESC as varchar2(4000)) as A_RES_DESC
+            ,A_PROPERTY_REDLINE
+            ,CAST(A_PROPERTY_DESC as varchar2(4000)) as A_PROPERTY_DESC
+            ,A_CUST_ROOM
+            ,A_ACCESS_PROJECT_SCHEME
+            ,A_RES_EXPLORER
+            ,A_RES_EXPLOR_CONTACT
+            ,A_RES_HAVE
+            ,CAST(A_TOTAL_AMOUNT as varchar2(30)) as A_TOTAL_AMOUNT
+            ,CAST(A_LONGEST_PERIOD as varchar2(30)) as A_LONGEST_PERIOD
+            ,CAST(A_UNABLE_RELOVE as varchar2(4000)) as A_UNABLE_RELOVE
+        </if>
+        <if test = 'type=="Z"'>,Z_RES_PROVIDE_STAND
+            ,Z_BOARD_READY
+            ,Z_TRANS_READY
+            ,Z_OPTICAL_READY
+            ,CAST(Z_BOARD_PERIOD as varchar2(30)) as Z_BOARD_PERIOD
+            ,CAST(Z_BOARD_AMOUNT as varchar2(30)) as Z_BOARD_AMOUNT
+            ,Z_BOARD_TYPE
+            ,Z_BOARD_MODEL
+            ,CAST(Z_TRANS_PERIOD as varchar2(30)) as Z_TRANS_PERIOD
+            ,CAST(Z_TRANS_AMOUNT as varchar2(30)) as Z_TRANS_AMOUNT
+            ,Z_TRANS_TYPE
+            ,Z_OTHER_TYPE
+            ,Z_TRANS_MODEL
+            ,CAST(Z_OPTICAL_PERIOD as varchar2(30)) as Z_OPTICAL_PERIOD
+            ,CAST(Z_OPTICAL_AMOUNT as varchar2(30)) as Z_OPTICAL_AMOUNT
+            ,CAST(Z_CONSTRUCT_PERIOD_STAND as varchar2(30)) as Z_CONSTRUCT_PERIOD_STAND
+            ,CAST(Z_PROJECT_AMOUNT as varchar2(30)) as Z_PROJECT_AMOUNT
+            ,CAST(Z_PROJECT_OVERVIEW as varchar2(4000)) as Z_PROJECT_OVERVIEW
+            ,Z_MUNICIPAL_APPROVAL
+            ,CAST(Z_APPROVAL_PERIOD as varchar2(30)) as Z_APPROVAL_PERIOD
+            ,CAST(Z_RES_DESC as varchar2(4000)) as Z_RES_DESC
+            ,Z_PROPERTY_REDLINE
+            ,CAST(Z_PROPERTY_DESC as varchar2(4000)) as Z_PROPERTY_DESC
+            ,Z_CUST_ROOM
+            ,Z_ACCESS_PROJECT_SCHEME
+            ,Z_RES_EXPLORER
+            ,Z_RES_EXPLOR_CONTACT
+            ,Z_RES_HAVE
+            ,CAST(Z_TOTAL_AMOUNT as varchar2(30)) as Z_TOTAL_AMOUNT
+            ,CAST(Z_LONGEST_PERIOD as varchar2(30)) as Z_LONGEST_PERIOD
+            ,CAST(Z_UNABLE_RELOVE as varchar2(4000)) as Z_UNABLE_RELOVE
+            ,ACCESS_CIR_TYPE,OTHER_ACE_CIR_TYPE,UPLINK_NODE_PORT
+        </if>
+        <if test = 'type=="B"'>,COLLECT_RES
+            ,CAST(COLLECT_MONEY as varchar2(30)) as COLLECT_MONEY
+            ,CAST(COLLECT_DAY as varchar2(30)) as COLLECT_DAY
+            ,CAST(COLLECT_DESC as varchar2(4000)) as COLLECT_DESC
+        </if>
+        FROM GOM_BDW_CHECK_FEEDBACK)
+        UNPIVOT (ATTR_VALUE FOR LIE IN (
+        <if test = 'type=="A"'> A_RES_PROVIDE_STAND,A_BOARD_READY,A_TRANS_READY,A_OPTICAL_READY,A_BOARD_PERIOD,A_BOARD_AMOUNT,A_BOARD_TYPE,A_BOARD_MODEL,A_TRANS_PERIOD,A_TRANS_AMOUNT,A_TRANS_TYPE,A_OTHER_TYPE,A_TRANS_MODEL,A_OPTICAL_PERIOD,A_OPTICAL_AMOUNT,A_CONSTRUCT_PERIOD_STAND,A_PROJECT_AMOUNT,A_PROJECT_OVERVIEW,A_MUNICIPAL_APPROVAL,A_APPROVAL_PERIOD,A_RES_DESC,A_PROPERTY_REDLINE,A_PROPERTY_DESC,A_CUST_ROOM,A_ACCESS_PROJECT_SCHEME,A_RES_EXPLORER,A_RES_EXPLOR_CONTACT,A_RES_HAVE,A_TOTAL_AMOUNT,A_LONGEST_PERIOD,A_UNABLE_RELOVE</if>
+        <if test = 'type=="Z"'> Z_RES_PROVIDE_STAND,Z_BOARD_READY,Z_TRANS_READY,Z_OPTICAL_READY,Z_BOARD_PERIOD,Z_BOARD_AMOUNT,Z_BOARD_TYPE,Z_BOARD_MODEL,Z_TRANS_PERIOD,Z_TRANS_AMOUNT,Z_TRANS_TYPE,Z_OTHER_TYPE,Z_TRANS_MODEL,Z_OPTICAL_PERIOD,Z_OPTICAL_AMOUNT,Z_CONSTRUCT_PERIOD_STAND,Z_PROJECT_AMOUNT,Z_PROJECT_OVERVIEW,Z_MUNICIPAL_APPROVAL,Z_APPROVAL_PERIOD,Z_RES_DESC,Z_PROPERTY_REDLINE,Z_PROPERTY_DESC,Z_CUST_ROOM,Z_ACCESS_PROJECT_SCHEME,Z_RES_EXPLORER,Z_RES_EXPLOR_CONTACT,Z_RES_HAVE,Z_TOTAL_AMOUNT,Z_LONGEST_PERIOD,Z_UNABLE_RELOVE,ACCESS_CIR_TYPE,OTHER_ACE_CIR_TYPE,UPLINK_NODE_PORT</if>
+        <if test = 'type=="B"'> COLLECT_RES,COLLECT_MONEY,COLLECT_DAY,COLLECT_DESC </if>
+        ))
+        WHERE WO_ID=#{woId}
+        ) TMP  ON S.COL_NAME=TMP.LIE
+        WHERE S.TYPE=#{type}
+    </select>
+    <!--查询汇总后的核查标准化信息 -->
+    <select id="queryCheckStandAllInfo" resultType="map">
+        SELECT SRV_ORD_ID, WO_ID
+        ,CASE WHEN  A_RES_HAVE='1' AND Z_RES_HAVE='1' THEN '1' ELSE '0' END RES_HAVE
+        ,CASE WHEN  NVL(A_LONGEST_PERIOD,0) > NVL(Z_LONGEST_PERIOD,0) THEN NVL(A_LONGEST_PERIOD,0) ELSE NVL(Z_LONGEST_PERIOD,0) END LONGEST_PERIOD
+        ,NVL(A_TOTAL_AMOUNT,0) + NVL(Z_TOTAL_AMOUNT,0) AS TOTAL_AMOUNT
+        ,NVL(CAST(A_RES_DESC as varchar2(4000)) ,'')|| ';'||NVL(CAST(Z_RES_DESC as varchar2(4000))  ,'') AS RES_DESC
+         FROM GOM_BDW_CHECK_FEEDBACK
+        WHERE WO_ID=#{woId}
+    </select>
+    <!--查询二干下发本地的核查汇总工单id -->
+    <select id="qryLocalWoInfo" resultType="map">
+        SELECT WO.WO_ID,AREGIONID,ZREGIONID,REL.REGION_ID,Z.PARENT_ID IDZ,A.PARENT_ID IDA
+        ,CASE WHEN A.PARENT_ID=REL.REGION_ID THEN 'A'
+        WHEN Z.PARENT_ID=REL.REGION_ID THEN 'Z'
+        ELSE '' END FLAG_TYPE
+        FROM GOM_BDW_SRV_ORD_INFO  SRV
+        LEFT JOIN (SELECT SOI.SRV_ORD_ID SRVORDIDINFO,ATTR.ATTR_CODE,ATTR.ATTR_VALUE
+        FROM  GOM_BDW_SRV_ORD_INFO SOI
+        LEFT JOIN GOM_BDW_SRV_ORD_ATTR_INFO ATTR ON ATTR.SRV_ORD_ID = SOI.SRV_ORD_ID
+        WHERE SOI.SRV_ORD_ID =#{srvOrdId} AND ATTR_CODE IN ('20000234','20000235')) T
+        PIVOT(MAX(T.ATTR_VALUE) FOR ATTR_CODE IN ('20000234' AREGIONID,'20000235' ZREGIONID)) A
+        ON A.SRVORDIDINFO = SRV.SRV_ORD_ID
+        LEFT JOIN GOM_BDW_SEC_LOCAL_RELATE_INFO REL ON SRV.SRV_ORD_ID=REL.SRV_ORD_ID
+        AND CONFIGSTATE <![CDATA[ <> ]]> '10X'
+        LEFT JOIN (SELECT MAX(WO_ID) WO_ID,MAX(ORDER_ID) ORDER_ID FROM
+         GOM_WO WO
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        WHERE  UT.TACHE_CODE='CHECK_TOTAL' GROUP BY ORDER_ID) WO ON WO.ORDER_ID=REL.ORDER_ID
+        LEFT  JOIN DEPARTMENT Z ON Z.DEPT_ID=ZREGIONID
+        LEFT  JOIN DEPARTMENT A ON   A.DEPT_ID=AREGIONID
+        WHERE SRV.SRV_ORD_ID =#{srvOrdId}
+    </select>
+</mapper>

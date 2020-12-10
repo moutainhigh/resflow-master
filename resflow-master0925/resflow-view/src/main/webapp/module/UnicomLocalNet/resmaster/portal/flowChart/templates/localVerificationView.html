@@ -1,0 +1,123 @@
+<div class="modal-header">
+    <h4 class="modal-title">本地调度流程</h4>
+</div>
+<div class="modal-body" style="padding:0px;">
+<!-- 流程图s -->
+    <div class="fish-flowBox">
+        <!-- 流程图展示 -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title">本地核查流程</span>
+            </div>
+            <div class="panel-body flow-chart-box">
+                <ul class="fish-prompt">
+                    <li class="fish-prompt-1">已完成</li>
+                    <li class="fish-prompt-2">处理中</li>
+                    <li class="fish-prompt-3">未完成</li>
+                </ul>
+
+                <ul class="fish-flowUl fish-verification clearfix">
+                    <li id="twodryFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">二干调度</p>
+                    </li>
+                    <li id="onedryFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">一干调度</p>
+                    </li>
+                    <li id="jikeFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">集中集客</p>
+                    </li>
+                    <li id="CHECK_DISPATCH" tacheCode="CHECK_DISPATCH">
+                        <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-1.png" /></span>
+                        <p class="fish-flowName">核查调度</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li class="fish-Line-s3 fish-Line-s3s"><label style="top: 50%"></label></li>
+                    <li class="fish-flow2">
+                        <dl class="fish-flow-dl">
+                            <dd class="clearfix">
+                                <div class="relative" id="OUTSIDElINE_CHECK" tacheCode="OUTSIDElINE_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-8.png" /></span>
+                                    <p class="fish-flowName">外线核查</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="inline-block relative" id="DATA_CHECK" tacheCode="DATA_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-7.png" /></span>
+                                    <p class="fish-flowName">数据核查</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="relative" id="TRANS_CHECK" tacheCode="TRANS_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-8.png" /></span>
+                                    <p class="fish-flowName">传输核查</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="relative" id="ACCESS_CHECK" tacheCode="ACCESS_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73access.png" /></span>
+                                    <p class="fish-flowName">接入核查</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="relative" id="OTHER_CHECK" tacheCode="OTHER_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73other.png" /></span>
+                                    <p class="fish-flowName">其他核查</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="relative" id="CHANGE_CHECK" tacheCode="CHANGE_CHECK">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73other.png" /></span>
+                                    <p class="fish-flowName">交换专业</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li class="fish-Line-s3 fish-Line-s3s">
+                        <label style="top: 0"></label>
+                        <label style="top: 100%"></label>
+                    </li>
+                    <li id="CHECK_TOTAL" tacheCode="CHECK_TOTAL">
+                        <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-6.png" /></span>
+                        <p class="fish-flowName">核查汇总</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li class="fish-Line-s1"><label style="top: 50%"></label></li>
+                    <li class="fish-flow1">
+                        <!-- 处理中加 fish-dispose\ 完成加 fish-finish -->
+                        <div class="relative" id="INVESTMENT_ESTIMATION" tacheCode="INVESTMENT_ESTIMATION">
+                            <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73profe.png" /></span>
+                            <p class="fish-flowName">投资估算</p>
+                            <div class="fish-arrows"></div>
+                        </div>
+                        <!-- 单横线 -->
+                        <div class="fish-line-he"></div>
+                    </li>
+                    <li class="fish-Line-s1">
+                        <label style="top: 0"></label>
+                    </li>
+                    <li id="flowEndSub">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73confirm.png" /></span>
+                        <p class="fish-flowName">流程结束</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 步骤s -->
+        <div class="panel-footer" id="localTaskInfo">
+
+        </div>
+
+    </div>
+
+</div>

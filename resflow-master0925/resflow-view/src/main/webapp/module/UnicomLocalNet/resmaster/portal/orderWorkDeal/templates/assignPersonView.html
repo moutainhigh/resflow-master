@@ -1,0 +1,62 @@
+<div class="modal-header">
+    <h4 class="modal-title">指定派发人员</h4>
+</div>
+<div class="modal-body">
+    <div class="col-md-12" id="transferView">
+        <div class="row">
+            <form class="form-horizontal" id="transferTree-form">
+<!--                <div class="row" id="newOrgPer" style="margin-left: 5px;">-->
+<!--                    <label class="radio-inline">-->
+<!--                        <input type="radio" name="newOrgPerRadio" id="newOrg" value="0">组织树</label>-->
+<!--                    <label class="radio-inline">-->
+<!--                        <input type="radio" name="newOrgPerRadio" id="newPer" value="1" checked="true">搜索</label>-->
+<!--                    <label class="radio-inline">-->
+<!--                        <input type="radio" name="newOrgPerRadio" id="newContacts" value="2">常用联系人</label>-->
+<!--                </div>-->
+<!--                <div class="row" style="height:330px;overflow-y:auto;margin-left: 5px;display: none;" id="transferTreeDiv">-->
+<!--                    <div id="transferTree">-->
+<!--                        <div id="transferObjTree"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div class="row" id="searchInput" style="margin-left: 5px;">
+<!--                    <div id="orgPerDeTypeDiv" class="col-md-4" >-->
+<!--                        <input class="combobox form-control" name="orgPerDeType" id="orgPerDeType">-->
+<!--                    </div>-->
+                    <div id="searchOrgPerDiv" class="col-md-6">
+                        <input type="text" id="searchOrgPer" name="searchOrgPer" class="form-control"/>
+                    </div>
+                    <div id="searchOrgPerBtnDiv" class="col-md-2">
+                        <button type="button" id="searchOrgPerBtn" class="btn"
+                                style="background-color: #EB4A4B;height: 25px;">查询
+                        </button>
+                    </div>
+<!--                    <input type="hidden" id="searchId">-->
+<!--                    <input type="hidden" id="searchName">-->
+<!--                    <input type="hidden" id="searchObjType">-->
+                </div>
+                <div class="row" style="margin-left: 5px;">
+<!--                    <div style="padding: 10px;" id="searchOrgPerDivDis">-->
+                    <div id="searchOrgPerGrid"></div>
+<!--                    </div>-->
+<!--                    <div style="padding: 10px;display: none;" id="searchOrgPerDePartDivDis">-->
+<!--                        <div id="searchOrgPerDepartGrid"></div>-->
+<!--                    </div>-->
+<!--                    <div style="padding: 10px;display: none;" id="searchOrgPerDePostDivDis">-->
+<!--                        <div id="searchOrgPerPostGrid"></div>-->
+<!--                    </div>-->
+                </div>
+<!--                <div class="row" id="searchContacts" style="height:330px;margin-left: 5px;display: none;">-->
+<!--                    <div id = "searchContactsView"></div>-->
+<!--                </div>-->
+                <div class="row">
+                    <div id="subBtnDiv" class="col-md-12" >
+                        <div style="text-align: center;padding-top:5px;padding-right:20px;" >
+                            <button type="button" id="submitBtn" class="btn" style="background-color: #EB4A4B">确定</button>
+                            <button type="button" class="btn" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.OrderSendMsgDao">
+
+    <insert id="insertMsg" parameterType="map">
+        insert into gom_bdw_msg (MSG_ID, ORDER_ID_LIST, AREA_ID, OPERACTION, STATE, STATE_DATE, CREATE_DATE, IS_REL_SEND,BELONGSYSTEM)
+        values (SEQ_gom_bdw_msg.Nextval,#{orderIdList},#{areaId},#{operAction},#{state},sysdate,sysdate,#{isRelSend},#{belongSystem})
+    </insert>
+
+    <insert id="copyMsgToHis" parameterType="int">
+        insert into gom_bdw_msg_his (MSG_ID, ORDER_ID_LIST, AREA_ID, OPERACTION, STATE, STATE_DATE, CREATE_DATE, IS_REL_SEND,BELONGSYSTEM)
+        SELECT MSG_ID, ORDER_ID_LIST, AREA_ID, OPERACTION, STATE, STATE_DATE, CREATE_DATE,IS_REL_SEND,BELONGSYSTEM
+        FROM gom_bdw_msg WHERE MSG_ID = #{msgId}
+    </insert>
+
+    <delete id="deleteMsg" parameterType="int">
+        DELETE FROM gom_bdw_msg msg WHERE msg.msg_id = #{msgId}
+    </delete>
+
+    <update id="updateMsgState" parameterType="map">
+        UPDATE gom_bdw_msg msg SET msg.state = #{state} ,msg.state_date = SYSDATE WHERE msg.msg_id = #{msgId}
+    </update>
+
+    <select id="getNeedSendMsgData" resultType="map" >
+        SELECT r.*
+        FROM (SELECT MSG.MSG_ID,
+        MSG.ORDER_ID_LIST,
+        MSG.AREA_ID,
+        MSG.OPERACTION,
+        MSG.STATE,
+        MSG.STATE_DATE,
+        MSG.CREATE_DATE,
+        MSG.IS_REL_SEND
+        FROM GOM_BDW_MSG MSG
+        WHERE MSG.STATE = '10A'
+        AND MSG.BELONGSYSTEM = #{orderType}
+        ORDER BY MSG.CREATE_DATE) r
+        WHERE ROWNUM <![CDATA[ <= ]]> 50
+    </select>
+
+    <select id="qrySendMsgInfo" resultType="map" parameterType="list">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,us.USER_NAME as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.disp_obj_id
+        where w.disp_obj_tye = '260000003'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qrySendMsgInfoChild" resultType="map" parameterType="list">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,us.USER_NAME as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.disp_obj_id
+        where w.disp_obj_tye = '260000003'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfoChild" resultType="map" parameterType="String">
+        SELECT t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select DISTINCT MAX(t.REQ_FIN_DATE) AS REQ_FIN_DATE,
+        t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.comp_user_id,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') AS REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.comp_user_id
+        where w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000004'
+        AND ut.tache_code IN
+        <foreach item="tacheCode" index="index" collection="tacheCodeList" open="(" separator="," close=")">
+            　#{tacheCode}
+        </foreach>
+        and w.ORDER_ID IN
+        <foreach item="orderId" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{orderId}
+        </foreach>
+        ORDER BY w.create_date DESC
+        ) t GROUP BY t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName
+        )t2 GROUP BY t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfoChildFristTache" resultType="map" parameterType="String">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct MAX(t.REQ_FIN_DATE) AS REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+          SELECT w.DISP_OBJ_TYE,w.deal_user_id,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+          REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+          ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+          FROM GOM_WO w
+          LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+          LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.ORDER_ID
+          LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+          LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+          LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+          left join vw_pub_staff s on s.staff_id = w.deal_user_id
+          where w.disp_obj_id != '-2000'
+          and w.WO_STATE = '290000005'
+          AND ut.tache_code IN
+          <foreach item="tacheCode" index="index" collection="tacheCodeList" open="(" separator="," close=")">
+            　#{tacheCode}
+          </foreach>
+          and w.ORDER_ID IN
+          <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+          </foreach>
+          ORDER BY w.create_date DESC
+        ) t GROUP BY t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName
+        )t2 group by t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qrySendMsgInfoFromSec" resultType="map" parameterType="list">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,us.USER_NAME as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.disp_obj_id
+        where w.disp_obj_tye = '260000003'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qrySendMsgInfoChildFromSec" resultType="map" parameterType="list">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,us.USER_NAME as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.parent_ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_user_s us on us.ORG_ID = w.disp_obj_id
+        where w.disp_obj_tye = '260000001'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.parent_ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join gom_staff_group_rela_s gs on gs.staff_group_id = w.disp_obj_id
+        LEFT JOIN vw_pub_staff s ON s.STAFF_ID = gs.STAFF_ID
+        where w.disp_obj_tye = '260000002'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        union all
+        SELECT w.DISP_OBJ_TYE,w.DISP_OBJ_ID,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.parent_ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.disp_obj_id
+        where w.disp_obj_tye = '260000003'
+        and w.WO_STATE = '290000002'
+        and w.ORDER_ID in
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfoChildFromSec" resultType="map" parameterType="String">
+        SELECT t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select DISTINCT MAX(t.REQ_FIN_DATE) AS REQ_FIN_DATE,
+        t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.comp_user_id,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') AS REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.parent_ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.comp_user_id
+        where w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000004'
+        AND ut.tache_code IN
+        <foreach item="tacheCode" index="index" collection="tacheCodeList" open="(" separator="," close=")">
+            　#{tacheCode}
+        </foreach>
+        and w.ORDER_ID IN
+        <foreach item="orderId" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{orderId}
+        </foreach>
+        ORDER BY w.create_date DESC
+        ) t GROUP BY t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName
+        )t2 GROUP BY t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfoChildFristTacheFromSec" resultType="map" parameterType="String">
+        select t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select distinct t.REQ_FIN_DATE,t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.deal_user_id,to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') as
+        REQ_FIN_DATE,cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.deal_user_id
+        where w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000002'
+        AND ut.tache_code = #{tacheCode}
+        and w.ORDER_ID IN
+        <foreach item="item" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{item}
+        </foreach>
+        ORDER BY w.create_date DESC
+        ) t )t2 group by
+        t2.REQ_FIN_DATE,t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfo" resultType="map" parameterType="String">
+        SELECT t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select DISTINCT MAX(t.REQ_FIN_DATE) AS REQ_FIN_DATE,
+        t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.comp_user_id,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') AS REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = o.ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.comp_user_id
+        where w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000005'
+        AND ut.tache_code = #{tacheCode}
+        and w.ORDER_ID IN
+        <foreach item="orderId" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{orderId}
+        </foreach>
+        ORDER BY w.create_date DESC
+        ) t GROUP BY t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName
+        )t2 GROUP BY t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryRollBackSendMsgInfoFromSec" resultType="map" parameterType="String">
+        SELECT t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,
+        t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE,wm_concat(t2.staffLoginName) as staffLoginName
+        from (
+        select DISTINCT MAX(t.REQ_FIN_DATE) AS REQ_FIN_DATE,
+        t.APPLY_ORD_ID,t.APPLY_ORD_NAME,
+        t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName from
+        (
+        SELECT w.DISP_OBJ_TYE,w.comp_user_id,
+        to_char(w.REQ_FIN_DATE, 'yyyy-MM-dd') AS REQ_FIN_DATE,
+        cst.APPLY_ORD_ID,cst.APPLY_ORD_NAME,
+        ws.tache_id,ut.tache_name,w.ORDER_ID,w.WO_ID,cst.CUST_NAME_CHINESE,s.login_name as staffLoginName
+        FROM GOM_WO w
+        LEFT JOIN GOM_ORDER o ON o.ORDER_ID = w.ORDER_ID
+        LEFT JOIN gom_bdw_sec_local_relate_info rel ON rel.order_id = o.ORDER_ID
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO srv ON srv.order_id = rel.parent_ORDER_ID
+        LEFT JOIN gom_bdw_cst_ord cst ON srv.cst_ord_id = cst.cst_ord_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        left join vw_pub_staff s on s.staff_id = w.comp_user_id
+        where w.disp_obj_id != '-2000'
+        and w.WO_STATE = '290000005'
+        and w.ORDER_ID IN
+        <foreach item="orderId" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{orderId}
+        </foreach>
+        and w.ORDER_ID IN
+        <foreach item="orderId" index="index" collection="orderIdList" open="(" separator="," close=")">
+            　#{orderId}
+        </foreach>
+        ORDER BY w.create_date DESC
+        ) t GROUP BY t.APPLY_ORD_ID,t.APPLY_ORD_NAME,t.tache_id,t.tache_name,t.CUST_NAME_CHINESE,t.staffLoginName
+        )t2 GROUP BY t2.REQ_FIN_DATE, t2.APPLY_ORD_ID,t2.APPLY_ORD_NAME,t2.tache_id,t2.tache_name,t2.CUST_NAME_CHINESE
+    </select>
+
+    <select id="qryCurrentTache" resultType="map" parameterType="String">
+        SELECT * FROM (
+        SELECT wo.wo_id,wo.order_id,wo.wo_state,oo.order_state,ut.id,ut.tache_code,ut.tache_name,os.id as ps_id
+        FROM gom_wo wo
+        LEFT JOIN gom_order oo ON oo.order_id = wo.order_id
+        LEFT JOIN gom_ps_2_wo_s ws ON ws.id = wo.ps_id
+        LEFT JOIN gom_ps_2_ord_s os ON os.id = ws.ord_ps_id
+        LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+        WHERE ut.tache_code not in ('FINISH_SOURCES_DISP','SPECIALTY_DATA_PRODUCTION_FINSH')
+        AND (oo.order_id = #{orderId} OR oo.parent_order_id = #{orderId})
+        ORDER BY wo.wo_id DESC
+        ) r WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryOrderIdChild" resultType="String" parameterType="String">
+        SELECT oo.order_id FROM gom_order oo
+        WHERE oo.parent_order_id = #{orderId}
+        AND oo.order_state = '200000002'
+        AND oo.parent_order_code = #{tacheCodeFlag}
+    </select>
+
+    <insert id="insertSendMsgLog" parameterType="Map">
+        INSERT INTO gom_bdw_send_msg_log (SEND_MSG_ID,APPLY_ORD_ID,APPLY_ORD_NAME,CUST_NAME_CHINESE,SMS_CONTENT,
+        USER_NAME,TACHE_ID,TACHE_NAME,ORDER_ID_LIST,CREATE_DATE,OPER_ACTION)
+        VALUES (SEQ_gom_bdw_send_msg_log.Nextval,#{applyOrdId},#{applyOrdName},#{custNameChinese},#{smsContent},
+        #{userName},#{tacheId},#{tacheName},#{orderIdList},sysdate,#{operAction})
+    </insert>
+
+    <select id="qryIsDataAndSchedule" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_wo wo
+        LEFT JOIN gom_order oo ON oo.order_id = wo.order_id
+        LEFT JOIN gom_ps_2_wo_s ws ON ws.id = wo.ps_id
+        LEFT JOIN gom_ps_2_ord_s os ON os.id = ws.ord_ps_id
+        LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+        WHERE ut.tache_code in ('TO_DATA_CREATE_AND_SCHEDULE','TO_DATA_CREATE_AND_SCHEDULE_2')
+        AND wo.wo_state in ('290000110','290000004')
+        AND oo.order_id = #{orderId}
+        ORDER BY wo.create_date DESC
+    </select>
+
+    <select id="qryOrderIdToBdw" resultType="String" parameterType="String">
+        SELECT rel.order_id FROM gom_bdw_sec_local_relate_info rel WHERE rel.parent_order_id = #{orderId}
+    </select>
+
+    <select id="qrySendMsgLog" resultType="map" parameterType="map">
+       SELECT * FROM gom_bdw_send_msg_log r WHERE r.apply_ord_id = #{applyOrdId} AND r.apply_ord_name = #{applyOrdName}
+        AND r.cust_name_chinese = #{custNameChinese} AND r.sms_content = #{smsContent}
+        AND r.user_name = #{userName} AND r.tache_id = #{tacheId} AND r.oper_action = #{operAction}
+    </select>
+
+</mapper>

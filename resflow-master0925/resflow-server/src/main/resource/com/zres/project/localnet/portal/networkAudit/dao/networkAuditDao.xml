@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zres.project.localnet.portal.networkAudit.dao.NetworkAuditDao">
+
+    <sql id="querynetworkAuditSql">
+        select c.CST_ORD_ID as cstOrdId,
+               c.CUST_NAME_CHINESE as custNameChinese,
+               c.SUBSCRIBE_ID as subScribeId,
+               f.TRADE_ID as tradeId,
+               f.SERIAL_NUMBER as serialNumber,
+               pc.CODE_CONTENT AS serviceName,
+               pt.CODE_CONTENT AS activeTypeName,
+               attr.circuitCode as circuitCode,
+               attr.Abelongprovince as abelongprovince,
+               attr.Abelongcity as abelongcity,
+               attr.Abelongregion as abelongregion,
+               attr.Ainstalledadd as ainstalledadd,
+               attr.Acontactman as acontactman,
+               attr.Acontacttel as acontacttel,
+               attr.Zbelongprovince as zbelongprovince,
+               attr.Zbelongcity as zbelongcity,
+               attr.Zbelongregion as zbelongregion,
+               attr.Zinstalledadd as zinstalledadd,
+               attr.Zcontactman as zcontactman,
+               attr.Zcontacttel as zcontacttel,
+               attr.speed as speed,
+               attr.custManager as custManager,
+               attr.custManaPhone as custManaPhone,
+               attr.cir_remark as cirremark,
+               case when ws.SUM_COMPLETION_DATE is not null then to_char(ws.SUM_COMPLETION_DATE,'yyyy-MM-dd hh24:mi:ss') end AS sumCompletionDate,
+               case when ws.RENT_CONFIRMATION_DATE is not null then to_char(ws.RENT_CONFIRMATION_DATE,'yyyy-MM-dd hh24:mi:ss') end AS rentConfirmationDate,
+               f.SERVICE_ID as serviceId,
+               f.ACTIVE_TYPE as activeType,
+               f.SRV_ORD_ID as srvOrdId,
+               o.ORDER_ID as orderId,
+               r.ROUTE_INFO as routeInfo,
+               d.DISPATCH_ORDER_NO as dispatchOrderNo
+        from GOM_BDW_CST_ORD c
+                 join GOM_BDW_SRV_ORD_INFO f
+                      on c.CST_ORD_ID = f.CST_ORD_ID
+                 join GOM_ORDER o
+                      on f.ORDER_ID = o.ORDER_ID
+                 left join (
+                      select code_content,code_value from GOM_BDW_CODE_INFO_SECOND where CODE_type = 'product_code'
+                 ) pc
+                 on f.SERVICE_ID = pc.code_value
+                 left join (
+                    select code_content,code_value from GOM_BDW_CODE_INFO_SECOND where CODE_type = 'operate_type'
+                  ) pt
+                 on f.ACTIVE_TYPE = pt.code_value
+                 left join (
+                select * from (
+                  select f.SRV_ORD_ID,f.ORDER_ID,a.ATTR_VALUE,a.ATTR_CODE
+                  from gom_bdw_srv_ord_info f
+                  left join gom_BDW_srv_ord_attr_info a
+                  on f.SRV_ORD_ID = a.SRV_ORD_ID
+                      where f.SYSTEM_RESOURCE = 'second-schedule-lt') fa
+                     pivot(MAX(fa.attr_value) FOR attr_code IN (
+                     '20000064' circuitCode ,
+                     'CON0101' Abelongprovince,
+                     '20000078' Abelongcity,
+                     '20000080' Abelongregion,
+                     '20000082' Ainstalledadd,
+                     '20000083' Acontactman,
+                     'CON0036' Acontacttel,
+                     'CON0102' Zbelongprovince,
+                     '20000096' Zbelongcity,
+                     '20000098' Zbelongregion,
+                     '20000100' Zinstalledadd,
+                     '20000101' Zcontactman,
+                     'CON0037' Zcontacttel,
+                     '10000103' speed,
+                     '20000071' custManager,
+                     '20000072' custManaPhone,
+                     '20000000' cir_remark
+                    ))
+            ) attr
+                 on f.SRV_ORD_ID = attr.SRV_ORD_ID
+                 left join (
+                    select * from
+                             (select w.STATE_DATE,w.PS_ID,ws.TACHE_ID,w.WO_ID,w.ORDER_ID
+                              from GOM_WO w
+                              join GOM_PS_2_WO_S ws
+                                on w.PS_ID = ws.ID
+                              join GOM_ORDER o
+                                on o.ORDER_ID = w.ORDER_ID
+                              where w.WO_STATE = '290000004' and ws.TACHE_ID in (510101084,510101085) and o.PS_ID = 10101060) wp
+                             pivot(MAX(STATE_DATE) FOR TACHE_ID IN (510101084 SUM_COMPLETION_DATE,510101085 RENT_CONFIRMATION_DATE))
+                  ) ws
+                           on o.ORDER_ID = ws.ORDER_ID
+                 left join gom_bdw_srv_ord_res_circuit r on f.SRV_ORD_ID = r.SRV_ORD_ID
+                 left join (
+                      select f.SRV_ORD_ID,WM_CONCAT(d.DISPATCH_ORDER_NO) DISPATCH_ORDER_NO
+                        from GOM_BDW_SRV_ORD_INFO f
+                   left join Gom_BDW_DISPATCH_ORDER d
+                          on f.DISPATCH_ORDER_ID = d.DISPATCH_ORDER_ID
+                       where f.SYSTEM_RESOURCE = 'second-schedule-lt'
+                         and f.DISPATCH_ORDER_ID is not null
+                    group by f.SRV_ORD_ID) d
+                          on f.SRV_ORD_ID = d.SRV_ORD_ID
+                JOIN ( select ORG_ID from GOM_ORG_S
+                START WITH  oRG_ID =(SELECT ORG_ID FROM GOM_ORG_S a where a.PARENT_ORG_ID =1
+                START WITH  a.ORG_ID=(select ORG_ID from gom_user_s  where user_id=#{userId})  CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+                )  CONNECT BY  PARENT_ORG_ID=prior ORG_ID
+                )b  on C.handle_dep_id=b.org_id
+            where o.PS_ID = 10101060
+        <if test="serviceCode != null and serviceCode != '' ">
+            and f.SERVICE_ID = #{serviceCode}
+        </if>
+        <if test="activeCode != null and activeCode != '' ">
+            and f.ACTIVE_TYPE = #{activeCode}
+        </if>
+        <if test="DISPATCH_ORDER_NO != null and DISPATCH_ORDER_NO != '' ">
+            and d.DISPATCH_ORDER_NO like '%'||#{DISPATCH_ORDER_NO}||'%'
+        </if>
+        <if test="SERIAL_NUMBER != null and SERIAL_NUMBER != '' ">
+            and f.SERIAL_NUMBER like '%'||#{SERIAL_NUMBER}||'%'
+        </if>
+        <if test="circuitCode != null and circuitCode != '' ">
+            and attr.circuitCode like '%'||#{circuitCode}||'%'
+        </if>
+        <if test="CUST_NAME_CHINESE != null and CUST_NAME_CHINESE != '' ">
+            and c.CUST_NAME_CHINESE like '%'||#{CUST_NAME_CHINESE}||'%'
+        </if>
+        <if test="SUM_COMPLETION_START_DATE != null and SUM_COMPLETION_START_DATE != ''
+                    and SUM_COMPLETION_END_DATE != null and SUM_COMPLETION_END_DATE != '' ">
+            and ws.SUM_COMPLETION_DATE between to_date( #{SUM_COMPLETION_START_DATE},'yyyy-mm-dd hh24:mi:ss') and to_date( #{SUM_COMPLETION_END_DATE},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="RENT_CONFIRMATION_START_DATE != null and RENT_CONFIRMATION_START_DATE != ''
+            and RENT_CONFIRMATION_END_DATE != null and RENT_CONFIRMATION_END_DATE != ''">
+            and ws.RENT_CONFIRMATION_DATE between to_date( #{RENT_CONFIRMATION_START_DATE},'yyyy-mm-dd hh24:mi:ss') and to_date( #{RENT_CONFIRMATION_END_DATE},'yyyy-mm-dd hh24:mi:ss')
+        </if>
+
+    </sql>
+
+    <select id="queryNetworkAuditData" resultType="com.zres.project.localnet.portal.networkAudit.domain.NetworkAuditPo">
+        select * from (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.cstOrdId desc) AS rowindex, y.*
+        From (
+        <include refid="querynetworkAuditSql"/>
+             ) y) z
+        <if test="startRow != null and startRow != ''
+                        and endRow != null and endRow != ''">
+            <![CDATA[
+	        where z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	        ]]>
+        </if>
+    </select>
+
+    <!--查询数据草稿单数量 -->
+    <select id="queryNetworkAuditDataCount" resultType="int">
+        select count(1)
+        From (
+        <include refid="querynetworkAuditSql"/>
+        ) y
+    </select>
+
+    <select id="queryNetworkAuditExportData" resultType="com.zres.project.localnet.portal.networkAudit.domain.NetworkAuditPo">
+        <include refid="querynetworkAuditSql"/>
+    </select>
+
+
+
+</mapper>

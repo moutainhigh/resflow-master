@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.order.data.dao.GomOrderQueryDao">
+
+    <resultMap type="com.zres.project.localnet.portal.order.domain.GomDispatcherOrderPo" id="formGomDispatcherMap">
+        <result property="dispatchOrderNo" column="dispatchOrderNo" />
+        <result property="dispatchOrderId" column="dispatchOrderId" />
+        <result property="productCodeContent" column="productCodeContent" />
+        <result property="activeTypeName" column="activeTypeName" />
+        <result property="dispatchTitle" column="dispatchTitle" />
+        <result property="orderTitle" column="orderTitle" />
+        <result property="srvOrdIds" column="srvOrdIds"/>
+        <result property="cirCount" column="cirCount"/>
+        <result property="orderIds" column="orderIds"/>
+        <result property="resources" column="resources"/>
+        <result property="orderType" column="orderType"/>
+        <result property="dispatchSource" column="dispatchSource"/>
+<!--        <result property="tacheName" column="tacheName" jdbcType="CLOB"
+                javaType = "java.lang.String" typeHandler ="com.zres.project.localnet.portal.handler.OracleClobTypeHandler"/>
+        <result property="pubDateName" column="pubDateName" jdbcType="CLOB"
+                javaType = "java.lang.String" typeHandler ="com.zres.project.localnet.portal.handler.OracleClobTypeHandler"/>-->
+        <result property="staffName" column="staffName" />
+        <result property="staffTel" column="staffTel" />
+        <result property="sendDate" column="sendDate" />
+        <result property="dispatchSendOrg" column="dispatchSendOrg" />
+        <result property="staffOrg" column="staffOrg" />
+        <result property="custNameChinese" column="custNameChinese" />
+        <result property="subscribeId" column="subscribeId" />
+        <result property="dispathUrgency" column="dispathUrgency" />
+
+    </resultMap>
+
+    <!-- 调单显示列-->
+    <sql id="queryGomOrderColumn">
+        dis.DISPATCH_ORDER_ID as dispatchOrderId,
+        dis.dispatch_order_no as dispatchOrderNo,
+        cinfo.code_content as productCodeContent,
+        c.ACTIVE_TYPE as activeType,
+        c.service_id as serviceId,
+        c.SRV_ORD_IDS as srvOrdIds,
+        c.cirCount as cirCount,
+        c.ORDER_IDS as orderIds,
+        c.RESOURCES as resources,
+        c.ORDER_TYPE as orderType,
+        c.SERIAL_NUMBERS as serialNumbers,
+        vinfo.code_content as activeTypeName,
+        cst.APPLY_ORD_NAME as orderTitle,
+        dis.dispatch_title as dispatchTitle,
+        c.cst_ord_id as cstOrdId,
+        dis.staff_name as staffName,
+        dis.staff_tel as staffTel,
+        dis.send_date as sendDate,
+        dis.dispatch_send_org as dispatchSendOrg,
+        dis.staff_org as staffOrg,
+        cst.cust_name_chinese as custNameChinese,
+        cst.subscribe_id as subscribeId,
+        gbci.code_content as dispatchSource,
+        dis.dispatch_urgency as dispathUrgency
+    </sql>
+
+    <!-- 调单sql-->
+    <sql id="queryGomDispatcherOrderOracle">
+        select
+        <include refid="queryGomOrderColumn"/>
+        from gom_bdw_dispatch_order dis
+        left join gom_bdw_code_info gbci on gbci.code_value = dis.dispatch_source and gbci.code_type = 'dispatch_source'
+        inner join
+          (select f.SYSTEM_RESOURCE,f.SERVICE_ID,f.CST_ORD_ID,f.ACTIVE_TYPE,f.RESOURCES,f.ORDER_TYPE,f.DISPATCH_ORDER_ID,count(*) as cirCount,
+                  WM_CONCAT(f.SRV_ORD_ID) as SRV_ORD_IDS,WM_CONCAT(f.ORDER_ID) as ORDER_IDS,
+                  WM_CONCAT(f.SERIAL_NUMBER) as SERIAL_NUMBERS
+            from gom_bdw_srv_ord_info f
+            inner join GOM_ORDER o
+            on f.ORDER_ID = o.ORDER_ID
+            where 1=1
+        <!-- 业务订单编号-->
+        <if test="tradeId != null and tradeId != '' ">
+            and f.trade_Id like '%'||#{tradeId}||'%'
+        </if>
+        <!-- 业务号码-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and f.SERIAL_NUMBER like '%'||#{serialNumber}||'%'
+        </if>
+        group by f.SYSTEM_RESOURCE,f.SERVICE_ID,f.CST_ORD_ID,f.ACTIVE_TYPE,f.DISPATCH_ORDER_ID,f.RESOURCES,f.ORDER_TYPE) c
+          on dis.DISPATCH_ORDER_ID = c.DISPATCH_ORDER_ID
+              join gom_bdw_cst_ord cst
+                      on c.cst_ord_id = cst.cst_ord_id
+                 left join GOM_BDW_CODE_INFO_SECOND cinfo
+                           on c.service_id = cinfo.code_value
+                           and cinfo.code_type = 'product_code'
+                  left join GOM_BDW_CODE_INFO_SECOND vinfo
+                           on c.ACTIVE_TYPE = vinfo.code_value
+                           and vinfo.code_type = 'operate_type'
+                join ( select ORG_ID from GOM_ORG_S
+                    START WITH  oRG_ID =(SELECT ORG_ID FROM GOM_ORG_S a where a.PARENT_ORG_ID =1
+                      START WITH  a.ORG_ID=(select ORG_ID from gom_user_s  where user_id=#{userId})  CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+                    )  CONNECT BY  PARENT_ORG_ID=prior ORG_ID
+                )b  on cst.handle_dep_id=b.org_id
+        where 1=1 and dis.state = '10A' and c.SYSTEM_RESOURCE='second-schedule-lt'
+        <!--申请单标题 -->
+        <if test="orderTitle != null and orderTitle != '' ">
+            and cst.APPLY_ORD_NAME like  '%'||#{orderTitle}||'%'
+        </if>
+        <!--客户名称 -->
+        <if test="custName != null and custName != '' ">
+            and cst.cust_name_chinese like '%'||#{custName}||'%'
+        </if>
+          <!-- 调度单编号-->
+        <if test="cirNum != null and cirNum != '' ">
+            and dis.dispatch_order_no like '%'||#{cirNum}||'%'
+        </if>
+          <!-- 客户订单号 -->
+        <if test="subscribeId != null and subscribeId != '' ">
+            and cst.subscribe_id = #{subscribeId}
+        </if>
+          <!-- 动作类型-->
+        <if test="actType != null and actType != '' ">
+            and c.ACTIVE_TYPE = #{actType}
+        </if>
+          <!-- 产品类型-->
+        <if test="productType != null and productType != '' ">
+            and c.SERVICE_ID = #{productType}
+        </if>
+
+    </sql>
+
+    <!-- 调单分页sql-->
+    <select id="queryGomDispatcherOrderPage" resultMap="formGomDispatcherMap">
+        <if test="databaseType == 'oracle' ">
+            select z.*
+            From (
+                SELECT ROW_NUMBER() OVER (ORDER BY y.dispatchOrderId desc) AS rowindex, y.*
+                From (
+                    <include refid="queryGomDispatcherOrderOracle"/>
+                    ) y
+                where 1=1
+             ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	        ]]>
+
+
+        </if>
+
+    </select>
+
+    <!--查询数据数量 -->
+    <select id="queryGomDispatcherOrderCount" resultType="int">
+        select count(1)
+        From (
+        <include refid="queryGomDispatcherOrderOracle"/>
+        ) y
+    </select>
+
+    <!-- 查询调度单导出的数据-->
+    <select id="queryGomDispatcherExportOrderData" resultMap="formGomDispatcherMap">
+        <if test="databaseType == 'oracle' ">
+            select z.*
+            From (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.dispatchOrderId desc) AS rowindex, y.*
+            From (
+            <include refid="queryGomDispatcherOrderOracle"/>
+            ) y
+            ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	        ]]>
+
+        </if>
+    </select>
+
+</mapper>

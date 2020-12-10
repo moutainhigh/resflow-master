@@ -1,0 +1,133 @@
+<div class="content">
+    <!--饼图-->
+    <div class="pieDiv">
+        <div class="title row">
+            <div class="title-left">
+                全国租用情况
+            </div>
+            <div class="title-right">
+                <div class="chunk color-1"></div>
+                <span class="span-text">总量</span>
+                <div class="chunk color-2"></div>
+                <span class="span-text">租用量</span>
+                <div id="form_date_month" class="form-data"></div>
+            </div>
+        </div>
+        <div class="row pieMainDiv">
+            <div class="pie" id="pie1"></div>
+            <div class="pie" id="pie2"></div>
+            <div class="pie" id="pie3"></div>
+            <div class="pie" id="pie4"></div>
+        </div>
+    </div>
+    <!--top-->
+    <div>
+        <div class="item">
+            <div class="circle color-1">
+                <img src="module/UnicomIDC/resmaster/portal/homePage/images/room.png">
+            </div>
+            <div class="text">
+                <span class="text-1">机房数量</span>
+                <span class="text-2" id="spaceNum">0</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="circle color-2">
+                <img src="module/UnicomIDC/resmaster/portal/homePage/images/room.png">
+            </div>
+            <div class="text">
+                <span class="text-1">机架</span>
+                <span class="text-2" id="rackNum">0</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="circle color-3">
+                <img src="module/UnicomIDC/resmaster/portal/homePage/images/room.png">
+            </div>
+            <div class="text">
+                <span class="text-1">数据设备</span>
+                <span class="text-2" id="eqpNum">0</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="circle color-4">
+                <img src="module/UnicomIDC/resmaster/portal/homePage/images/room.png">
+            </div>
+            <div class="text">
+                <span class="text-1">宽带M</span>
+                <span class="text-2" id="bandWidthNum">0</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="circle color-5">
+                <img src="module/UnicomIDC/resmaster/portal/homePage/images/room.png">
+            </div>
+            <div class="text">
+                <span class="text-1">总流量MB</span>
+                <span class="text-2" >0</span>
+            </div>
+        </div>
+    </div>
+    <!--地图-->
+    <div>
+        <div class="map" id="mapId"></div>
+        <div class="map-right">
+            <div class="notice">
+                <div id="noticDiv">
+                    <span class="title">公告</span>
+                    <span class="bnt-span">
+                       <button type="button" class="btn btn-outline-danger publish">
+                           <img src="module/UnicomIDC/resmaster/portal/homePage/images/publish.png">
+                           发布</button>
+                  </span>
+                </div>
+            </div>
+            <div class="flow">
+                <div class="flow-item">
+                    <div class="icon">
+                        <!--<span class="icon iconfont icon-gongdan"></span>-->
+                        <img src="module/UnicomIDC/resmaster/portal/homePage/images/todo.png">
+                    </div>
+                    <div class="text_num">
+                        <span>999</span>
+                    </div>
+                    <div class="text">
+                        <span>待办</span>
+                    </div>
+                </div>
+                <div class="vertical-line"></div>
+                <div class="flow-item">
+                    <div class="icon">
+                        <img src="module/UnicomIDC/resmaster/portal/homePage/images/done.png">
+                    </div>
+                    <div class="text_num">
+                        <span>666</span>
+                    </div>
+                    <div class="text">
+                        <span>已办</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--折线图-->
+    <div>
+        <div class="line">
+            <div  class="title">
+                <div class="title-left">
+                    <span class="title-left-title">全国流量趋势图</span>
+                    <span class="title-left-sub">单位：M</span>
+                </div>
+                <div class="title-right">
+                    <!--<button type="button" class="btn btn-default">导出</button>-->
+                    <div id="form_date" class="form-data"></div>
+                </div>
+            </div>
+            <div class="lineDiv" id="lineId"></div>
+        </div>
+        <div class="line-right">
+            <div class="title">流量排行榜 <img src="module/UnicomIDC/resmaster/portal/homePage/images/top.png"></div>
+            <div class="top-bar" id="top_bar"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,140 @@
+<div id="affairDispatcher-mainPanel">
+    <div style="padding: 15px 15px 2px 15px;">
+        <form class="form-horizontal" id="affairDispatcher-Qryform">
+            <div class="affairDispatcher-btn-row">
+                <div id="affairDispatcher-searchCodeDiv">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-3 control-label">事务调单编号</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input id="affOrderCode" name="affOrderCode" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-3 control-label">事务调单标题</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input id="orderTitle" name="orderTitle" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-3 control-label">事务状态</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input id="orderState" name="orderState" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-3 control-label">事务单类型</label>
+                                <div class="col-md-9 col-sm-9">
+                                    <input id="orderType" name="orderType" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-3 col-sm-3 control-label">创建时间</label>
+                                <div class="col-md-4 col-sm-4">
+                                    <input id="beginDate" name="beginDate" class="form-control">
+                                </div>
+                                <label class="col-md-1 col-sm-1">
+                                    ~
+                                </label>
+                                <div class="col-md-4 col-sm-4">
+                                    <input id="endDate" name="endDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                        </div>
+                    </div>
+                    <div class="clearfix" id="searchBtnDiv">
+                        <div style="float: right;margin-right: 30px">
+                            <button id="queryBtn" type="button" class="btn btn-danger">查询</button>
+                            <button id="cancelBtn" type="reset" class="btn btn-default">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="orderDeal-tab" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a id="tabs-a-a-link" href="#tabs-a-a">
+                    我的发起<span class="redge pull-right clearfix" id="fqAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-g-link" href="#tabs-a-a">
+                    草稿箱<span class="redge pull-right clearfix" id="cgAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-b-link" href="#tabs-a-a">
+                    事务审核<span class="redge pull-right clearfix" id="shAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-c-link" href="#tabs-a-a">
+                    事务处理<span class="redge pull-right clearfix" id="clAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-h-link" href="#tabs-a-a">
+                    事务审查<span class="redge pull-right clearfix" id="scAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-d-link" href="#tabs-a-a">
+                    事务确认<span class="redge pull-right clearfix" id="qrAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-f-link" href="#tabs-a-a">
+                    历史工单<span class="redge pull-right clearfix" id="lsAmount">0</span>
+                </a>
+            </li>
+            <li>
+                <a id="tabs-a-e-link" href="#tabs-a-a">
+                    抄送通知<span class="redge pull-right clearfix" id="tzAmount">0</span>
+                </a>
+            </li>
+        </ul>
+        <div class="mgtb-10-15" style="margin-bottom: 0 !important;">
+            <button class="btn btn-default mgr-5" type="button" id="fqAffairBtn">发起事务</button>
+            <button class="btn btn-default mgr-5" type="button" id="anewInitAffairBtn">重新发起事务</button>
+            <button class="btn btn-default mgr-5" type="button" id="initiateBtn">编辑事务</button>
+            <button class="btn btn-default mgr-5" type="button" id="shAffairBtn">事务审核</button>
+            <button class="btn btn-default mgr-5" type="button" id="clAffairBtn">事务处理</button>
+            <button class="btn btn-default mgr-5" type="button" id="scAffairBtn">事务审查</button>
+            <button class="btn btn-default mgr-5" type="button" id="qrAffairBtn">事务确认</button>
+            <button class="btn btn-default mgr-5" type="button" id="closeAffairBtn">关闭事务</button>
+            <button class="btn btn-default mgr-5" type="button" id="delAffairBtn">删除草稿</button>
+            <button class="btn btn-default mgr-5" type="button" id="exportExcelBtn">导出数据</button>
+            <button class="btn btn-default mgr-5" type="button" id="resetSelectBtn">取消选择</button>
+            <div id="rejectNumDiv1" style="float: right;padding-top: 10px;padding-right: 10px;font-size: 14px">
+                审核驳回待处理 <a href="#" style="color: red" id="rejectNum1">0</a> 条
+            </div>
+            <div id="rejectNumDiv2" style="float: right;padding-top: 10px;padding-right: 10px;font-size: 14px">
+                事务处理被驳回待处理 <a href="#" style="color: red" id="rejectNum2">0</a> 条
+            </div>
+        </div>
+        <div id="tabs-a-a" class="ui-tabs-panel">
+            <!-- 实际的内容页 -->
+            <div class="tab-content-model">
+                <div id="orderDeal-grid"></div>
+            </div>
+        </div>
+
+    </div>
+</div>

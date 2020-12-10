@@ -1,0 +1,32 @@
+<div class="ui-dialog">
+	<div class="modal-header clearfix">
+		<span class="modal-title">导入电路</span>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal js-uploadForm">
+			<div class="panel-body">
+				备注 <br/>
+				注：请从第二行开始填写数据。并设置所有的单元格的类型为文本！<br/>
+				参见模板： <br/>
+				<a target="_blank"  href="javascript:void(0);"  class="js-downloadTemplate" >
+					{{DOWNLOAD_TEMP_FILE}} 电路信息导入模板.xlsx</a>
+			</div>
+			<div class="row" >
+				<label class="control-label col-md-2" style="font-size: 16px ;">导入文件:</label>
+				<div class="col-md-10">
+					<div class="input-group file-input">
+						<input readonly="readonly"  name="FILE_PATH"  class="form-control js-file_path" style="height: 30px;width: 400px">
+						<button class="btn btn-primary fileinput-button" type="button" style="margin-left: 20px">
+							上传附件 <input class="fileinput-input js-uploading" type="file"  multiple="" name="uploadFiles">
+						</button>
+						<button type="button" class="btn btn-primary js-submit-Lead" style="margin-left:20px;">确认导入</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-danger js-close_Lead" id="close">关闭</button>
+	</div>
+</div>

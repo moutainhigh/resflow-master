@@ -1,0 +1,175 @@
+<div  class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title">工单提交-核查调度</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <!-- 是否选专业 -->
+                    <div class="row form-group" id="selectSpecialDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">是否派发专业<span class="LOCAL">及本地网核查</span>：</label>
+                        <div class="col-md-10 col-sm-8" id="selectSpecial">
+                            <label class="radio-inline">
+                                <input type="radio" name="resRadio" id="resPass" value="0" checked="true">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="resRadio" id="resNoPass" value="1">否</label>
+                        </div>
+                    </div>
+
+                    <!-- 电路信息 -->
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-8">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+
+                    <!-- 核查专业选择 -->
+                    <div class="row form-group check_div" id="specialDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">选择专业核查：</label>
+                        <div class="col-md-10 col-sm-8">
+
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="transSpecial" id="transSpecial" value="trans">传输专业</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="changeSpecial" id="changeSpecial" value="change">交换专业</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="dataSpecial" id="dataSpecial" value="data">数据专业</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="otherSpecial" id="otherSpecial" value="other">其他专业</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 核查本地网 -->
+                    <div class="row form-group check_div LOCAL" id="localScheduleDiv" hidden>
+                        <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;">选择本地网核查：</label>
+                        <div class="col-md-10 col-sm-8">
+
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="col-md-4" style="padding-right: 0;padding-left: 0px;">
+                                            <label class="checkbox-inline">
+                                                <input type="checkbox" name="localScheduleSpecial"
+                                                       id="localScheduleSpecial" value="localSchedule"
+                                                       >本地网</label>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left: 0px;">
+                                            <div class="input-group">
+                                                <input id="localSchedulePopedit" name="localSchedulePopedit"
+                                                       value="请选择派发区域！"
+                                                       class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group" style="text-align: right;" hidden id="specialSaveBtnDiv">
+                        <button type="button" id="specialSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存
+                        </button>
+                    </div>
+
+
+                    <!-- 核查反馈 -->
+                    <div class="row form-group" id="feedBackZDiv" hidden>
+                        <!-- 资源是否满足-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label  Z_LABEL COLLECT_RES" ><span class="Z_TERMINATE"></span>资源是否具备:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <input id="COLLECT_RES" name="COLLECT_RES" class="form-control  menu "  data-rule="" >
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 Z_DIV Z_PROJECT">
+                            <div class="col-md-6 col-sm-6 Z_DAY" hideen>
+                                <label class="col-md-4 col-sm-4 control-label  Z_LABEL COLLECT_DAY" ><span class="Z_TERMINATE"></span>建设工期(工作日):</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="COLLECT_DAY" name="COLLECT_DAY" class="form-control Z_INPUT"  type="number" data-rule="workDayRep">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 Z_AMOUNT">
+                                <label class="col-md-4 col-sm-4 control-label Z_LABEL COLLECT_MONEY" ><span class="Z_TERMINATE"></span>工程概算造价(万元):</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="COLLECT_MONEY" name="COLLECT_MONEY" class="form-control Z_INPUT"  type="number" data-rule-amount="/^[0-9]+(.[0-9]{1,3})?$/">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 A_DIV A_PROJECT_DESC" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label  A_LABEL COLLECT_DESC"><span class="A_TERMINATE"></span>工程概述:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="COLLECT_DESC" name="COLLECT_DESC" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 👆👆👆👆 专业核查 👆👆👆👆-->
+
+                    <div class="form-group" style="text-align: right;" hidden id="checkSaveBtnDiv">
+                        <button type="button" id="checkSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存</button>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="row form-group" id="fileUpdateDiv">
+                        <div id="attach" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8" style="width: 70%">
+                                <form id="displaySource">
+                                    <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="">
+                                        </span>
+                                    </div>
+                                    <div id="fileGrid"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 说明 -->
+                    <div class="row form-group" id="remarkDiv">
+                        <div id="remarkGoRoll" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"> 说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                         ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>
+

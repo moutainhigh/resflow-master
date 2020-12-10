@@ -1,0 +1,161 @@
+<div id="isa-operTaskManagement-mainPanel" style="background-color: #FFFFFF; overflow-x: hidden"><!-- background-color: #EDEDED;-->
+    <div style="margin:10px 2px;padding: 0;background-color:#FFFFFF;">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="operTaskManagement-btn-row">
+                <div id="operTaskManagement-searchCodeDiv">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">单据类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="orderType" id="orderType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="productType" id="productType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">动作类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="actType" id="actType" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="applyOrdId" name="applyOrdId" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label" id="applyOrdNamelabel">申请单标题</label>
+                                <div class="col-md-8 col-sm-8" id="applyOrdNamediv">
+                                    <input id="applyOrdName" name="applyOrdName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="custName" name="custName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-md-4">
+                            <div class="form-group">
+                                <div class="col-md-12" >
+                                    <button type="button" class="btn btn-danger" id="queryLocalApply">查询</button>
+                                    <button type="button" class="btn btn-default" id="resetLocalApply">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-11 col-sm-11" >
+                        <div class="col-sm-1 col-sm-1">
+                            <div class="form-group" style="margin-left: 5px;"/>
+                        </div>
+                        <div class="col-md-11 col-sm-11" style="border:1px dashed #FF0000;">
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group" style="margin-bottom: 10px;margin-top: 10px;">
+                                    <label class="col-md-5 col-sm-5 control-label">单据类型</label>
+                                    <div class="col-md-7 col-sm-7">
+                                        <input class="combobox form-control" name="itemTypeStart" id="itemTypeStart">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group" style="margin-bottom: 10px;margin-top: 10px;">
+                                    <label class="col-md-5 col-sm-5 control-label">产品类型</label>
+                                    <div class="col-md-7 col-sm-7">
+                                        <input class="combobox form-control" name="productTypeStart" id="productTypeStart">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group" style="margin-bottom: 10px;margin-top: 10px;">
+                                    <label class="col-md-5 col-sm-5 control-label">动作类型</label>
+                                    <div class="col-md-7 col-sm-7">
+                                        <input class="combobox form-control" name="actTypeStart" id="actTypeStart" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group" style="margin-bottom: 10px;margin-top: 10px;">
+                                    <div class="col-md-12 col-md-12" >
+                                        <button type="button" class="btn btn-danger" id="startLocalApply">二干发起</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div id="localApplyTabs" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a href="#local_apply_tabs_draft" id="local_apply_tabs_draft_link">草稿单<span class="redge pull-right clearfix" id="draftspan">0</span></a>
+            </li>
+            <li>
+                <a href="#local_apply_tabs_whole" id="local_apply_tabs_whole_link">全部申请单<span class="redge pull-right clearfix" id="wholespan">0</span></a>
+            </li>
+            <li>
+                <a href="#local_apply_tabs_completed" id="local_apply_tabs_completed_link">已完成申请单<span class="redge pull-right clearfix" id="completespan">0</span></a>
+            </li>
+            <li>
+                <a href="#local_apply_tabs_submit" id="local_apply_tabs_submit_link">已提交申请单<span class="redge pull-right clearfix" id="submitspan">0</span></a>
+            </li>
+        </ul>
+				<div id="local_apply_tabs_draft" class="ui-tabs-panel">
+                    <!--<button class="btn btn-default" type="button" id="draftEdit">编辑草稿</button>-->
+                    <button class="btn btn-default" type="button" id="draftDelete">删除草稿</button>
+                    <button class="btn btn-default" type="button" id="draftExport">导出数据</button>
+				</div>
+				<div id="local_apply_tabs_whole" class="ui-tabs-panel">
+                    <!--<button class="btn btn-default" type="button" id="wholeView">查看</button>-->
+                    <button class="btn btn-default" type="button" id="wholeExport">导出数据</button>
+					<!--<div id="localConfig-localwholeGrid"></div>-->
+				</div>
+				<div id="local_apply_tabs_completed" class="ui-tabs-panel">
+                    <!--<button class="btn btn-default" type="button" id="completedView">查看</button>-->
+                    <button class="btn btn-default" type="button" id="completedExport">导出数据</button>
+					<!--<div id="localConfig-localcompletedGrid"></div>-->
+				</div>
+				<div id="local_apply_tabs_submit" class="ui-tabs-panel">
+                    <!--<button class="btn btn-default" type="button" id="submitView">查看</button>-->
+                    <button class="btn btn-default" type="button" id="submitExport">导出数据</button>
+				</div>
+        </div>
+        <div style="padding: 10px">
+            <div id="localConfig-localdraftGrid"></div>
+        </div>
+
+</div>

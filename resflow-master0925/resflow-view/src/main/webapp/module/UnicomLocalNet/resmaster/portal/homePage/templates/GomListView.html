@@ -1,0 +1,138 @@
+<div id="isa-operTaskManagement-mainPanel">
+    <div style="padding: 15px;">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="operTaskManagement-btn-row" style="margin-bottom: 0 !important;">
+                <div id="operTaskManagement-searchCodeDiv" class="row">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="applyOrdId" name="applyOrdId" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-md-4 col-sm-4">
+                             <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单标题</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="orderTitle" name="orderTitle" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">调单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="dispOrderNo" name="dispOrderNo" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="custName" name="custName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">电路编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="cirNum" name="cirNum" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="serialNumber" name="serialNumber" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">客户订单号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="subscribeId" name="subscribeId" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">业务订单号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="tradeId" name="tradeId" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                 <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                 <input class="combobox form-control" name="productType" id="productType">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">动作类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="actType" id="actType" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">要求完成开始时间</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="startDate" name="startDate" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">要求完成结束时间</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="endDate" name="endDate" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">单据来源</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="resourceType" id="resourceType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-sm-8" id="searchBtnDiv">
+                            <div style="float: right;margin-right: 30px" >
+                                <button id="queryOrder" type="button" class="btn btn-danger">查询</button>
+                                <button id="excelOrder" type="button" class="btn btn-danger">导出数据</button>
+                                <button  type="reset" class="btn btn-default">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="orderDeal-grid"></div>
+    </div>
+</div>

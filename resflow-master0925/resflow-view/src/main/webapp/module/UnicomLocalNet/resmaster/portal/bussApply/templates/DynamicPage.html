@@ -1,0 +1,44 @@
+<div class="panel panel-default dynamic_query_content" id="query_content">
+	{{#if isshowtitle}}
+	<div class="panel-heading" id="head_content">
+		<label>{{title}}</label>
+	</div>
+	{{/if}}
+	{{#if right_of_condition}}
+	<div class="panel-body row_form_content" id="row_form_content">
+		<div class="row">
+			<div class="cond_form_content">
+				<div class="cond1_form_content">
+					<div class="col-md-12 col-sm-12" id="form_content"></div>
+				</div>
+			</div>
+			<div class="cond_right_tool" id="right_form_tool_content">
+			<!-- 默认只放4行菜单,每行放一个菜单 -->
+				<div class="form-group" id="right_form_tool_content0"> </div>
+                <div class="form-group" id="right_form_tool_content1"> </div>
+                <div class="form-group" id="right_form_tool_content2"> </div>
+                <div class="form-group" id="right_form_tool_content3"> </div>
+			</div>
+		</div>
+	</div>
+	{{else}}
+	<div class="panel-body" id="form_content"></div>
+	{{/if}}
+	<!-- 中间工具栏位置 -->
+	{{#if allcenter}}
+	<div class="panel-body page_all_of_center">
+		<div class="panel-footer col-md-{{left_center}} col-sm-3 allleft_center" id="left_center_tool_content"></div>
+		<div class="panel-footer col-md-{{right_center}} col-sm-3 allright_center" id="right_center_tool_content"></div>
+	</div>
+	{{/if}}
+	{{#if left_of_center}}
+	<div class="panel-footer left_center" id="left_center_tool_content"></div>
+	{{/if}}
+	{{#if right_of_center}}
+	<div class="panel-footer right_center" id="right_center_tool_content"></div>
+	{{/if}}
+	
+	<!-- grid内容接收DIV -->
+	<div class="panel-body page_grid_content" id="grid_content"></div>
+	
+</div>

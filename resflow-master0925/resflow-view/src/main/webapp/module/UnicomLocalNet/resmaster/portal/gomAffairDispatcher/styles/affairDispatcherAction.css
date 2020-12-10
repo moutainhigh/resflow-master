@@ -1,0 +1,139 @@
+.mgtb-10-15 {
+    margin: 10px 15px;
+}
+
+.mgr-5 {
+    margin-right: 5px;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+
+.title_left {
+    border-left: 4px solid #EB4A4B;
+    margin-top: 15px;
+}
+
+.title_left .title_left_span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    margin-left: 20px;
+
+}
+
+.row .col-md-12 {
+    padding: 0px;
+}
+
+#ui-tabs-nav {
+    margin-top: 10px;
+}
+
+/*ul li a标签的样式*/
+.ui-tabs-nav li {
+    text-align: center;
+
+}
+
+.ui-tabs.tabs-pill > .ui-tabs-nav li a {
+    margin-bottom: 0;
+    border: 2px solid #E2E2E2;
+    color: #666666;
+    border-radius: 4px;
+    background-color: #F2F2F2;
+}
+
+/*a标签上鼠标划过 鼠标不划过等样式*/
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:focus {
+    margin-bottom: 1px;
+    padding-bottom: 4px;
+    border-width: 2px;
+    border-style: solid;
+    color: #fff;
+    background-color: #EB4A4B;
+    border-color: #E2E2E2;
+    border-bottom: 1px solid #f06e69;
+}
+
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:focus {
+    border-width: 1px;
+    border-style: solid;
+    color: #fff;
+    background-color: #f06e69;
+    border-color: #f06e69;
+    border-bottom: 1px solid #f06e69;
+}
+
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:hover {
+    background-color: #EB4A4B;
+    border: 1px solid #E2E2E2;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-default {
+    margin-left: 0px;
+    padding-right: 2px;
+}
+
+/*a标签的 圆角样式控制*/
+/*第一个li*/
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child:not(:last-child) > a {
+    border-radius: 0px 0px 0px 0px;
+}
+
+/*最后一个li*/
+.tabs-pill .ui-tabs-nav > .ui-state-default:last-child:not(:first-child) > a {
+    border-radius: 0px 0px 0px 0px;
+}
+
+/*ul li a标签结束*/
+.tab-content-model {
+    margin-left: 0;
+}
+
+.handle-order-btn {
+    border-width: 0;
+    color: #fff;
+    background: transparent;
+    border-radius: 2px;
+    border: 1px solid #E2E2E2;
+    border-radius: 2px 2px 2px 2px;
+    adding-left: 10px;
+    width: 4%;
+    margin-right: 10px;
+    border-color: #d43f3a;
+}
+
+.ui-dialog.dialog-md {
+    width: 90%;
+}
+
+/*.btn-default{*/
+/*float: left;*/
+/*!*width: 4%;*!*/
+/*border-radius: 10px 10px 10px 10px;
+}*/
+.redge {
+    display: inline-block;
+    min-width: 15px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #EB4A4B;
+    border-radius: 10px;
+    margin-left: 5px;
+}

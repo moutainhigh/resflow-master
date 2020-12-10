@@ -1,0 +1,9 @@
+.requires {}
+
+.requires :before {
+    content: "*";
+    color: red;
+    padding-right: 4px;
+    vertical-align: middle;
+    display: inline-block;
+}

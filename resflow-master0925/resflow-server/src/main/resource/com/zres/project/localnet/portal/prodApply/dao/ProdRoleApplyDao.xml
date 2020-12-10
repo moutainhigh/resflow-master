@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.prodApply.dao.ProdRoleApplyDao">
+
+    <select id="queryAssingProdInfo" parameterType="String" resultType="map">
+        select a.code_value as prod_id,a.code_content as prod_name
+        from gom_bdw_code_info_second a
+        where 1=1 and a.code_type='product_code'
+        <if test="staffId != null and staffId != ''">
+            and a.code_value not in (
+            select sp.prod_id
+            from gom_staff_prod sp
+            where sp.staff_id = #{staffId}
+            )
+        </if>
+    </select>
+
+    <select id="queryUnAssingProdInfo" parameterType="String" resultType="map">
+        select a.code_value as prod_id,a.code_content as prod_name
+        from gom_bdw_code_info_second a
+        where 1=1 and a.code_type='product_code'
+        <if test="staffId != null and staffId != ''">
+            and a.code_value in (
+            select sp.prod_id
+            from gom_staff_prod sp
+            where sp.staff_id = #{staffId}
+            )
+        </if>
+    </select>
+
+    <select id="queryProdGroupAssingInfo" parameterType="String" resultType="map">
+        select a.code_value as prod_id,a.code_content as prod_name
+        from gom_bdw_code_info_second a
+        where 1=1 and a.code_type='product_code'
+        <if test="groupId != null and groupId != ''">
+            and a.code_value not in (
+            select sp.prod_id
+            from gom_staff_prod sp
+            where sp.dept_id = #{groupId}
+            )
+        </if>
+    </select>
+
+    <select id="queryProdGroupUnAssingInfo" parameterType="String" resultType="map">
+        select a.code_value as prod_id,a.code_content as prod_name
+        from gom_bdw_code_info_second a
+        where 1=1 and a.code_type='product_code'
+        <if test="groupId != null and groupId != ''">
+            and a.code_value in (
+            select sp.prod_id
+            from gom_staff_prod sp
+            where sp.dept_id = #{groupId}
+            )
+        </if>
+    </select>
+
+
+    <insert id="saveProdStaff">
+      insert into
+      gom_staff_prod(staff_id,prod_id,create_date)
+      values
+      (#{staffId},#{prodId},sysdate)
+    </insert>
+
+    <insert id="saveProdGroupStaff">
+        insert into
+        gom_staff_prod(dept_id,prod_id,create_date)
+        values
+        (#{groupId},#{prodId},sysdate)
+    </insert>
+
+    <select id="isProdSave" resultType="int">
+      select count(1)
+      from gom_staff_prod a
+      where 1=1
+      and a.staff_id=#{staffId}
+      and a.prod_id=#{prodId}
+      and a.delete_state='0'
+    </select>
+
+    <select id="isProdGroupSave" resultType="int">
+        select count(1)
+        from gom_staff_prod a
+        where 1=1
+        and a.dept_id=#{groupId}
+        and a.prod_id=#{prodId}
+        and a.delete_state='0'
+    </select>
+
+    <delete id="deleteProdStaff" >
+        delete from gom_staff_prod where staff_id = #{staffId}
+    </delete>
+
+    <delete id="deleteProdGroup" >
+        delete from gom_staff_prod where dept_id = #{groupId}
+    </delete>
+
+</mapper>

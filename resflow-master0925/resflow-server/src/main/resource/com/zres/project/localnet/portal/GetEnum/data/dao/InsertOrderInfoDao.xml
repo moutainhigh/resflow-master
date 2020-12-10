@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.InsertOrderInfoDao">
+
+    <select id="querySequence" parameterType="String" resultType="int" useCache="false" flushCache="true">
+        SELECT ${tableName} FROM DUAL
+    </select>
+    <!--申请单标题拼接信息-->
+    <select id="queryScheduNum" parameterType="map" resultType="map">
+         select ORG_ID,SCHEDU_CODE,SCHEDU_NUM,ORG_NAME,UPDATE_DATE from gom_BDW_schedu_num where ORG_ID = #{orgIdQu} and ACTION_SCOPE = #{actionScope}
+    </select>
+    <select id="queryOrgIdSecond" resultType="map" parameterType="string">
+        select * from gom_org_s where org_id =(select org_id from gom_user_s where user_id=#{userId} )
+    </select>
+    <!--使用oracle函数查询流水号-->
+    <select id="queryScheduNumFunction" parameterType="String" resultType="String" useCache="false" flushCache="true">
+        select SERIA_NUMBER_GENERATOR_OVER(#{orgId}) from dual
+    </select>
+    <select id="queryOrgId" resultType="string" parameterType="string" >
+        SELECT ORG_ID
+        FROM GOM_ORG_S a
+        where a.ORG_ID IN
+              (SELECT ORG_ID
+               FROM GOM_ORG_S
+               WHERE PARENT_ORG_ID = '1')
+            START WITH a.ORG_ID =
+            (SELECT org_id
+                       FROM gom_user_s
+                       where user_id = #{userId})
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID
+    </select>
+
+    <!--根据原电路编码查询定单信息-->
+    <select id="querySrvOrdId" resultType="string" parameterType="string" >
+        select SRV_ORD_ID from gom_BDW_srv_ord_attr_info  a where   a.ATTR_CODE = '20000064' and a.ATTR_VALUE = #{0}
+    </select>
+    <select id="queryOrderId"  resultType="string" parameterType="string">
+        select o.ORDER_ID from GOM_BDW_SRV_ORD_INFO s left join  gom_order o on s.ORDER_ID = o.ORDER_ID where s.SRV_ORD_ID = #{0}
+    </select>
+   <!--插入客户信息 ren.jh 2018/12/26-->
+    <insert id="insertCustomerInfo" parameterType="map">
+        insert into GOM_BDW_CST_ORD(
+        <if test = "CST_ORD_ID!=null">CST_ORD_ID</if>
+        <if test = "PROJECT_TYPE!=null">,PROJECT_TYPE</if>
+        <if test = "NETWORK_LEVEL!=null">,NETWORK_LEVEL</if>
+        <if test = "DEAL_AREA_CODE!=null">,DEAL_AREA_CODE</if>
+        <if test = "GROUP_PM_ID!=null">,GROUP_PM_ID</if>
+        <if test = "GROUP_PM_NAME!=null">,GROUP_PM_NAME</if>
+        <if test = "GROUP_PM_TEL!=null">,GROUP_PM_TEL</if>
+        <if test = "GROUP_PM_EMAIL!=null">,GROUP_PM_EMAIL</if>
+        <if test = "PROVINCE_PM_ID!=null">,PROVINCE_PM_ID</if>
+        <if test = "PROVINCE_PM_NAME!=null">,PROVINCE_PM_NAME</if>
+        <if test = "PROVINCE_PM_TEL!=null">,PROVINCE_PM_TEL</if>
+        <if test = "PROVINCE_PM_EMAIL!=null">,PROVINCE_PM_EMAIL</if>
+        <if test = "INIT_AM_ID!=null">,INIT_AM_ID</if>
+        <if test = "INIT_AM_NAME!=null">,INIT_AM_NAME</if>
+        <if test = "INIT_AM_TEL!=null">,INIT_AM_TEL</if>
+        <if test = "INIT_AM_EMAIL!=null">,INIT_AM_EMAIL</if>
+        <if test = "REMARK!=null">,REMARK</if>
+        <if test = "CUST_ID!=null">,CUST_ID</if>
+        <if test = "CONTRACT_ID!=null">,CONTRACT_ID</if>
+        <if test = "CUST_NAME_CHINESE!=null">,CUST_NAME_CHINESE</if>
+        <if test = "CUST_NAME_ENGLISH!=null">,CUST_NAME_ENGLISH</if>
+        <if test = "CUST_ADDRESS!=null">,CUST_ADDRESS</if>
+        <if test = "CUST_INDUSTRY!=null">,CUST_INDUSTRY</if>
+        <if test = "CUST_PROVINCE!=null">,CUST_PROVINCE</if>
+        <if test = "CUST_CITY!=null">,CUST_CITY</if>
+        <if test = "CUST_TEL!=null">,CUST_TEL</if>
+        <if test = "CUST_FAX!=null">,CUST_FAX</if>
+        <if test = "CUST_EMAIL!=null">,CUST_EMAIL</if>
+        <if test = "CUST_CONTACT_MAN_ID!=null">,CUST_CONTACT_MAN_ID</if>
+        <if test = "CUST_CONTACT_MAN_NAME!=null">,CUST_CONTACT_MAN_NAME</if>
+        <if test = "CUST_CONTACT_MAN_TEL!=null">,CUST_CONTACT_MAN_TEL</if>
+        <if test = "CUST_CONTACT_MAN_EMAIL!=null">,CUST_CONTACT_MAN_EMAIL</if>
+        <if test = "CUST_OPERATOR_NAME!=null">,CUST_OPERATOR_NAME</if>
+        <if test = "CUST_OPERATOR_TEL!=null">,CUST_OPERATOR_TEL</if>
+        <if test = "CUST_OPERATOR_EMAIL!=null">,CUST_OPERATOR_EMAIL</if>
+        <if test = "CREATE_DATE!=null">,CREATE_DATE</if>
+        <if test = "SUBSCRIBE_ID!=null">,SUBSCRIBE_ID</if>
+        <if test = "SUBSCRIBE_ID_RELA!=null">,SUBSCRIBE_ID_RELA</if>
+        <if test = "SERVICELEVEL!=null">,SERVICELEVEL</if>
+        <if test = "UPPERCODE!=null">,UPPERCODE</if>
+        <if test = "UPPERNAME!=null">,UPPERNAME</if>
+        <if test = "INIT_AM_ORG!=null">,INIT_AM_ORG</if>
+        <if test = "APPLY_ORD_ID!=null">,APPLY_ORD_ID</if>
+        <if test = "APPLY_ORD_NAME!=null">,APPLY_ORD_NAME</if>
+        <if test = "CUST_MANAGER!=null">,CUST_MANAGER</if>
+        <if test = "CUST_MANAGER_TEL!=null">,CUST_MANAGER_TEL</if>
+        <if test = "CONTRACT_NAME!=null">,CONTRACT_NAME</if>
+        <if test = "CUST_NAME!=null">,CUST_NAME</if>
+        <if test = "CUST_TYPE!=null">,CUST_TYPE</if>
+        <if test = "FLOW_TYPE!=null">,FLOW_TYPE</if>
+        <if test = "RELE_B_INSPECT_ORDER!=null">,RELE_B_INSPECT_ORDER</if>
+        <if test = "RELE_O_INSPECT_ORDER!=null">,RELE_O_INSPECT_ORDER</if>
+        <if test = "HANDLE_MAN_NAME!=null">,HANDLE_MAN_NAME</if>
+        <if test = "HANDLE_MAN_TEL!=null">,HANDLE_MAN_TEL</if>
+        <if test = "HANDLE_DEP!=null">,HANDLE_DEP</if>
+        <if test = "HANDLE_CITY!=null">,HANDLE_CITY</if>
+        <if test = "HANDLE_DEP_ID!=null">,HANDLE_DEP_ID</if>
+        <if test = "HANDLE_CITY_ID!=null">,HANDLE_CITY_ID</if>
+        <if test = "HANDLE_TIME!=null">,HANDLE_TIME</if>
+        <if test = "COOPERATION_MODE!=null">,COOPERATION_MODE</if>
+        <if test = "OTHER_OPERA_SER_NUM!=null">,OTHER_OPERA_SER_NUM</if>
+        <if test = "BUSINESS_COORD_DEP!=null">,BUSINESS_COORD_DEP</if>
+        <if test = "BATCH!=null">,BATCH</if>
+        <if test = "CREATE_ORD_MODE!=null">,CREATE_ORD_MODE</if>
+        <if test = "ANNEX!=null">,ANNEX</if>
+        <if test = "NOTES!=null">,NOTES</if>
+        <if test = "AUTIT_NAME!=null">,AUTIT_NAME</if>
+        <if test = "AUTIT_ID!=null">,AUTIT_ID</if>
+        <if test = "IS_GROUP_CUST!=null">,IS_GROUP_CUST</if>
+        <if test = "RELE_CREATE_APPLICATION!=null">,RELE_CREATE_APPLICATION</if>
+        )
+        values (
+        <if test = "CST_ORD_ID!=null">#{CST_ORD_ID,jdbcType=INTEGER}</if>
+        <if test = "PROJECT_TYPE!=null">,#{PROJECT_TYPE}</if>
+        <if test = "NETWORK_LEVEL!=null">,#{NETWORK_LEVEL}</if>
+        <if test = "DEAL_AREA_CODE!=null">,#{DEAL_AREA_CODE}</if>
+        <if test = "GROUP_PM_ID!=null">,#{GROUP_PM_ID}</if>
+        <if test = "GROUP_PM_NAME!=null">,#{GROUP_PM_NAME}</if>
+        <if test = "GROUP_PM_TEL!=null">,#{GROUP_PM_TEL}</if>
+        <if test = "GROUP_PM_EMAIL!=null">,#{GROUP_PM_EMAIL}</if>
+        <if test = "PROVINCE_PM_ID!=null">,#{PROVINCE_PM_ID}</if>
+        <if test = "PROVINCE_PM_NAME!=null">,#{PROVINCE_PM_NAME}</if>
+        <if test = "PROVINCE_PM_TEL!=null">,#{PROVINCE_PM_TEL}</if>
+        <if test = "PROVINCE_PM_EMAIL!=null">,#{PROVINCE_PM_EMAIL}</if>
+        <if test = "INIT_AM_ID!=null">,#{INIT_AM_ID}</if>
+        <if test = "INIT_AM_NAME!=null">,#{INIT_AM_NAME}</if>
+        <if test = "INIT_AM_TEL!=null">,#{INIT_AM_TEL}</if>
+        <if test = "INIT_AM_EMAIL!=null">,#{INIT_AM_EMAIL}</if>
+        <if test = "REMARK!=null">,#{REMARK}</if>
+        <if test = "CUST_ID!=null">,#{CUST_ID}</if>
+        <if test = "CONTRACT_ID!=null">,#{CONTRACT_ID}</if>
+        <if test = "CUST_NAME_CHINESE!=null">,#{CUST_NAME_CHINESE}</if>
+        <if test = "CUST_NAME_ENGLISH!=null">,#{CUST_NAME_ENGLISH}</if>
+        <if test = "CUST_ADDRESS!=null">,#{CUST_ADDRESS}</if>
+        <if test = "CUST_INDUSTRY!=null">,#{CUST_INDUSTRY}</if>
+        <if test = "CUST_PROVINCE!=null">,#{CUST_PROVINCE}</if>
+        <if test = "CUST_CITY!=null">,#{CUST_CITY}</if>
+        <if test = "CUST_TEL!=null">,#{CUST_TEL}</if>
+        <if test = "CUST_FAX!=null">,#{CUST_FAX}</if>
+        <if test = "CUST_EMAIL!=null">,#{CUST_EMAIL}</if>
+        <if test = "CUST_CONTACT_MAN_ID!=null">,#{CUST_CONTACT_MAN_ID}</if>
+        <if test = "CUST_CONTACT_MAN_NAME!=null">,#{CUST_CONTACT_MAN_NAME}</if>
+        <if test = "CUST_CONTACT_MAN_TEL!=null">,#{CUST_CONTACT_MAN_TEL}</if>
+        <if test = "CUST_CONTACT_MAN_EMAIL!=null">,#{CUST_CONTACT_MAN_EMAIL}</if>
+        <if test = "CUST_OPERATOR_NAME!=null">,#{CUST_OPERATOR_NAME}</if>
+        <if test = "CUST_OPERATOR_TEL!=null">,#{CUST_OPERATOR_TEL}</if>
+        <if test = "CUST_OPERATOR_EMAIL!=null">,#{CUST_OPERATOR_EMAIL}</if>
+        <if test = "CREATE_DATE!=null">,TO_DATE(#{CREATE_DATE}, 'yyyy-mm-dd hh24:mi:ss')</if>
+        <if test = "SUBSCRIBE_ID!=null">,#{SUBSCRIBE_ID}</if>
+        <if test = "SUBSCRIBE_ID_RELA!=null">,#{SUBSCRIBE_ID_RELA}</if>
+        <if test = "SERVICELEVEL!=null">,#{SERVICELEVEL}</if>
+        <if test = "UPPERCODE!=null">,#{UPPERCODE}</if>
+        <if test = "UPPERNAME!=null">,#{UPPERNAME}</if>
+        <if test = "INIT_AM_ORG!=null">,#{INIT_AM_ORG}</if>
+        <if test = "APPLY_ORD_ID!=null">,#{APPLY_ORD_ID}</if>
+        <if test = "APPLY_ORD_NAME!=null">,#{APPLY_ORD_NAME}</if>
+        <if test = "CUST_MANAGER!=null">,#{CUST_MANAGER}</if>
+        <if test = "CUST_MANAGER_TEL!=null">,#{CUST_MANAGER_TEL}</if>
+        <if test = "CONTRACT_NAME!=null">,#{CONTRACT_NAME}</if>
+        <if test = "CUST_NAME!=null">,#{CUST_NAME}</if>
+        <if test = "CUST_TYPE!=null">,#{CUST_TYPE}</if>
+        <if test = "FLOW_TYPE!=null">,#{FLOW_TYPE}</if>
+        <if test = "RELE_B_INSPECT_ORDER!=null">,#{RELE_B_INSPECT_ORDER}</if>
+        <if test = "RELE_O_INSPECT_ORDER!=null">,#{RELE_O_INSPECT_ORDER}</if>
+        <if test = "HANDLE_MAN_NAME!=null">,#{HANDLE_MAN_NAME}</if>
+        <if test = "HANDLE_MAN_TEL!=null">,#{HANDLE_MAN_TEL}</if>
+        <if test = "HANDLE_DEP!=null">,#{HANDLE_DEP}</if>
+        <if test = "HANDLE_CITY!=null">,#{HANDLE_CITY}</if>
+        <if test = "HANDLE_DEP_ID!=null">,#{HANDLE_DEP_ID}</if>
+        <if test = "HANDLE_CITY_ID!=null">,#{HANDLE_CITY_ID}</if>
+        <if test = "HANDLE_TIME!=null">,TO_DATE(#{HANDLE_TIME}, 'yyyy-mm-dd hh24:mi:ss')</if>
+        <if test = "COOPERATION_MODE!=null">,#{COOPERATION_MODE}</if>
+        <if test = "OTHER_OPERA_SER_NUM!=null">,#{OTHER_OPERA_SER_NUM}</if>
+        <if test = "BUSINESS_COORD_DEP!=null">,#{BUSINESS_COORD_DEP}</if>
+        <if test = "BATCH!=null">,#{BATCH}</if>
+        <if test = "CREATE_ORD_MODE!=null">,#{CREATE_ORD_MODE}</if>
+        <if test = "ANNEX!=null">,#{ANNEX}</if>
+        <if test = "NOTES!=null">,#{NOTES}</if>
+        <if test = "AUTIT_NAME!=null">,#{AUTIT_NAME}</if>
+        <if test = "AUTIT_ID!=null">,#{AUTIT_ID}</if>
+        <if test = "IS_GROUP_CUST!=null">,#{IS_GROUP_CUST}</if>
+        <if test = "RELE_CREATE_APPLICATION!=null">,#{RELE_CREATE_APPLICATION}</if>
+
+        )
+    </insert>
+
+    <!--插入定单信息 ren.jh-->
+    <insert id="insertOrderInfo"  parameterType="map">
+     INSERT  INTO GOM_BDW_SRV_ORD_INFO (
+        <if test = "SRV_ORD_ID!=null">SRV_ORD_ID</if>
+        <if test = "CST_ORD_ID!=null">,CST_ORD_ID</if>
+        <if test = "ORDER_ID!=null">,ORDER_ID</if>
+        <if test = "SERVICE_ID!=null">,SERVICE_ID</if>
+        <if test = "TRADE_TYPE_CODE!=null">,TRADE_TYPE_CODE</if>
+        <if test = "ACTIVE_TYPE!=null">,ACTIVE_TYPE</if>
+        <if test = "SERVICE_OFFER_ID!=null">,SERVICE_OFFER_ID</if>
+        <if test = "SERIAL_NUMBER!=null">,SERIAL_NUMBER</if>
+        <if test = "TRADE_ID!=null">,TRADE_ID</if>
+        <if test = "TRADE_ID_RELA!=null">,TRADE_ID_RELA</if>
+        <if test = "USER_ID!=null">,USER_ID</if>
+        <if test = "FLOW_ID!=null">,FLOW_ID</if>
+        <if test = "SRV_ORD_STAT!=null">,SRV_ORD_STAT</if>
+        ,RESOURCES
+        <if test = "CREATE_DATE!=null">,CREATE_DATE</if>
+        <if test="ORDER_TYPE!=null">,ORDER_TYPE</if>
+        <if test="INSTANCE_ID!=null">,INSTANCE_ID</if>
+        <if test="SYSTEM_RESOURCE!=null and SYSTEM_RESOURCE != '' ">,SYSTEM_RESOURCE</if>
+        <if test="REQ_FIN_TIME!=null">,REQ_FIN_TIME</if>
+
+        )VALUES (
+        <if test = "SRV_ORD_ID!=null">#{SRV_ORD_ID}</if>
+        <if test = "CST_ORD_ID!=null">,#{CST_ORD_ID}</if>
+        <if test = "ORDER_ID!=null">,#{ORDER_ID}</if>
+        <if test = "SERVICE_ID!=null">,#{SERVICE_ID}</if>
+        <if test = "TRADE_TYPE_CODE!=null">,#{TRADE_TYPE_CODE}</if>
+        <if test = "ACTIVE_TYPE!=null">,#{ACTIVE_TYPE}</if>
+        <if test = "SERVICE_OFFER_ID!=null">,#{SERVICE_OFFER_ID}</if>
+        <if test = "SERIAL_NUMBER!=null">,#{SERIAL_NUMBER}</if>
+        <if test = "TRADE_ID!=null">,#{TRADE_ID}</if>
+        <if test = "TRADE_ID_RELA!=null">,#{TRADE_ID_RELA}</if>
+        <if test = "USER_ID!=null">,#{USER_ID}</if>
+        <if test = "FLOW_ID!=null">,#{FLOW_ID}</if>
+        <if test = "SRV_ORD_STAT!=null">,#{SRV_ORD_STAT}</if>
+        ,'secondary'
+        <if test = "CREATE_DATE!=null">,TO_DATE(#{CREATE_DATE}, 'yyyy-mm-dd hh24:mi:ss')</if>
+        <if test="ORDER_TYPE!=null">,#{ORDER_TYPE}</if>
+        <if test="INSTANCE_ID!=null">,#{INSTANCE_ID}</if>
+        <if test="SYSTEM_RESOURCE!=null and SYSTEM_RESOURCE != '' ">,#{SYSTEM_RESOURCE}</if>
+        <if test="REQ_FIN_TIME!=null">,#{REQ_FIN_TIME}</if>
+
+        )
+
+    </insert>
+
+    <!--插入电路信息 ren.jh-->
+    <insert id="insertordAttrInfo"  parameterType="java.util.List">
+        insert  into gom_BDW_srv_ord_attr_info(ATTR_INFO_ID,SRV_ORD_ID,ATTR_ACTION,ATTR_CODE,ATTR_NAME,ATTR_VALUE,ATTR_VALUE_NAME,CREATE_DATE,SOURSE)
+        <foreach collection="list" item="item" index="index" separator="union all" >
+            SELECT GET_SEQ_NEXT('seq_gom_BDW_srv_ord_attr_info'),#{item.SRV_ORD_ID,jdbcType=INTEGER},
+            #{item.ATTR_ACTION,jdbcType=VARCHAR},#{item.ATTR_CODE,jdbcType=VARCHAR},#{item.ATTR_NAME,jdbcType=VARCHAR},
+            #{item.ATTR_VALUE,jdbcType=VARCHAR},#{item.ATTR_VALUE_NAME,jdbcType=VARCHAR},TO_DATE(#{item.CREATE_DATE}, 'yyyy-mm-dd hh24:mi:ss'),#{item.SOURSE,jdbcType=VARCHAR}
+            FROM  dual
+        </foreach>
+
+    </insert>
+    <!--修改申请单序列号-->
+    <update id="updateScheduNum">
+        <if test="org_id!=null">
+            update gom_BDW_schedu_num
+            set SCHEDU_NUM  = SCHEDU_NUM+1 ,UPDATE_DATE=sysDate
+            where ORG_ID=#{org_id} and ACTION_SCOPE=#{actionScope}
+        </if>
+    </update>
+
+    <update id="updateInitScheduNum">
+        <if test="org_id!=null">
+           update gom_BDW_schedu_num
+           set SCHEDU_NUM  = '1' ,UPDATE_DATE=sysDate
+           where ORG_ID=#{org_id} and ACTION_SCOPE=#{actionScope}
+        </if>
+    </update>
+
+    <select id="queryWoIdByOrderId" resultType="string" parameterType="string">
+        select w.wo_id as woId from gom_wo w
+        left join GOM_PS_2_WO_S psw on w.PS_ID=psw.id
+        left join uos_tache ut on psw.tache_id=ut.id
+        where w.order_id=#{0}  and ut.TACHE_CODE='NEW_APPLICATION_FORM' and w.WO_STATE='290000114'
+    </select>
+
+
+    <!--插入电路信息竣工时间-->
+    <update id="updateFinishTime"  parameterType="string" >
+        update gom_BDW_srv_ord_attr_info set ATTR_VALUE = #{finishTime} where ATTR_CODE='REC_30004' AND SRV_ORD_ID = #{srd}
+    </update>
+
+    <!--查询竣工时间-->
+    <select id="queryFinishTime" resultType="string" parameterType="string" >
+        SELECT ATTR_VALUE FROM gom_BDW_srv_ord_attr_info  WHERE ATTR_CODE='REC_30004' AND SRV_ORD_ID=#{0}
+    </select>
+
+    <!--查询竣工时间-->
+    <select id="queryAttrInfo" resultType="java.util.Map" parameterType="string" >
+           SELECT  case when attr_value='是' then '1'
+            when attr_value='否' then '0'
+              else ''
+                end as ASSESS_RESULT
+        FROM gom_BDW_srv_ord_attr_info
+         WHERE ATTR_CODE=#{attrCode} AND SRV_ORD_ID=#{srvOrdId}
+    </select>
+</mapper>
+

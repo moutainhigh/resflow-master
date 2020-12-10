@@ -1,0 +1,124 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title" id="operOrderViewTitle">工单处理-核查汇总</h4>
+</div>
+<div class="modal-body">
+
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="orderOper-form">
+                <div id="orderOperDiv" style="width: 99%">
+                    <!-- 电路信息 -->
+                    <div class="row form-group" id="circuitDiv">
+                        <label class="col-md-2 col-sm-2 control-label requires" style="padding-right: 0">电路信息：</label>
+                        <div class="col-md-10 col-sm-10">
+                            <div id="circuitGrid"></div>
+                        </div>
+                    </div>
+                    <div class="row form-group" id="estimateDiv" >
+                        <label class="col-md-2 col-sm-2 control-label"  style="padding-right: 0;">是否投资估算：</label>
+                        <div class="col-md-10 col-sm-10" id="estimate">
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimatePass" value="0">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="estimateRadio" id="estimateNoPass" value="1" checked="true" >否</label>
+                        </div>
+                    </div>
+                    <!-- 核查反馈 -->
+                    <div class="row form-group" id="feedBackZDiv">
+                        <!-- 资源是否满足-->
+                        <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label requires Z_LABEL Z_RES_HAVE" ><span class="Z_TERMINATE"></span>资源是否具备:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <input id="COLLECT_RES" name="COLLECT_RES" class="form-control  menu "  data-rule="required" >
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 Z_DIV Z_PROJECT">
+                            <div class="col-md-6 col-sm-6 Z_DAY" hideen>
+                                <label class="col-md-4 col-sm-4 control-label requires Z_LABEL COLLECT_DAY" ><span class="Z_TERMINATE"></span>建设工期(工作日):</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="COLLECT_DAY" name="COLLECT_DAY" class="form-control Z_INPUT"  >
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 Z_AMOUNT">
+                                <label class="col-md-4 col-sm-4 control-label Z_LABEL COLLECT_MONEY" ><span class="Z_TERMINATE"></span>工程概算造价(万元):</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="COLLECT_MONEY" name="COLLECT_MONEY" class="form-control Z_INPUT "  type="number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 A_DIV A_PROJECT_DESC" style="margin-bottom: 15px">
+                            <label class="col-md-2 col-sm-2 control-label  Z_LABEL COLLECT_DESC"><span class="A_TERMINATE"></span>工程概述:</label>
+                            <div class="col-md-10 col-sm-10">
+                                <textarea id="COLLECT_DESC" name="COLLECT_DESC" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+<!--                        &lt;!&ndash; <Z端接入工程方案&ndash;&gt;-->
+<!--                        <div class="row form-group" id="Z_fileUpdateDiv">-->
+<!--                            &lt;!&ndash; 用来存储上传的附件id &ndash;&gt;-->
+<!--                            <div id="Z_attach" class="">-->
+<!--                                <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>-->
+<!--                                <div class="col-md-10 col-sm-8">-->
+<!--                                    <form id="Z_displaySource">-->
+<!--                                        <div class="btn-toolbar" style="margin-bottom: 10px;">-->
+<!--                                        <span class="btn btn-default fileinput-button">-->
+<!--                                            <i class="glyphicon glyphicon-plus"></i>-->
+<!--                                            <span style="line-height: 23px;">选择文件...</span>-->
+<!--                                            <input class="js-select-file" id="Z_selectFiles" type="file"-->
+<!--                                                   name="selectFiles" multiple="" >-->
+<!--                                        </span>-->
+<!--                                        </div>-->
+<!--                                        <div id="Z_fileGrid"></div>-->
+<!--                                    </form>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <input id="Z_ACCESS_PROJECT_SCHEME" name="Z_ACCESS_PROJECT_SCHEME" class="form-control hidden"  >-->
+<!--                        </div>-->
+                    <!-- 👆👆👆👆 专业核查 👆👆👆👆-->
+
+                    <div class="form-group" style="text-align: right;"  id="checkSaveBtnDiv">
+                        <button type="button" id="localCheckBtn" class="btn btn-outline-danger LOCAL" style="margin-right:20px;">录入本地核查信息</button>
+                        <button type="button" id="checkSaveBtn" class="btn btn-danger" style="margin-right:20px;">保存</button>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="row form-group" id="fileUpdateDiv">
+                        <div id="attach" class="">
+                            <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>
+                            <div class="col-md-10 col-sm-8">
+                                <form id="displaySource">
+                                    <div class="btn-toolbar" style="margin-bottom: 10px;">
+                                        <span class="btn btn-default fileinput-button">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span style="line-height: 23px;">选择文件...</span>
+                                            <input class="js-select-file" id="selectFiles" type="file"
+                                                   name="selectFiles" multiple="" >
+                                        </span>
+                                    </div>
+                                    <div id="fileGrid"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 说明 -->
+                    <div class="row form-group remark" id="remarkDiv">
+                        <div id="remarkGoRoll" class="">
+                            <label class="col-md-2 col-sm-4 control-label requires" style="padding-right: 0;"> 说明：</label>
+                            <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>

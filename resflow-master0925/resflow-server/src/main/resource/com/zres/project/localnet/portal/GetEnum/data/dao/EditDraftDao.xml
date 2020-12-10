@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.EditDraftDao">
+    <select id="querySelectedServInfo"  parameterType="java.lang.String" resultType="java.util.Map">
+       select sev.srv_ord_id,
+             sev.order_id,
+             sev.service_id,
+             sev.trade_type_code,
+             sev.active_type,
+             sev.service_offer_id,
+             sev.serial_number,
+             sev.trade_id,
+             sev.trade_id_rela,
+             sev.user_id,
+             sev.flow_id,
+             sev.SRV_ORD_STAT,
+             sev.RESOURCES,
+             sev.MAINORG,
+             sev.QCWOORDERCODE,
+             sev.INSTANCE_ID,
+             cst.CST_ORD_ID,
+             cst.PROJECT_TYPE,
+             cst.NETWORK_LEVEL,
+             cst.DEAL_AREA_CODE,
+             cst.GROUP_PM_ID,
+             cst.GROUP_PM_NAME,
+             cst.GROUP_PM_TEL,
+             cst.GROUP_PM_EMAIL,
+             cst.PROVINCE_PM_ID,
+             cst.PROVINCE_PM_NAME,
+             cst.PROVINCE_PM_TEL,
+             cst.PROVINCE_PM_EMAIL,
+             cst.INIT_AM_ID,
+             cst.INIT_AM_TEL,
+             cst.INIT_AM_EMAIL,
+             cst.INIT_AM_NAME,
+             cst.REMARK,
+             cst.CUST_ID,
+             cst.CONTRACT_ID,
+             cst.CUST_NAME_CHINESE,
+             cst.CUST_NAME_ENGLISH,
+             cst.CUST_ADDRESS,
+             cst.CUST_INDUSTRY,
+             cst.CUST_PROVINCE,
+             cst.CUST_CITY,
+             cst.CUST_TEL,
+             cst.CUST_FAX,
+             cst.CUST_EMAIL,
+             cst.CUST_CONTACT_MAN_ID,
+             cst.CUST_CONTACT_MAN_NAME,
+             cst.CUST_CONTACT_MAN_TEL,
+             cst.CUST_CONTACT_MAN_EMAIL,
+             cst.CUST_OPERATOR_NAME,
+             cst.CUST_OPERATOR_TEL,
+             cst.CUST_OPERATOR_EMAIL,
+             TO_char(cst.CREATE_DATE, 'yyyy-mm-dd hh24:mi:ss') as CREATE_DATE,
+             cst.SUBSCRIBE_ID,
+             cst.SUBSCRIBE_ID_RELA,
+             cst.SERVICELEVEL,
+             cst.UPPERCODE,
+             cst.UPPERNAME,
+             cst.INIT_AM_ORG,
+             cst.APPLY_ORD_ID,
+             cst.APPLY_ORD_NAME,
+             cst.CUST_MANAGER,
+             cst.CUST_MANAGER_TEL,
+             cst.CONTRACT_NAME,
+             cst.CUST_NAME,
+             cst.CUST_TYPE,
+             cst.FLOW_TYPE,
+             cst.RELE_B_INSPECT_ORDER,
+             cst.RELE_O_INSPECT_ORDER,
+             cst.HANDLE_MAN_NAME,
+             cst.HANDLE_MAN_TEL,
+             cst.HANDLE_DEP,
+             cst.HANDLE_CITY,
+             TO_char(cst.HANDLE_TIME, 'yyyy-mm-dd hh24:mi:ss') as HANDLE_TIME,
+             cst.COOPERATION_MODE,
+             cst.OTHER_OPERA_SER_NUM,
+             cst.BUSINESS_COORD_DEP,
+             cst.BATCH,
+             cst.CREATE_ORD_MODE,
+             cst.ANNEX,
+             cst.NOTES,
+             cst.HANDLE_CITY_ID,
+             cst.HANDLE_DEP_ID,
+             cst.AUTIT_NAME,
+             cst.AUTIT_ID,
+             cst.RELE_CREATE_APPLICATION
+        from GOM_BDW_SRV_ORD_INFO sev
+        left join GOM_BDW_CST_ORD cst
+          on sev.cst_ord_id = cst.cst_ord_id
+      where sev.srv_ord_id =#{SrvOrdId}
+    </select>
+    <!--根据客户ID 查询 客户所有的 业务订单ID-->
+    <select id="querySrvOrdIdByCustId"  parameterType="java.lang.String" resultType="java.lang.String">
+      select t.srv_ord_id from GOM_BDW_SRV_ORD_INFO t where t.cst_ord_id = #{CustId}
+      <if test="OrderState!=null and OrderState!=''"> and t.SRV_ORD_STAT = #{OrderState}</if>
+    </select>
+    <!--根据申请单编号查询 业务CustOrdId-->
+    <select id="queryCustOrdIdByApplicationCode"  parameterType="java.lang.String" resultType="java.lang.String">
+        select t.CST_ORD_ID from GOM_BDW_CST_ORD t where t.APPLY_ORD_ID = #{applicationCode}
+    </select>
+    <!--根据业务订单ID  查询 电路信息-->
+    <select id="queryCircuitInfoBySrvId"  parameterType="java.lang.String" resultType="java.util.Map">
+
+      select  soa.attr_value_name,soa.attr_value
+      from GOM_BDW_SRV_ORD_INFO soi left join gom_bdw_srv_ord_attr_info soa
+      on soi.srv_ord_id = soa.srv_ord_id
+      where soi.srv_ord_id = #{SrvOrdId}
+      <if test="CgFlag!=null and CgFlag!=''">
+          and soi.SRV_ORD_STAT =#{CgFlag}
+      </if>
+
+
+    </select>
+      <select id="queryCircuitInfoBySubscribeId"  parameterType="java.lang.String" resultType="java.util.Map">
+            select a.attr_value_name,a.attr_value,b.order_type
+                  from gom_bdw_srv_ord_attr_info a
+                  left join gom_bdw_srv_ord_info b on b.srv_ord_id = a.srv_ord_id
+                  left join gom_bdw_cst_ord c on c.CST_ORD_ID = b.cst_ord_id
+                  where c.APPLY_ORD_ID =#{SubscribeId}
+
+      </select>
+    <select id="queryCircuitById"  parameterType="java.lang.String" resultType="java.util.Map">
+        select b.SRV_ORD_ID,b.CST_ORD_ID,b.INSTANCE_ID
+        from gom_bdw_cst_ord c
+        left join gom_bdw_srv_ord_info b on c.CST_ORD_ID = b.cst_ord_id
+        where c.APPLY_ORD_ID=#{SubscribeId} and b.SRV_ORD_STAT = '10F'
+
+    </select>
+    <select id="queryCircuitInfoById"  parameterType="java.lang.String" resultType="java.util.Map">
+        select a.attr_value_name,a.attr_value,b.order_type
+        from gom_bdw_srv_ord_attr_info a
+        left join gom_bdw_srv_ord_info b on b.srv_ord_id = a.srv_ord_id
+        where b.srv_ord_id =#{srvOrdId}
+    </select>
+    <!--根据订单ID 查询申请单信息 trade_id-->
+    <select id="queryTradeIdBySrvOrdId" parameterType="java.lang.String" resultType="java.util.Map">
+        select t.* from  GOM_BDW_CST_ORD t where  t.CST_ORD_ID=#{SrvOrdId}
+    </select>
+    <select id="queryCustInfoByAppId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT * FROM GOM_BDW_CST_ORD where APPLY_ORD_ID =#{0}
+    </select>
+</mapper>

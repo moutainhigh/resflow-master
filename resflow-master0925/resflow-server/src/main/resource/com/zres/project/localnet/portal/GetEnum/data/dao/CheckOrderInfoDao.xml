@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.initApplOrderDetail.dao.CheckOrderInfoDao">
+
+    <select id="queryCircuitCodeNum" parameterType="String" resultType="map" useCache="false" flushCache="true">
+        select ord.ORDER_STATE,
+               srv.ACTIVE_TYPE,
+               gbsoai.ATTR_VALUE as circuitcode,
+               cst.apply_ord_id
+          from gom_bdw_srv_ord_info srv
+          left join gom_order ord on ord.order_id = srv.order_id
+                                 and ord.ORDER_STATE != '200000005'
+          left join gom_bdw_cst_ord cst on cst.cst_ord_id = srv.cst_ord_id
+          join gom_bdw_srv_ord_attr_info gbsoai on gbsoai.SRV_ORD_ID =
+                                                   srv.SRV_ORD_ID
+                                               and gbsoai.ATTR_CODE = '20000064'
+         where srv.SRV_ORD_ID in (select max(srv.SRV_ORD_ID) as SRV_ORD_ID
+                                    from gom_bdw_srv_ord_attr_info gbsoai
+                                    join gom_bdw_srv_ord_info gbsoi on gbsoai.SRV_ORD_ID =
+                                                                       gbsoi.SRV_ORD_ID
+                                    join gom_bdw_srv_ord_info srv on srv.INSTANCE_ID =
+                                                                     gbsoi.INSTANCE_ID
+                                   where gbsoai.ATTR_CODE = '20000064'
+                                     and gbsoai.ATTR_VALUE = #{circuitCode}
+                                   group by srv.INSTANCE_ID)
+--AND GBSOI.ACTIVE_TYPE IN(101,103,104,105,106) AND ORDER_STATE='200000004'
+--AND GBSOI.ACTIVE_TYPE IN(101,102,103,104,105,106)
+    </select>
+    <select id = "queryCircuitCount" parameterType="string" resultType="int">
+      select count(a.ATTR_VALUE)
+          from GOM_BDW_SRV_ORD_ATTR_INFO a
+          left join GOM_BDW_SRV_ORD_INFO b on a.srv_ord_id = b.srv_ord_id
+         where a.ATTR_CODE = '20000064'
+           and a.ATTR_VALUE = #{circuitCode}
+    </select>
+    <select id="querySrvOriderCount" parameterType="map" resultType="int">
+        select COUNT(*) from GOM_BDW_SRV_ORD_INFO
+        where TRADE_ID = #{tradeId}
+        <if test="actType != null and actType!=''"> and ACTIVE_TYPE != '101' </if>
+        <if test="orderType != null and orderType!=''"> and ORDER_TYPE = #{orderType} </if>
+    </select>
+    <select id="querySrvNumberCount" parameterType="map" resultType="int">
+        select COUNT(*) from GOM_BDW_SRV_ORD_INFO
+        where SERIAL_NUMBER = #{serialNumber}
+        <if test="actType != null and actType!=''"> and ACTIVE_TYPE != '101' </if>
+        <if test="orderType != null and orderType!=''"> and ORDER_TYPE = #{orderType} </if>
+    </select>
+    <select id="querySrvOrderState" parameterType="map" resultType="map">
+        SELECT c.APPLY_ORD_ID ,s.SRV_ORD_STAT
+        FROM GOM_BDW_SRV_ORD_INFO s
+        left join GOM_BDW_CST_ORD c on s.CST_ORD_ID = c.CST_ORD_ID
+        where INSTANCE_ID = #{instanceId}
+    </select>
+    <select id="queryIsTear" resultType="string" parameterType="map">
+      select TO_CHAR(wm_concat(co.APPLY_ORD_ID))  from GOM_BDW_CST_ORD co
+      left join gom_BDW_srv_ord_info soi  on co.CST_ORD_ID=soi.CST_ORD_ID
+      where soi.ACTIVE_TYPE='102' and soi.SRV_ORD_STAT='10F' and soi.INSTANCE_ID in
+        (select INSTANCE_ID from gom_BDW_srv_ord_info where
+            SRV_ORD_ID in
+            <foreach collection="srvOrdIds.split(',')" item="srvOrdId" index="index" open="(" close=")" separator = ",">
+                #{srvOrdId}
+            </foreach>
+        )
+
+    </select>
+    <select id="queryisOnWay" parameterType="map" resultType="string">
+        SELECT TO_CHAR(wm_concat(co.APPLY_ORD_ID))  FROM GOM_BDW_CST_ORD co
+        LEFT  JOIN   GOM_BDW_SRV_ORD_INFO soi on co.CST_ORD_ID=soi.CST_ORD_ID
+        where soi.SRV_ORD_STAT!='10F'
+        and soi.SRV_ORD_ID in
+        <foreach collection="srvOrdIds.split(',')" item="srvOrdId" index="index" open="(" close=")" separator = ",">
+            #{srvOrdId}
+        </foreach>
+    </select>
+    <select id="querySrvOrderInfoState" parameterType="map" resultType="map">
+        SELECT s.SRV_ORD_STAT,s.ACTIVE_TYPE
+        FROM GOM_BDW_SRV_ORD_INFO_VIEW s
+        where SERIAL_NUMBER = #{serialNumber}
+        and ACTIVE_TYPE != '101'
+    </select>
+</mapper>

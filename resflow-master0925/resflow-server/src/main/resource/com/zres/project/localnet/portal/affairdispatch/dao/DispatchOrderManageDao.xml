@@ -1,0 +1,867 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.affairdispatch.dao.DispatchOrderManageDao">
+
+    <!-- 新增实物调单记录 -->
+    <insert id="insertAffairDispatchOrder" parameterType="java.util.Map">
+        insert into GOM_BDW_AFFAIR_DISPATCH_ORDER (ID, ORDER_ID, CODE, TITLE, CONTENT, DISPOSE_STAFF_ARR, CREATE_STAFF,
+                                                   CREATE_DATE, IS_CHECK, STATE, CHECK_STAFF, FILE_INFO, TYPE )
+        values (#{affairId},
+                #{orderId},
+                #{code},
+                #{title},
+                #{content},
+                #{disposeStaffArr},
+                #{createStaff},
+                sysdate,
+                #{isCheck},
+                #{state},
+                #{checkStaff},
+                #{fileInfo},
+                #{type})
+    </insert>
+    <!--根据当前用户查到对应的省份 org_id-->
+    <select id="queryOrgId" resultType="string" parameterType="string" >
+        SELECT ORG_ID
+        FROM GOM_ORG_S a
+        where a.ORG_ID IN
+        (SELECT ORG_ID
+        FROM GOM_ORG_S
+        WHERE PARENT_ORG_ID = '1')
+        START WITH a.ORG_ID =
+        (SELECT org_id
+        FROM gom_user_s
+        where user_id = #{userId})
+        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID
+    </select>
+    <!--使用oracle函数查询事务调单流水号-->
+    <select id="queryDispatchOrderNumFunction" parameterType="String" resultType="String" useCache="false" flushCache="true">
+        select DISPATCH_ORDER_NUM_GENERATOR(#{orgId}) from dual
+    </select>
+    <!-- 批量新增事务调单抄送人记录 -->
+    <insert id="batchInsertNoticeRecord" parameterType="java.util.List">
+        insert into GOM_BDW_ORDER_NOTICE(NOTICE_ID,SRV_ORD_ID,DEAL_USER_ID,NOTICE_TYPE,NOTICE_CONTENT,CREATE_DATE,STAT)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            SELECT
+            GET_SEQ_NEXT('SEQ_GOM_BDW_ORDER_NOTICE'),#{item.srvOrdId},#{item.dealUserId},#{item.noticeType},#{item.noticeContent},sysdate,#{item.state}
+            FROM dual
+        </foreach>
+    </insert>
+
+    <!-- 通过订单ID及环节编码得到工单信息 -->
+    <select id="getWorkOrder" resultType="map">
+        select w.wo_id woId, w.order_id orderId, w.wo_code woCode, w.wo_title woTitle
+        from gom_wo w
+                 left join gom_ps_2_wo_s pw on pw.id = w.ps_id
+                 left join uos_tache t on pw.tache_id = t.id
+        where w.order_id = #{orderId}
+          and t.tache_code = #{tacheCode}
+        order by w.create_date desc
+    </select>
+
+    <!-- 批量插入订单文件记录（不添加加orderId） -->
+    <insert id="batchInsertOrderFileRecord">
+        insert into gom_bdw_attach_info (ATTACH_INFO_ID, FILE_ID, FILE_NAME,
+        FILE_PATH, FILE_TYPE, CREATE_DATE, WO_ORD_ID, FILE_SIZE)
+        <foreach collection="fileInfos" item="fileInfo" index="index" separator="union all">
+            SELECT GET_SEQ_NEXT('SEQ_GOM_BDW_ATTACH_INFO')+1,#{fileInfo.fileId},
+            #{fileInfo.fileName},'createbuss',#{fileInfo.fileType},sysdate,
+            #{woId},#{fileInfo.fileSize}
+            FROM dual
+        </foreach>
+    </insert>
+
+    <!--生成事务调单编码 SWDD-QH-2019-000001-->
+    <select id="getAffairDisCode" resultType="string">
+        select CONCAT(CONCAT(#{ariaCode}, to_char(sysdate, 'yyyy')),
+                      CONCAT('-', lpad(SEQ_GOM_BDW_AFFAIR_DIS_NO.NEXTVAL, 6, 0)))
+        from dual
+    </select>
+
+    <sql id="qryAffairOrderData">
+        select tab.* from (
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        a.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        a.FILE_INFO as FILE_INFO,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date,'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+                    CASE
+                    WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+                    WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+                    WHEN c.ALARM_DATE > sysdate then '正常单'
+                    ELSE '正常单'
+                    END as WO_COMPLETE_STATE,
+                  ]]>
+        row_number() over (partition by a.order_id order by c.wo_id desc) rn
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.order_id = a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        where 1=1
+        <if test="staffId !='' and staffId !=null and queryType == 'cgOrder'.toString() ">
+            and a.create_staff= #{staffId}
+        </if>
+        <if test="staffId !='' and staffId !=null and queryType != 'cgOrder'.toString() ">
+            and c.DISP_OBJ_ID = #{staffId}
+        </if>
+        <if test="tacheCode !='' and tacheCode !=null ">
+            and e.tache_code= #{tacheCode}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="queryType == 'fqOrder'.toString() ">
+            and a.state != '290000112'
+        </if>
+        <if test="isReject == 'true'.toString() ">
+            and c.priv_forward_wo_id is not null
+        </if>
+        ) tab where tab.rn = 1
+        order by tab.AFFAIR_DISPATCH_ORDER_ID desc
+    </sql>
+
+    <!-- 查询事务调单条数 -->
+    <select id="countAffairOrderList" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from (
+        <include refid="qryAffairOrderData"/>
+        ) t
+    </select>
+
+    <!-- 查询事务调单列表 -->
+    <select id="selectAffairOrderList" resultType="java.util.Map" parameterType="java.util.Map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+    <sql id="qryDraftAffairOrderData">
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        a.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        a.FILE_INFO as FILE_INFO,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date,'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+                    CASE
+                    WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+                    WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+                    WHEN c.ALARM_DATE > sysdate then '正常单'
+                    ELSE '正常单'
+                    END as WO_COMPLETE_STATE
+                  ]]>
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.order_id = a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        where 1=1
+        <if test="staffId !='' and staffId !=null">
+            and a.create_staff= #{staffId}
+        </if>
+        <if test="tacheCode !='' and tacheCode !=null ">
+            and e.tache_code= #{tacheCode}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        order by a.id desc
+    </sql>
+
+    <!-- 查询草稿箱事务调单条数 -->
+    <select id="countDraftAffairOrderList" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from (
+        <include refid="qryDraftAffairOrderData"/>
+        ) t
+    </select>
+
+    <!-- 查询草稿箱事务调单列表 -->
+    <select id="selectDraftAffairOrderList" resultType="java.util.Map" parameterType="java.util.Map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryDraftAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+    <!-- 通过id得到事务调单信息 -->
+    <select id="getAffairDisOrderById" parameterType="string" resultType="map">
+        SELECT ID,
+               ORDER_ID,
+               CODE,
+               TITLE,
+               CONTENT,
+               DISPOSE_STAFF_ARR,
+               CREATE_STAFF,
+               CHECK_STAFF
+        FROM GOM_BDW_AFFAIR_DISPATCH_ORDER
+        WHERE ID = #{ID}
+    </select>
+
+    <!-- 通过orderId得到父工单信息 -->
+    <select id="getParentWorkOrderList" parameterType="string" resultType="map">
+        SELECT W.WO_ID, W.ORDER_ID, T.TACHE_CODE
+        FROM GOM_WO W
+                 LEFT JOIN GOM_PS_2_WO_S PW
+                           ON PW.ID = W.PS_ID
+                 LEFT JOIN UOS_TACHE T
+                           ON PW.TACHE_ID = T.ID
+        WHERE W.ORDER_ID = (SELECT PARENT_ORDER_ID
+                            FROM GOM_ORDER
+                            WHERE ORDER_ID = #{orderId})
+        ORDER BY W.CREATE_DATE DESC
+    </select>
+
+    <!-- 得到所有子流程定单 -->
+    <select id="getSonOrderList" parameterType="string" resultType="map">
+        SELECT ORDER_ID, ORDER_CODE, ORDER_TITLE, REMARK
+        FROM GOM_ORDER
+        WHERE PARENT_ORDER_ID = #{parentOrderId}
+    </select>
+
+    <!-- 修改事务调单状态 -->
+    <update id="modifyAffairDisState">
+        update GOM_BDW_AFFAIR_DISPATCH_ORDER
+        set state=#{state},
+            update_staff=#{staffId},
+            update_date=sysdate
+        where id = #{affairId}
+    </update>
+
+    <!-- 得到序列 -->
+    <select id="querySequence" parameterType="String" resultType="integer" useCache="false" flushCache="true">
+        SELECT ${seqName}
+        FROM DUAL
+    </select>
+
+    <!-- 更新事务调单记录定单id -->
+    <update id="updateAffairOrderId">
+        UPDATE GOM_BDW_AFFAIR_DISPATCH_ORDER
+        SET ORDER_ID=#{orderId}
+        WHERE ID = #{affairId}
+    </update>
+
+    <!-- 更新事务调单信息（全量） -->
+    <update id="updateAffairDispatchOrder" parameterType="map">
+        UPDATE GOM_BDW_AFFAIR_DISPATCH_ORDER
+        SET TITLE=#{title},
+            CONTENT=#{content},
+            DISPOSE_STAFF_ARR=#{disposeStaffArr},
+            UPDATE_STAFF=#{updateStaff},
+            UPDATE_DATE=sysdate,
+            IS_CHECK=#{isCheck},
+            STATE=#{state},
+            CHECK_STAFF=#{checkStaff},
+            FILE_INFO=#{fileInfo}
+        WHERE ID = #{affairId}
+    </update>
+
+    <!-- 得到事务调单附件(作废) -->
+    <!--<select id="getAffairDispatchFile" resultType="map">
+        SELECT A.*
+        FROM (SELECT WO_ID
+        FROM GOM_WO W
+        LEFT JOIN GOM_PS_2_WO_S PW
+        ON PW.ID = W.PS_ID
+        LEFT JOIN UOS_TACHE T
+        ON PW.TACHE_ID = T.ID
+        WHERE W.ORDER_ID = (SELECT ORDER_ID
+        FROM GOM_BDW_AFFAIR_DISPATCH_ORDER
+        WHERE ID = #{affairId})
+        AND T.TACHE_CODE = #{tacheCode}
+        <![CDATA[
+          AND ROWNUM < 2
+	    ]]>
+        ORDER BY W.CREATE_DATE DESC) W,
+        GOM_BDW_ATTACH_INFO A
+        WHERE A.WO_ORD_ID = W.WO_ID
+    </select>-->
+
+    <!-- 作废抄送人记录 -->
+    <update id="obsoleteNoticeRecord">
+        UPDATE GOM_BDW_ORDER_NOTICE
+        SET STAT = #{noticeState}
+        WHERE SRV_ORD_ID = #{affairId}
+          AND NOTICE_TYPE = #{noticeType}
+    </update>
+
+    <!-- 更改工单描述信息 -->
+    <update id="modifyWoOrderRemark">
+        UPDATE GOM_WO
+        SET REMARK = #{remark}
+        WHERE WO_ID = #{woId}
+    </update>
+
+    <!-- 得到事务调单抄送人 -->
+    <select id="getAffairNoticeStaffArray" resultType="java.util.Map">
+        SELECT T.DEAL_USER_ID "id", U.ORG_NAME "section", U.USER_REAL_NAME "name"
+        FROM GOM_BDW_ORDER_NOTICE T
+                 INNER JOIN GOM_USER_S U ON U.USER_ID = T.DEAL_USER_ID
+        WHERE T.NOTICE_TYPE = '10G'
+          AND T.SRV_ORD_ID = #{affairId}
+          AND T.STAT = '0'
+    </select>
+
+    <sql id="qryDisponseAffairOrderData">
+        select tab.* from (
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        b.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date, 'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE, 'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        a.file_info as FILE_INFO,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+            CASE
+            WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+            WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+            WHEN c.ALARM_DATE > sysdate then '正常单'
+            ELSE '正常单'
+            END as WO_COMPLETE_STATE,
+          ]]>
+        row_number() over (partition by b.order_id order by c.wo_id desc) rn
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.parent_order_id = a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        where c.wo_state = '290000002'
+        <if test="staffId !='' and staffId !=null ">
+            and c.DISP_OBJ_ID = #{staffId}
+        </if>
+        <if test="tacheCode !='' and tacheCode !=null ">
+            and e.tache_code= #{tacheCode}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="isReject == 'true'.toString() ">
+            and c.priv_forward_wo_id is not null
+        </if>
+        ) tab where tab.rn = 1
+        order by tab.AFFAIR_DISPATCH_ORDER_ID desc
+    </sql>
+
+    <!-- 事务处理工单条数 -->
+    <select id="countDisponeAffairOrderList" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1) from (
+        <include refid="qryDisponseAffairOrderData"/>
+        ) t
+    </select>
+
+    <!-- 查询事务处理工单 -->
+    <select id="selectDisponseAffairOrderList" resultType="map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryDisponseAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+    <!--获取事务调单审核信息-->
+    <select id="getAffairCheckInfoArray" resultType="java.util.Map">
+        SELECT DISTINCT a.id                                           as AFFAIR_DISPATCH_ORDER_ID,
+                        a.order_id                                     as ORDER_ID,
+                        a.code                                         as AFFAIR_DISPATCH_ORDER_CODE,
+                        c.wo_state                                     as WO_STATE,
+                        c.wo_id                                        as WO_ID,
+                        c.wo_code                                      as WO_CODE,
+                        to_char(c.STATE_DATE, 'yyyy-MM-dd hh24:mi:ss') as DEAL_DATE,
+                        c.remark                                       as REMARK,
+                        f.user_name                                    as CHECK_USER_NAME
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+                 left join GOM_ORDER b on b.order_id = a.order_id
+                 LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+                 LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+                 LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+                 left join vw_pub_staff f on f.staff_id = c.DISP_OBJ_ID
+        where a.id = #{affairId}
+          and e.tache_code = 'AFFAIR_REVIEW'
+        order by c.wo_id
+    </select>
+
+    <!-- 获取事务调单工单附件 -->
+    <select id="getAffairWoAccessoryFile" resultType="java.util.Map">
+        select *
+        from gom_bdw_attach_info a
+        where a.wo_ord_id = #{woId}
+    </select>
+
+    <!--获取事务调单处理进度列表 -->
+    <select id="getAffairDisposeList" resultType="java.util.Map">
+        select t.*
+        from (
+                 SELECT DISTINCT a.id                                           as                 AFFAIR_DISPATCH_ORDER_ID,
+                                 b.order_id                                     as                 ORDER_ID,
+                                 a.code                                         as                 AFFAIR_DISPATCH_ORDER_CODE,
+                                 c.wo_state                                     as                 WO_STATE,
+                                 c.wo_id                                        as                 WO_ID,
+                                 c.wo_code                                      as                 WO_CODE,
+                                 to_char(c.STATE_DATE, 'yyyy-MM-dd hh24:mi:ss') as                 DEAL_DATE,
+                                 c.remark                                       as                 REMARK,
+                                 f.user_name                                    as                 DEAL_STAFF_NAME,
+                                 c.priv_forward_wo_id                           as                 PRIV_FORWARD_WO_ID,
+                                 row_number() over (partition by b.order_id order by c.wo_id desc) rn
+                 from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+                          left join GOM_ORDER b on b.parent_order_id = a.order_id
+                          LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+                          LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+                          LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+                          LEFT join vw_pub_staff f on f.staff_id = c.DISP_OBJ_ID
+                 where a.id = #{affairId}
+                   and e.tache_code = 'AFFAIR_PROCESS'
+                 order by c.wo_id
+             ) t
+        where t.rn = 1
+    </select>
+
+
+    <sql id="qryCopyAffairOrderData">
+        select tab.* from (
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        a.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        a.FILE_INFO as FILE_INFO,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date,'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+                    CASE
+                    WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+                    WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+                    WHEN c.ALARM_DATE > sysdate then '正常单'
+                    ELSE '正常单'
+                    END as WO_COMPLETE_STATE,
+                  ]]>
+        row_number() over (partition by a.order_id order by c.wo_id desc) rn
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.order_id = a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        left join gom_bdw_order_notice gbon on gbon.srv_ord_id = a.id
+        where gbon.notice_type = '10G'
+        <if test="staffId !='' and staffId !=null ">
+            and gbon.Deal_User_Id = #{staffId}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        and a.state != '290000112'
+        ) tab where tab.rn = 1
+        order by tab.AFFAIR_DISPATCH_ORDER_ID desc
+    </sql>
+    <!-- 获取抄送事务单条数 -->
+    <select id="countCopyAffairOrderList" resultType="java.lang.Integer">
+        select count(1) from (
+        <include refid="qryCopyAffairOrderData"/>
+        ) t
+    </select>
+    <!-- 获取抄送事务单列表-->
+    <select id="selectCopyAffairOrderList" resultType="java.util.Map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryCopyAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+
+    <sql id="qryHistoryAffairOrderData">
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        a.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        a.FILE_INFO as FILE_INFO,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date,'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+            CASE
+            WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+            WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+            WHEN c.ALARM_DATE > sysdate then '正常单'
+            ELSE '正常单'
+            END as WO_COMPLETE_STATE
+          ]]>
+
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.order_id = a.order_id or b.parent_order_id=a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        where 1=1
+        <if test="staffId !='' and staffId !=null ">
+            and c.DISP_OBJ_ID = #{staffId}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        and a.state != '290000112'
+        <!--and c.wo_state != '290000002'-->
+        and c.disp_obj_id!='-2000'
+        and e.tache_code != 'INITIATE_AFFAIR'
+        and c.wo_state!='290000002'
+        order by a.id desc
+    </sql>
+    <!--获取历史事务单工单数量-->
+    <select id="countHistoryAffairOrderList" resultType="java.lang.Integer">
+        select count(1) from (
+        <include refid="qryHistoryAffairOrderData"/>
+        ) t
+    </select>
+    <!--获取历史事务单工单列表-->
+    <select id="selectHistoryAffairOrderList" resultType="java.util.Map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryHistoryAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+    <!--获取子流程工单信息-->
+    <select id="getChildWorkOrderList" resultType="java.util.Map">
+        select *
+        from (
+                 select b.order_id,
+                        c.*,
+                        e.tache_code,
+                        row_number() over (partition by b.order_id order by c.wo_id desc) rn
+                 from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+                          INNER JOIN GOM_ORDER b on b.parent_order_id = a.order_id
+                          LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+                          LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+                          LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+                 where a.id = #{affairId}
+             ) t
+        where t.rn = 1
+    </select>
+
+    <!--获取事务调单子单处理进度-->
+    <select id="getChildAffairDisposeList" resultType="java.util.Map">
+        SELECT DISTINCT a.id                                           as AFFAIR_DISPATCH_ORDER_ID,
+                        b.order_id                                     as ORDER_ID,
+                        a.code                                         as AFFAIR_DISPATCH_ORDER_CODE,
+                        c.wo_state                                     as WO_STATE,
+                        c.wo_id                                        as WO_ID,
+                        c.wo_code                                      as WO_CODE,
+                        to_char(c.STATE_DATE, 'yyyy-MM-dd hh24:mi:ss') as DEAL_DATE,
+                        c.remark                                       as REMARK,
+                        /*f.user_name                                    as DEAL_STAFF_NAME,*/
+                         CASE  WHEN C.COMP_USER_ID IS NOT NULL  THEN (SELECT VF.USER_NAME FROM VW_PUB_STAFF VF WHERE VF.STAFF_ID=C.COMP_USER_ID)
+                         ELSE (SELECT VF.USER_NAME FROM VW_PUB_STAFF VF WHERE VF.STAFF_ID=C.DISP_OBJ_ID) END AS DEAL_STAFF_NAME,
+                        c.priv_forward_wo_id                           as PRIV_FORWARD_WO_ID,
+                        e.tache_name                                   as TACHE_NAME
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+                 INNER join GOM_ORDER b on b.parent_order_id = a.order_id
+                 LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+                 LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+                 LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+              /*   LEFT join vw_pub_staff f on f.staff_id = c.comp_user_id*/
+        where b.order_id = #{orderId}
+            /*and e.tache_code = 'AFFAIR_PROCESS'*/
+          and c.old_wo_id is null
+          /*排除子流程等待环节*/
+          and e.tache_code !='AFFAIR_CONFIROM_WAIT'
+        order by c.wo_id
+    </select>
+
+    <select id="getAriaCode" parameterType="string" resultType="string">
+        select schedu_code
+        from GOM_BDW_SCHEDU_NUM
+        where org_id = (SELECT ORG_ID
+                        FROM GOM_ORG_S a
+                        where a.PARENT_ORG_ID = 1
+                        START WITH a.ORG_ID = (select u.ORG_ID from gom_user_s u WHERE u.user_id = #{operatorId})
+                        CONNECT BY prior a.PARENT_ORG_ID = a.ORG_ID)
+          and schedu_code is not null
+          and rownum = 1
+    </select>
+
+
+    <sql id="qryStartAffairOrderData">
+        select tab.* from (
+        SELECT DISTINCT a.id as AFFAIR_DISPATCH_ORDER_ID,
+        a.order_id as ORDER_ID,
+        a.code as AFFAIR_DISPATCH_ORDER_CODE,
+        a.title as TITLE,
+        a.content as CONTENT,
+        a.dispose_staff_arr as DISPOSE_STAFF_ARR,
+        a.create_staff as CREATE_STAFF_ID,
+        a.FILE_INFO as FILE_INFO,
+        f.user_name as CREATE_STAFF_NAME,
+        g.user_name as CHECK_STAFF_NAME,
+        to_char(a.create_date,'yyyy-MM-dd hh24:mi:ss') as CREATE_DATE,
+        a.is_check as IS_CHECK,
+        a.state as STATE,
+        a.type as TYPE,
+        a.check_staff as CHECK_STAFF,
+        e.tache_name as TACHE_NAME,
+        c.wo_state as WO_STATE,
+        c.wo_id as WO_ID,
+        c.wo_code as WO_CODE,
+        to_char(c.REQ_FIN_DATE,'yyyy-MM-dd hh24:mi:ss') as REQ_FIN_DATE,
+        c.priv_forward_wo_id as PRIV_FORWARD_WO_ID,
+        <![CDATA[
+            CASE
+            WHEN c.REQ_FIN_DATE <= sysdate then '超时单'
+            WHEN c.ALARM_DATE <= sysdate and sysdate < c.REQ_FIN_DATE then '预警单'
+            WHEN c.ALARM_DATE > sysdate then '正常单'
+            ELSE '正常单'
+            END as WO_COMPLETE_STATE,
+        ]]>
+        row_number() over (partition by a.order_id order by c.wo_id desc) rn
+        from GOM_BDW_AFFAIR_DISPATCH_ORDER a
+        left join GOM_ORDER b on b.order_id = a.order_id
+        LEFT JOIN GOM_WO c ON c.ORDER_ID = b.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S d ON d.ID = c.PS_ID
+        LEFT JOIN UOS_TACHE e on e.ID = d.TACHE_ID
+        LEFT join vw_pub_staff f on f.staff_id = a.create_staff
+        LEFT join vw_pub_staff g on g.staff_id = a.check_staff
+        where e.tache_code is not null
+        <if test="staffId !='' and staffId !=null">
+            and a.create_staff= #{staffId}
+        </if>
+        <if test="orderState !='' and orderState !=null ">
+            and a.state= #{orderState}
+        </if>
+        <if test="orderType !='' and orderType !=null ">
+            and a.type= #{orderType}
+        </if>
+        <if test="affOrderCode !='' and affOrderCode !=null ">
+            and a.code like '%' || #{affOrderCode} || '%'
+        </if>
+        <if test="orderTitle !='' and orderTitle !=null ">
+            and a.title like '%' || #{orderTitle} || '%'
+        </if>
+        <if test="beginDate !='' and beginDate !=null ">
+            <![CDATA[   and a.create_date >= to_date( #{beginDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="endDate !='' and endDate !=null ">
+            <![CDATA[   and a.create_date <= to_date( #{endDate},'yyyy-mm-dd')   ]]>
+        </if>
+        <if test="isReject == 'true'.toString() ">
+            and c.priv_forward_wo_id is not null
+        </if>
+        and a.state != '290000112'
+        ) tab where tab.rn = 1
+        order by tab.AFFAIR_DISPATCH_ORDER_ID desc
+    </sql>
+
+    <!--我的发起事务单条数-->
+    <select id="countStartAffairOrderList" resultType="java.lang.Integer">
+        select count(1) from (
+        <include refid="qryStartAffairOrderData"/>
+        ) t
+    </select>
+    <!--我的发起事务单列表-->
+    <select id="selectStartAffairOrderList" resultType="java.util.Map">
+        select z.*
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY y.CREATE_DATE desc) AS rowindex, y.*
+        From (
+        <include refid="qryStartAffairOrderData"/>
+        ) y
+        )z
+        where 1=1
+        <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	    ]]>
+    </select>
+
+    <select id="qryAffairDispatchOrderType" resultType="map">
+        SELECT r.code_content AS "name",r.code_value AS "value" FROM gom_bdw_code_info r WHERE r.code_type = 'AFFAIR_ORDER_TYPE'
+    </select>
+
+</mapper>

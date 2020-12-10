@@ -1,0 +1,63 @@
+<div class="modal-header">
+    <h4 class="modal-title">资源补录发起</h4>
+</div>
+<div class="modal-body">
+    <div style="padding: 10px;">
+        <label class="control-label" style="padding-right: 0">电路信息：</label>
+        <div id="initiateResourceGrid"></div>
+    </div>
+    <form class="form-horizontal" id="resourceInitiateForm">
+        <div class="form-group">
+            <label class="col-md-2 col-sm-4 control-label">是否派发本地网</label>
+            <div class="col-md-10 col-sm-8" id="isSendLocalNet">
+                <label class="radio-inline">
+                    <input type="radio" name="isSendLocalNet" id="inlineRadio1" value="0" data-rule="checked" checked="true">是</label>
+                <label class="radio-inline">
+                    <input type="radio" name="isSendLocalNet" id="inlineRadio2" value="1">否</label>
+            </div>
+        </div>
+        <div class="form-group required" id="cityDev">
+            <label class="col-md-2 col-sm-4 control-label">城市</label>
+            <div class="col-md-6 col-sm-8">
+                <div class="input-group">
+                    <input id="cityPopedit" name="cityPopedit" class="form-control" data-rule="required;">
+                    <input id="cityId" name="cityPopedit" class="form-control" style="display:none">
+                </div>
+            </div>
+        </div>
+        <div class="form-group required">
+            <label class="col-md-2 col-sm-4 control-label">专业</label>
+            <div class="col-md-6 col-sm-8">
+                <select id="resourceSpecialty" name="resourceSpecialty" class="ui-multiselect form-control" data-placeholder="请选择专业..." data-rule="required" multiple="">
+                    <option value=""></option>
+                    <option value="Austria" selected="selected">Austria</option>
+                    <option value="Azerbaijan" selected="selected">Azerbaijan</option>
+                    <option value="Bahamas">Bahamas</option>
+                </select>
+            </div>
+        </div>
+        <!-- -->
+        <div class="row form-group" id="remarkDiv">
+            <div id="remarkGoRoll" class="">
+                <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0;"> 补录说明：</label>
+                <div class="col-md-10 col-sm-8 clear-white">
+                                <textarea id="remark" name="remark" class="form-control" rows="8" style="width: 516px;"
+                                          data-rule="length[10~, true]"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="clearfix" style="text-align: right;" hidden id="saveBtnDiv">
+        <button type="button" id="saveBtn" class="btn btn-danger" style="margin-right:20px;margin-bottom:15px;">保存
+        </button>
+    </div>
+</div>
+<div class="modal-footer">
+    <div class="col-md-12 col-sm-12" id="BtnDiv">
+        <div style="text-align: center">
+            <!--<button id="saveDraft" type="button" class="btn btn-default">保存草稿</button>-->
+            <button id="submit" type="button" class="btn btn-danger">提交</button>
+            <button id="cancelThisBtn" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        </div>
+    </div>
+</div>

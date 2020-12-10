@@ -1,0 +1,542 @@
+<div class="modal-header">
+    <h4 style="font-size: 16px;font-weight:bold;" class="modal-title">核查信息</h4>
+</div>
+<div class="modal-body">
+    <div id="orderOperView">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="checkInfo">
+                <div class="row form-group panel" id="collectDiv" style="padding-top: 34px;margin:10px 5px;">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label A_RES_HAVE"><span class="A_TERMINATE">A端</span>资源是否具备:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_RES_HAVE" name="A_RES_HAVE" class="col-md-8 col-sm-8 form-control menu" disabled="disabled" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6"  style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label A_TOTAL_AMOUNT"><span class="A_TERMINATE">A端</span>投资总金额(万元):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TOTAL_AMOUNT" name="A_TOTAL_AMOUNT" class="col-md-8 col-sm-8 form-control" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6"  style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_LONGEST_PERIOD"><span class="A_TERMINATE">A端</span>最长工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_LONGEST_PERIOD" name="A_LONGEST_PERIOD" class="form-control" disabled="disabled">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label Z_RES_HAVE"><span class="A_TERMINATE">Z端</span>资源是否具备:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_RES_HAVE" name="Z_RES_HAVE" class="col-md-8 col-sm-8 form-control menu" disabled="disabled" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6"  style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label Z_TOTAL_AMOUNT"><span class="Z_TERMINATE">Z端</span>投资总金额(万元):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TOTAL_AMOUNT" name="Z_TOTAL_AMOUNT" class="col-md-8 col-sm-8 form-control "  disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6"  style="margin-bottom: 15px">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_LONGEST_PERIOD"><span class="Z_TERMINATE">Z端</span>最长工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_LONGEST_PERIOD" name="Z_LONGEST_PERIOD" class="form-control " disabled="disabled">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--  查看信息 -->
+                <!-- 核查反馈 A端   feedBackADiv-->
+                <!-- 核查反馈 A端   feedBackADiv-->
+                <div class="row form-group" id="feedBackADiv"  >
+                    <!-- 资源提供方式-->
+                    <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires A_LABEL" ><span class="A_TERMINATE">A端</span>资源提供方式:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <input id="A_RES_PROVIDE_STAND" name="A_RES_PROVIDE_STAND" class="form-control  menu"  data-rule="required" >
+                        </div>
+                    </div>
+                    <!-- 板卡备货情况-->
+                    <div class="col-md-12 col-sm-12 A_DIV A_BOARD"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_BOARD_READY"><span class="A_TERMINATE">A端</span>备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_BOARD_READY" name="A_BOARD_READY" class="form-control A_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+                    <!--板卡信息 -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_BOARD">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_BOARD_PERIOD" id="periodA"><span class="A_TERMINATE">A端</span>采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_BOARD_PERIOD" name="A_BOARD_PERIOD" class="form-control A_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_BOARD_AMOUNT" id="amountA"><span class="A_TERMINATE">A端</span>设备金额(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_BOARD_AMOUNT" name="A_BOARD_AMOUNT" class="form-control A_INPUT CHANGE_DATA" type = "number" >
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 板卡设备类型、设备型号是文本-->
+                    <div class="col-md-12 col-sm-12 A_DIV A_BOARD"    style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6 DIV_A_BOARD_TYPE">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_BOARD_TYPE"><span class="A_TERMINATE">A端</span>设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_BOARD_TYPE" name="A_BOARD_TYPE" class="form-control A_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6  DIV_A_BOARD_MODEL">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_BOARD_MODEL"><span class="A_TERMINATE">A端</span>设备型号:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_BOARD_MODEL" name="A_BOARD_MODEL" class="form-control A_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 传输备货情况-->
+                    <div class="col-md-12 col-sm-12 A_DIV A_TRANS"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_TRANS_READY"><span class="A_TERMINATE">A端</span>传输备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TRANS_READY" name="A_TRANS_READY" class="form-control A_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--传输信息 -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_TRANS">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_TRANS_PERIOD" ><span class="A_TERMINATE">A端</span>传输采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TRANS_PERIOD" name="A_TRANS_PERIOD" class="form-control A_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_TRANS_AMOUNT" ><span class="A_TERMINATE">A端</span>传输设备金额(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TRANS_AMOUNT" name="A_TRANS_AMOUNT" class="form-control A_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 A_DIV A_TRANS"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_TRANS_TYPE"><span class="A_TERMINATE">A端</span>传输设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TRANS_TYPE" name="A_TRANS_TYPE" class="form-control menu A_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_TRANS_MODEL"><span class="A_TERMINATE">A端</span>传输设备型号:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_TRANS_MODEL" name="A_TRANS_MODEL" class="form-control A_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 A_DIV A_OTHER_TRANS"   style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_OTHER_TYPE"><span class="A_TERMINATE">A端</span>其它设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_OTHER_TYPE" name="A_OTHER_TYPE" class="form-control A_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+                    <!--传输信息 -->
+
+                    <!-- 光缆及配件备货情况-->
+                    <div class="col-md-12 col-sm-12 A_DIV A_OPTICAL"    style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 requires control-label A_LABEL A_OPTICAL_READY"><span class="A_TERMINATE">A端</span>光缆及配件备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_OPTICAL_READY" name="A_OPTICAL_READY" class="form-control A_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--光缆及配件信息 -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_OPTICAL">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_OPTICAL_PERIOD" ><span class="A_TERMINATE">A端</span>采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_OPTICAL_PERIOD" name="A_OPTICAL_PERIOD" class="form-control A_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_OPTICAL_AMOUNT" ><span class="A_TERMINATE">A端</span>客户接入工程概算造价(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_OPTICAL_AMOUNT" name="A_OPTICAL_AMOUNT" class="form-control A_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 是否需要市政报批 -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_APPROVAL">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_MUNICIPAL_APPROVAL"><span class="A_TERMINATE">A端</span>是否需要市政报批:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_MUNICIPAL_APPROVAL" name="A_MUNICIPAL_APPROVAL" class="form-control menu A_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_APPROVAL_PERIOD" ><span class="A_TERMINATE">A端</span>报批工作日:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_APPROVAL_PERIOD" name="A_APPROVAL_PERIOD" class="form-control A_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 A_DIV A_PROJECT">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_CONSTRUCT_PERIOD_STAND" ><span class="A_TERMINATE">A端</span>建设工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_CONSTRUCT_PERIOD_STAND" name="A_CONSTRUCT_PERIOD_STAND" class="form-control A_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_PROJECT_AMOUNT" ><span class="A_TERMINATE">A端</span>工程概算造价(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_PROJECT_AMOUNT" name="A_PROJECT_AMOUNT" class="form-control A_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 工程概述  -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_PROJECT_DESC" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires  A_LABEL A_PROJECT_OVERVIEW"><span class="A_TERMINATE">A端</span>工程概述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="A_PROJECT_OVERVIEW" name="A_PROJECT_OVERVIEW" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 资源提供方式选择1、2、3、4、5、6时，此项必填 -->
+                    <div class="col-md-12 col-sm-12 A_DIV A_ALL" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires A_LABEL A_RES_DESC "><span class="A_TERMINATE">A端</span>资源情况描述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="A_RES_DESC" name="A_RES_DESC" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 A_DIV A_ALL" style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_LABEL A_PROPERTY_REDLINE"><span class="A_TERMINATE">A端</span>物业红线区域内施工是否涉及物业问题:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_PROPERTY_REDLINE" name="A_PROPERTY_REDLINE" class="form-control A_INPUT menu" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_CUST_ROOM"><span class="A_TERMINATE">A端</span>客户机房条件:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="A_CUST_ROOM" name="A_CUST_ROOM" class="form-control A_INPUT menu" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 A_DIV A_ALL" style="margin-bottom: 15px " >
+                        <label class="col-md-2 col-sm-2 control-label A_PROPERTY_DESC"><span class="A_TERMINATE">A端</span>物业问题描述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="A_PROPERTY_DESC" name="A_PROPERTY_DESC" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 A_DIV A_ALL" style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires A_RES_EXPLORER"><span class="A_TERMINATE">A端</span>资源勘查人:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="A_RES_EXPLORER" name="A_RES_EXPLORER" class="form-control A_INPUT"  >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label A_LABEL A_RES_EXPLOR_CONTACT requires"><span class="A_TERMINATE">A端</span>资源勘查人联系方式:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="A_RES_EXPLOR_CONTACT" name="A_RES_EXPLOR_CONTACT" class="form-control A_INPUT" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 A_DIV A_RELOVE" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label A_LABEL A_UNABLE_RELOVE"><span class="A_TERMINATE">A端</span>无法解决原因:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="A_UNABLE_RELOVE" name="A_UNABLE_RELOVE" class="form-control A_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+                    <!--                        <div class="row form-group" id="A_fileUpdateDiv">-->
+                    <!--                            &lt;!&ndash; 用来存储上传的附件id &ndash;&gt;-->
+                    <!--                            <div id="A_attach" class="">-->
+                    <!--                                <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>-->
+                    <!--                                <div class="col-md-10 col-sm-8">-->
+                    <!--                                    <form id="A_displaySource">-->
+                    <!--                                        <div class="btn-toolbar" style="margin-bottom: 10px;">-->
+                    <!--                                        <span class="btn btn-default fileinput-button">-->
+                    <!--                                            <i class="glyphicon glyphicon-plus"></i>-->
+                    <!--                                            <span style="line-height: 23px;">选择文件...</span>-->
+                    <!--                                            <input class="js-select-file" id="A_selectFiles" type="file"-->
+                    <!--                                                   name="selectFiles" multiple="" >-->
+                    <!--                                        </span>-->
+                    <!--                                        </div>-->
+                    <!--                                        <div id="A_fileGrid"></div>-->
+                    <!--                                    </form>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                            <input id="A_ACCESS_PROJECT_SCHEME" name="A_ACCESS_PROJECT_SCHEME" class="form-control hidden">-->
+                    <!--                        </div>-->
+                </div>
+                <!-- 核查反馈 Z端-->
+                <!-- 核查反馈 Z端-->
+                <div class="row form-group" id="feedBackZDiv">
+                    <!-- 资源提供方式-->
+                    <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires Z_LABEL" ><span class="Z_TERMINATE">Z端</span>资源提供方式:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <input id="Z_RES_PROVIDE_STAND" name="Z_RES_PROVIDE_STAND" class="form-control  menu"  data-rule="required" >
+                        </div>
+                    </div>
+                    <!-- 板卡备货情况-->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_BOARD"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_BOARD_READY"><span class="Z_TERMINATE">Z端</span>板卡备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_BOARD_READY" name="Z_BOARD_READY" class="form-control Z_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+                    <!--板卡信息 -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_BOARD">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_BOARD_PERIOD" id="periodZ"><span class="Z_TERMINATE">Z端</span>采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_BOARD_PERIOD" name="Z_BOARD_PERIOD" class="form-control Z_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_BOARD_AMOUNT" id="amountZ"><span class="Z_TERMINATE">Z端</span>设备金额(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_BOARD_AMOUNT" name="Z_BOARD_AMOUNT" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 板卡设备类型、设备型号是文本-->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_BOARD"    style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6 DIV_Z_BOARD_TYPE">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_BOARD_TYPE"><span class="Z_TERMINATE">Z端</span>设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_BOARD_TYPE" name="Z_BOARD_TYPE" class="form-control Z_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6  DIV_Z_BOARD_MODEL">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_BOARD_MODEL"><span class="Z_TERMINATE">Z端</span>设备型号:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_BOARD_MODEL" name="Z_BOARD_MODEL" class="form-control Z_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 传输备货情况-->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_TRANS"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_TRANS_READY"><span class="Z_TERMINATE">Z端</span>传输备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TRANS_READY" name="Z_TRANS_READY" class="form-control Z_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--传输信息 -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_TRANS">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_TRANS_PERIOD" ><span class="Z_TERMINATE">Z端</span>传输采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TRANS_PERIOD" name="Z_TRANS_PERIOD" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_TRANS_AMOUNT" ><span class="Z_TERMINATE">Z端</span>传输设备金额(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TRANS_AMOUNT" name="Z_TRANS_AMOUNT" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_TRANS"  style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_TRANS_TYPE"><span class="Z_TERMINATE">Z端</span>传输设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TRANS_TYPE" name="Z_TRANS_TYPE" class="form-control menu Z_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_TRANS_MODEL"><span class="Z_TERMINATE">Z端</span>传输设备型号:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_TRANS_MODEL" name="Z_TRANS_MODEL" class="form-control Z_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_OTHER_TRANS"   style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_OTHER_TYPE"><span class="Z_TERMINATE">Z端</span>其它设备类型:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_OTHER_TYPE" name="Z_OTHER_TYPE" class="form-control Z_INPUT" >
+                            </div>
+                        </div>
+                    </div>
+                    <!--传输信息 -->
+
+                    <!-- 光缆及配件备货情况-->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_OPTICAL"    style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 requires control-label Z_LABEL Z_OPTICAL_READY"><span class="Z_TERMINATE">Z端</span>光缆及配件备货情况:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_OPTICAL_READY" name="Z_OPTICAL_READY" class="form-control Z_INPUT menu" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--光缆及配件信息 -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_OPTICAL">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_OPTICAL_PERIOD" ><span class="Z_TERMINATE">Z端</span>采购工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_OPTICAL_PERIOD" name="Z_OPTICAL_PERIOD" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_OPTICAL_AMOUNT" ><span class="Z_TERMINATE">Z端</span>客户接入工程概算造价(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_OPTICAL_AMOUNT" name="Z_OPTICAL_AMOUNT" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 是否需要市政报批 -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_APPROVAL">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_MUNICIPAL_APPROVAL"><span class="Z_TERMINATE">Z端</span>是否需要市政报批:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_MUNICIPAL_APPROVAL" name="Z_MUNICIPAL_APPROVAL" class="form-control menu Z_INPUT" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_APPROVAL_PERIOD" ><span class="Z_TERMINATE">Z端</span>报批工作日:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_APPROVAL_PERIOD" name="Z_APPROVAL_PERIOD" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_PROJECT">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_CONSTRUCT_PERIOD_STAND" ><span class="Z_TERMINATE">Z端</span>建设工期(工作日):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_CONSTRUCT_PERIOD_STAND" name="Z_CONSTRUCT_PERIOD_STAND" class="form-control Z_INPUT CHANGE_DATA"  type="number">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_PROJECT_AMOUNT" ><span class="Z_TERMINATE">Z端</span>工程概算造价(万):</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_PROJECT_AMOUNT" name="Z_PROJECT_AMOUNT" class="form-control Z_INPUT CHANGE_DATA"  type="number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 工程概述  -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_PROJECT_DESC" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires  Z_LABEL Z_PROJECT_OVERVIEW"><span class="Z_TERMINATE">Z端</span>工程概述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="Z_PROJECT_OVERVIEW" name="Z_PROJECT_OVERVIEW" class="form-control Z_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+
+
+                    <!-- 资源提供方式选择1、2、3、4、5、6时，此项必填 -->
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_ALL" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label requires Z_LABEL Z_RES_DESC "><span class="Z_TERMINATE">Z端</span>资源情况描述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="Z_RES_DESC" name="Z_RES_DESC" class="form-control Z_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_ALL" style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label requires Z_LABEL Z_PROPERTY_REDLINE"><span class="Z_TERMINATE">Z端</span>物业红线区域内施工是否涉及物业问题:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_PROPERTY_REDLINE" name="Z_PROPERTY_REDLINE" class="form-control Z_INPUT menu" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_CUST_ROOM"><span class="Z_TERMINATE">Z端</span>客户机房条件:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="Z_CUST_ROOM" name="Z_CUST_ROOM" class="form-control Z_INPUT menu" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_ALL" style="margin-bottom: 15px " >
+                        <label class="col-md-2 col-sm-2 control-label Z_PROPERTY_DESC"><span class="Z_TERMINATE">Z端</span>物业问题描述:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="Z_PROPERTY_DESC" name="Z_PROPERTY_DESC" class="form-control Z_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_ALL" style="margin-bottom: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_RES_EXPLORER"><span class="Z_TERMINATE">Z端</span>资源勘查人:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="Z_RES_EXPLORER" name="Z_RES_EXPLORER" class="form-control Z_INPUT"  >
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label Z_LABEL Z_RES_EXPLOR_CONTACT requires"><span class="Z_TERMINATE">Z端</span>资源勘查人联系方式:</label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="Z_RES_EXPLOR_CONTACT" name="Z_RES_EXPLOR_CONTACT" class="form-control Z_INPUT" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 Z_DIV Z_RELOVE" style="margin-bottom: 15px">
+                        <label class="col-md-2 col-sm-2 control-label Z_LABEL Z_UNABLE_RELOVE"><span class="Z_TERMINATE">Z端</span>无法解决原因:</label>
+                        <div class="col-md-10 col-sm-10">
+                            <textarea id="Z_UNABLE_RELOVE" name="Z_UNABLE_RELOVE" class="form-control Z_INPUT" rows="4"  style="width: 516px" ></textarea>
+                        </div>
+                    </div>
+                    <!--                        &lt;!&ndash; <Z端接入工程方案&ndash;&gt;-->
+                    <!--                        <div class="row form-group" id="Z_fileUpdateDiv">-->
+                    <!--                            &lt;!&ndash; 用来存储上传的附件id &ndash;&gt;-->
+                    <!--                            <div id="Z_attach" class="">-->
+                    <!--                                <label class="col-md-2 col-sm-4 control-label" style="padding-right: 0">上传附件：</label>-->
+                    <!--                                <div class="col-md-10 col-sm-8">-->
+                    <!--                                    <form id="Z_displaySource">-->
+                    <!--                                        <div class="btn-toolbar" style="margin-bottom: 10px;">-->
+                    <!--                                        <span class="btn btn-default fileinput-button">-->
+                    <!--                                            <i class="glyphicon glyphicon-plus"></i>-->
+                    <!--                                            <span style="line-height: 23px;">选择文件...</span>-->
+                    <!--                                            <input class="js-select-file" id="Z_selectFiles" type="file"-->
+                    <!--                                                   name="selectFiles" multiple="" >-->
+                    <!--                                        </span>-->
+                    <!--                                        </div>-->
+                    <!--                                        <div id="Z_fileGrid"></div>-->
+                    <!--                                    </form>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                            <input id="Z_ACCESS_PROJECT_SCHEME" name="Z_ACCESS_PROJECT_SCHEME" class="form-control hidden"  >-->
+                    <!--                        </div>-->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="saveCheckInfoLocal" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>
+

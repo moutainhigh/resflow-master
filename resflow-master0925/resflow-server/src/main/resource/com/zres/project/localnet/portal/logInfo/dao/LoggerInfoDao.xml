@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.logInfo.dao.LoggerInfoDao">
+
+    <insert id="saveResInterfaceInfo" parameterType="com.zres.project.localnet.portal.logInfo.entry.ResInterfaceLog">
+        INSERT INTO GOM_BDW_INTERF_LOG_INFO (INTERF_NAME, URL, CONTENT, CREATE_DATE, ORDER_NO, ID,
+         REMARK, UPDATE_DATE, RETURN_CONTENT) VALUES
+        (#{interfName}, #{url}, #{content}, sysdate, #{orderNo}, SEQ_GOM_BDW_INTERF_LOG_INFO.NEXTVAL,
+         #{remark}, sysdate, #{returnContent})
+    </insert>
+
+    <insert id="insertResCreateInstanceFlag" parameterType="com.zres.project.localnet.portal.logInfo.entry.ResCreateInstanceFlag">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (attr_info_id, srv_ord_id, attr_action, attr_code, attr_name,
+        attr_value, attr_value_name, create_date, sourse) VALUES
+        (SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL,#{srvOrdId},#{attrAction},#{attrCode},#{attrName},
+        #{attrValue},#{attrValueName},sysdate,#{sourse})
+    </insert>
+
+    <delete id="deleteResAttrCode" parameterType="com.zres.project.localnet.portal.logInfo.entry.ResRollbackLog">
+        DELETE FROM GOM_BDW_SRV_ORD_ATTR_INFO WHERE SRV_ORD_ID = #{srvOrdId} AND ATTR_ACTION=#{interfaceName}
+    </delete>
+
+    <resultMap id="toKafkaTacheInfo" type="com.zres.project.localnet.portal.logInfo.entry.ToKafkaTacheLog">
+        <id column="ID" property="id"/>
+        <result column="SHEET_ID" property="sheet_id"/>
+        <result column="BELONG" property="belong"/>
+        <result column="SERVICE_ID" property="service_id"/>
+        <result column="ORDER_TITLE" property="order_title"/>
+        <result column="ORDER_TYPE" property="order_type"/>
+        <result column="ACTIVE_TYPE" property="active_type"/>
+        <result column="SYS_RESOUCE" property="sys_resouce"/>
+        <result column="CUST_NAME" property="cust_name"/>
+        <result column="CONTACT_NAME" property="contact_name"/>
+        <result column="TACHE_SERVICE_ID" property="tache_service_id"/>
+        <result column="ORG_ID" property="org_id"/>
+        <result column="ORG_NAME" property="org_name"/>
+        <result column="CONTACT_NBR" property="contact_nbr"/>
+        <result column="TACHE_DEFINE_ID" property="tache_define_id"/>
+        <result column="TACHE_NAME" property="tache_name"/>
+        <result column="AREA_ID" property="area_id"/>
+        <result column="AREA_NAME" property="area_name"/>
+        <result column="CHARACTER_VALUE" property="character_value"/>
+        <result column="ACCEPT_ORGNAME" property="accept_orgname"/>
+        <result column="ORDER_CODE" property="order_code"/>
+        <result column="ACC_NBR" property="acc_nbr"/>
+        <result column="ACCEPT_DATE" property="accept_date"/>
+        <result column="CREATE_DATE" property="create_date"/>
+        <result column="FINISH_DATE" property="finish_date"/>
+        <result column="WORK_ORDER_STATE" property="work_order_state"/>
+        <result column="MONITER_WORK_TIME" property="moniter_work_time"/>
+        <result column="UOS_TACHE_LIMIT" property="uos_tache_limit"/>
+        <result column="OUTTIME" property="outtime"/>
+        <result column="BASE_ORDER_ID" property="base_order_id"/>
+        <result column="ORDER_STATE" property="order_state"/>
+        <result column="ORDER_STATE_NAME" property="order_state_name"/>
+        <result column="PAUSE_BEGIN_DATE" property="pause_begin_date"/>
+        <result column="PAUSE_END_DATE" property="pause_end_date"/>
+        <result column="WORK_CONTENT" property="work_content"/>
+        <result column="BUSS_INF" property="buss_inf"/>
+        <result column="RETAIN_1" property="retain_1"/>
+        <result column="RETAIN_2" property="retain_2"/>
+        <result column="RETAIN_3" property="retain_3"/>
+        <result column="DOMAIN" property="domain"/>
+        <result column="SOURCE_SYSTEM" property="source_system"/>
+        <result column="SOURCE_SYSTEM_REMARK" property="source_system_remark"/>
+    </resultMap>
+
+    <select id="qryOrderInfo" parameterType="map" resultMap="toKafkaTacheInfo">
+        SELECT CST.CST_ORD_ID ID,
+        WO.WO_ID SHEET_ID,
+        '订单中心' BELONG,
+        RELATIONINFO.CODE_INFO SERVICE_ID,
+        RELATIONINFO.CODE_NAME ORDER_TITLE,
+        SRV.ORDER_TYPE ORDER_TYPE,
+        SRV.ACTIVE_TYPE ACTIVE_TYPE,
+        '2' SYS_RESOUCE,
+        CST.CUST_NAME_CHINESE CUST_NAME,
+        BS.STAFF_NAME CONTACT_NAME,
+        SRV.SERVICE_ID || CASE WHEN ut.id = '510101040' THEN '510101080'
+         WHEN ut.id = '510101044' THEN '510101084'
+         WHEN ut.id = '510101048' THEN '510101081'
+           WHEN ut.id = '1551002629' THEN '510101082'
+         ELSE to_char(ut.id)
+       END TACHE_SERVICE_ID,
+        CASE
+        WHEN WO.DISP_OBJ_TYE = '260000002' THEN
+        WG.REGION_ID
+        WHEN WO.DISP_OBJ_TYE = '260000003' THEN
+        (SELECT TO_CHAR(ORG_ID)
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID IN
+        (SELECT R.ORG_ID FROM GOM_ORG_S R WHERE R.PARENT_ORG_ID = 1)
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = WO.DISP_OBJ_ID)
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        END AS ORG_ID,
+        CASE
+        WHEN WO.DISP_OBJ_TYE = '260000002' THEN
+        (SELECT DEPT_NAME FROM DEPARTMENT WHERE DEPT_ID = WG.REGION_ID)
+        WHEN WO.DISP_OBJ_TYE = '260000003' THEN
+        (SELECT ORG_NAME
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID IN
+        (SELECT R.ORG_ID FROM GOM_ORG_S R WHERE R.PARENT_ORG_ID = 1)
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = WO.DISP_OBJ_ID)
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        END AS ORG_NAME,
+        BS.PHONE CONTACT_NBR,
+        CASE WHEN ut.id = '510101040' THEN '510101080'
+         WHEN ut.id = '510101044' THEN '510101084'
+         WHEN ut.id = '510101048' THEN '510101081'
+           WHEN ut.id = '1551002629' THEN '510101082'
+         ELSE to_char(ut.id)
+       END TACHE_DEFINE_ID,
+       CASE WHEN ut.TACHE_NAME = '二干资源分配' THEN '资源分配'
+         WHEN ut.TACHE_NAME = '专业数据制作' THEN '数据制作'
+         ELSE ut.TACHE_NAME
+       END TACHE_NAME,
+        KI.REGION_ID AREA_ID,
+        DEPT.DEPT_NAME AREA_NAME,
+        SRV.TRADE_TYPE_CODE CHARACTER_VALUE,
+        CST.HANDLE_DEP ACCEPT_ORGNAME,
+        SRV.TRADE_ID ORDER_CODE,
+        SRV.SERIAL_NUMBER ACC_NBR,
+        SRV.CREATE_DATE ACCEPT_DATE,
+        WO.CREATE_DATE CREATE_DATE,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        NULL
+        WHEN WO.WO_STATE != '290000002' THEN
+        WO.STATE_DATE
+        END AS FINISH_DATE,
+        CASE
+        WHEN WO.WO_STATE in ('290000002','290000112','290000111','290000118','290000118') THEN
+        '02'
+        ELSE '01'
+        END AS WORK_ORDER_STATE,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        0
+        WHEN WO.WO_STATE != '290000002' THEN
+        CASE <![CDATA[
+        WHEN ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE)) < 1 THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60)
+        WHEN ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE)) > 1 THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60) /
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60) ]]>
+        END
+        END AS MONITER_WORK_TIME,
+        ROUND(TO_CHAR(WO.REQ_FIN_DATE - WO.CREATE_DATE)) UOS_TACHE_LIMIT,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        CASE
+        WHEN <![CDATA[ WO.REQ_FIN_DATE < SYSDATE ]]> THEN
+        ROUND(TO_CHAR(SYSDATE - WO.REQ_FIN_DATE)) * 24 * 60
+        END
+        WHEN WO.WO_STATE != '290000002' THEN
+        CASE
+        WHEN <![CDATA[ WO.REQ_FIN_DATE < WO.STATE_DATE ]]> THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.REQ_FIN_DATE)) * 24 * 60
+        END
+        END AS OUTTIME,
+        WO.ORDER_ID BASE_ORDER_ID,
+        ORD.ORDER_STATE ORDER_STATE,
+        PDSO.PUB_DATE_NAME ORDER_STATE_NAME,
+        '' PAUSE_BEGIN_DATE,
+        '' PAUSE_END_DATE,
+        '' WORK_CONTENT,
+        '' BUSS_INF,
+        '' RETAIN_1,
+        '' RETAIN_2,
+        '' RETAIN_3,
+        '2' DOMAIN,
+        'OSS' SOURCE_SYSTEM,
+        'OSS' SOURCE_SYSTEM_REMARK
+        FROM GOM_BDW_CST_ORD CST
+        JOIN GOM_BDW_SRV_ORD_INFO SRV
+        ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_ORDER ORD
+        ON ORD.ORDER_ID = SRV.ORDER_ID
+        OR ORD.PARENT_ORDER_ID = SRV.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN WORK_GROUP WG ON WG.WORK_GROUP_ID = WO.DISP_OBJ_ID
+        LEFT JOIN BFM_STAFF BS ON BS.STAFF_ID = WO.DEAL_USER_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = KI.REGION_ID
+        LEFT JOIN GOM_PUB_DATE_S PDSW ON PDSW.PUB_DATE_ID = WO.WO_STATE AND PDSW.DF_TYPE = 'WO_STATE'
+        LEFT JOIN GOM_PUB_DATE_S PDSO ON PDSO.PUB_DATE_ID = ORD.ORDER_STATE AND PDSO.DF_TYPE = 'ORDER_STATE'
+        LEFT JOIN GOM_ORG_S OS ON OS.ORG_ID = CST.HANDLE_DEP_ID
+        LEFT JOIN GOM_AREA_S GAS ON GAS.ID = OS.AREA_ID
+        LEFT JOIN GOM_BDW_RELATION_INFO RELATIONINFO ON RELATIONINFO.CODE_VALUE = SRV.SERVICE_ID
+        WHERE WO.DISP_OBJ_ID NOT IN ('-2000', '11')
+        AND UT.ID IN (510101040, 510101080, 510101048, 510101044, 510101084, 1551002629)
+        AND ord.order_id = #{orderId}
+        <if test="woId != null and woId != ''">
+            AND wo.wo_id = #{woId}
+        </if>
+        ORDER BY SRV.CREATE_DATE DESC
+    </select>
+
+    <select id="qryOrderInfoSec" parameterType="map" resultMap="toKafkaTacheInfo">
+        SELECT CST.CST_ORD_ID ID,
+        WO.WO_ID SHEET_ID,
+        '订单中心' BELONG,
+        RELATIONINFO.CODE_INFO SERVICE_ID,
+        RELATIONINFO.CODE_NAME ORDER_TITLE,
+        SRV.ORDER_TYPE ORDER_TYPE,
+        SRV.ACTIVE_TYPE ACTIVE_TYPE,
+        '0' SYS_RESOUCE,
+        CST.CUST_NAME_CHINESE CUST_NAME,
+        BS.STAFF_NAME CONTACT_NAME,
+        SRV.SERVICE_ID || CASE WHEN ut.id = '500001155' THEN '500001157'
+         WHEN ut.id = '500001156' THEN '500001159'
+         WHEN ut.id = '500001168' THEN '500001161'
+         ELSE to_char(ut.id)
+       END TACHE_SERVICE_ID,
+        CASE
+        WHEN WO.DISP_OBJ_TYE = '260000002' THEN
+        WG.REGION_ID
+        WHEN WO.DISP_OBJ_TYE = '260000003' THEN
+        (SELECT TO_CHAR(ORG_ID)
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID IN
+        (SELECT R.ORG_ID FROM GOM_ORG_S R WHERE R.PARENT_ORG_ID = 1)
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = WO.DISP_OBJ_ID)
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        END AS ORG_ID,
+        CASE
+        WHEN WO.DISP_OBJ_TYE = '260000002' THEN
+        (SELECT DEPT_NAME FROM DEPARTMENT WHERE DEPT_ID = WG.REGION_ID)
+        WHEN WO.DISP_OBJ_TYE = '260000003' THEN
+        (SELECT ORG_NAME
+        FROM GOM_ORG_S A
+        WHERE A.PARENT_ORG_ID IN
+        (SELECT R.ORG_ID FROM GOM_ORG_S R WHERE R.PARENT_ORG_ID = 1)
+        START WITH A.ORG_ID =
+        (SELECT ORG_ID
+        FROM GOM_USER_S
+        WHERE USER_ID = WO.DISP_OBJ_ID)
+        CONNECT BY PRIOR A.PARENT_ORG_ID = A.ORG_ID)
+        END AS ORG_NAME,
+        BS.PHONE CONTACT_NBR,
+        CASE WHEN ut.id = '500001155' THEN '500001157'
+         WHEN ut.id = '500001156' THEN '500001159'
+         WHEN ut.id = '500001168' THEN '500001161'
+         ELSE to_char(ut.id)
+       END TACHE_DEFINE_ID,
+       CASE WHEN ut.TACHE_NAME = '光纤资源分配' THEN '资源分配'
+         WHEN ut.TACHE_NAME = '外线施工' OR ut.tache_name = '资源施工' THEN '现场实施'
+         WHEN ut.TACHE_NAME = '跨域全程调测' THEN '全程调测'
+         ELSE ut.TACHE_NAME
+       END TACHE_NAME,
+        KI.REGION_ID AREA_ID,
+        DEPT.DEPT_NAME AREA_NAME,
+        SRV.TRADE_TYPE_CODE CHARACTER_VALUE,
+        CST.HANDLE_DEP ACCEPT_ORGNAME,
+        SRV.TRADE_ID ORDER_CODE,
+        SRV.SERIAL_NUMBER ACC_NBR,
+        SRV.CREATE_DATE ACCEPT_DATE,
+        WO.CREATE_DATE CREATE_DATE,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        NULL
+        WHEN WO.WO_STATE != '290000002' THEN
+        WO.STATE_DATE
+        END AS FINISH_DATE,
+        CASE
+        WHEN WO.WO_STATE in ('290000002','290000112','290000111','290000118','290000118') THEN
+        '02'
+        ELSE '01'
+        END AS WORK_ORDER_STATE,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        0
+        WHEN WO.WO_STATE != '290000002' THEN
+        CASE <![CDATA[
+        WHEN ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE)) < 1 THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60)
+        WHEN ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE)) > 1 THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60) /
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.CREATE_DATE) * 24 * 60) ]]>
+        END
+        END AS MONITER_WORK_TIME,
+        ROUND(TO_CHAR(WO.REQ_FIN_DATE - WO.CREATE_DATE)) UOS_TACHE_LIMIT,
+        CASE
+        WHEN WO.WO_STATE = '290000002' THEN
+        CASE
+        WHEN <![CDATA[ WO.REQ_FIN_DATE < SYSDATE ]]> THEN
+        ROUND(TO_CHAR(SYSDATE - WO.REQ_FIN_DATE)) * 24 * 60
+        END
+        WHEN WO.WO_STATE != '290000002' THEN
+        CASE
+        WHEN <![CDATA[ WO.REQ_FIN_DATE < WO.STATE_DATE ]]> THEN
+        ROUND(TO_CHAR(WO.STATE_DATE - WO.REQ_FIN_DATE)) * 24 * 60
+        END
+        END AS OUTTIME,
+        WO.ORDER_ID BASE_ORDER_ID,
+        ORD.ORDER_STATE ORDER_STATE,
+        PDSO.PUB_DATE_NAME ORDER_STATE_NAME,
+        '' PAUSE_BEGIN_DATE,
+        '' PAUSE_END_DATE,
+        '' WORK_CONTENT,
+        '' BUSS_INF,
+        '' RETAIN_1,
+        '' RETAIN_2,
+        '' RETAIN_3,
+        '2' DOMAIN,
+        'OSS' SOURCE_SYSTEM,
+        'OSS' SOURCE_SYSTEM_REMARK
+        FROM GOM_BDW_CST_ORD CST
+        JOIN GOM_BDW_SRV_ORD_INFO SRV
+        ON SRV.CST_ORD_ID = CST.CST_ORD_ID
+        LEFT JOIN GOM_BDW_SEC_LOCAL_RELATE_INFO SEC
+           ON SEC.SRV_ORD_ID = SRV.SRV_ORD_ID
+        LEFT JOIN GOM_ORDER ORD
+           ON ORD.ORDER_ID = SEC.ORDER_ID
+           OR ORD.PARENT_ORDER_ID = SEC.ORDER_ID
+        LEFT JOIN GOM_WO WO ON WO.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID = WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN WORK_GROUP WG ON WG.WORK_GROUP_ID = WO.DISP_OBJ_ID
+        LEFT JOIN BFM_STAFF BS ON BS.STAFF_ID = WO.DEAL_USER_ID
+        LEFT JOIN GOM_ORD_KEY_INFO KI ON KI.ORDER_ID = ORD.ORDER_ID
+        LEFT JOIN DEPARTMENT DEPT ON DEPT.DEPT_ID = KI.REGION_ID
+        LEFT JOIN GOM_PUB_DATE_S PDSW ON PDSW.PUB_DATE_ID = WO.WO_STATE AND PDSW.DF_TYPE = 'WO_STATE'
+        LEFT JOIN GOM_PUB_DATE_S PDSO ON PDSO.PUB_DATE_ID = ORD.ORDER_STATE AND PDSO.DF_TYPE = 'ORDER_STATE'
+        LEFT JOIN GOM_ORG_S OS ON OS.ORG_ID = CST.HANDLE_DEP_ID
+        LEFT JOIN GOM_AREA_S GAS ON GAS.ID = OS.AREA_ID
+        LEFT JOIN GOM_BDW_RELATION_INFO RELATIONINFO ON RELATIONINFO.CODE_VALUE = SRV.SERVICE_ID
+        WHERE WO.DISP_OBJ_ID NOT IN ('-2000', '11')  AND UT.ID NOT IN (510101081, 510101050)
+        AND ord.order_id = #{orderId}
+        <if test="woId != null and woId != ''">
+            AND wo.wo_id = #{woId}
+        </if>
+        ORDER BY SRV.CREATE_DATE DESC
+    </select>
+
+</mapper>

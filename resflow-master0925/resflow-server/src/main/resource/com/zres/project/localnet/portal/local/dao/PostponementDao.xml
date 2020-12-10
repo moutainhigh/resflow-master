@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zres.project.localnet.portal.local.dao.PostponementDao">
+
+
+    <select id="queryPostponementInfoBySrvId" resultType="java.util.Map">
+        SELECT to_char(PA.POSTPONEMENT, 'yyyy-MM-dd HH24:Mi:ss') as POSTPONEMENT,PA.REMARK,PA.OLD_DATE,
+        decode(PA.APPLY_TYPE,'2015111801','客户原因','2015111802','工程原因','2015111803','业务部门原因','2015111804','系统原因','2015111805','对端原因（含对端运营商','2015111806','海外POP','2015111807','运维原因','2015111808','其他原因','类型错误')as APPLY_TYPE,
+        U.USER_NAME as DEAL_USER,PA.AUDIT_OPINION,
+        decode(PA.APPLY_STATE,'290000000','已保存未提交','290000002','已提交','290000004','同意','290000006','驳回','290000020','一干审核通过','290000021','一干审核不通过','申请状态错误')as APPLY_STATE,
+        to_char(PA.CREATE_DATE, 'yyyy-MM-dd HH24:Mi:ss') as  CREATE_DATE
+         ,wm_concat(AI.FILE_NAME) as FILE_NAME
+        FROM GOM_BDW_POSTPONEMENT_APPLY PA
+        LEFT JOIN GOM_BDW_ATTACH_INFO AI ON PA.ID = AI.DISPATCH_ORDER_ID
+        LEFT JOIN BFM_USER U ON PA.DEAL_USER = U.USER_ID
+        WHERE PA.SRV_ORD_ID = #{srvOrdId}
+        group by AI.ATTACH_INFO_ID, AI.FILE_NAME, PA.POSTPONEMENT,PA.REMARK,PA.OLD_DATE,U.USER_NAME,PA.AUDIT_OPINION,PA.CREATE_DATE,PA.APPLY_TYPE,PA.APPLY_STATE, pa.ID
+        order by pa.ID
+    </select>
+</mapper>

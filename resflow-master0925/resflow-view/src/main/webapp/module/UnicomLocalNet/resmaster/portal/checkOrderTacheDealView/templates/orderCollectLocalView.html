@@ -1,0 +1,85 @@
+<div class="modal-header">
+    <h4 class="modal-title">本地核查信息录入</h4>
+</div>
+<div class="modal-body">
+    <!-- 核查反馈 L端-->
+    <form class="row form-group" id="localOrderOper-form" >
+        <!--本地A端-->
+        <div class="col-md-6 col-sm-6">
+            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                <div class="col-md-6 col-sm-6">
+                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端资源是否满足:</label>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_A_RES_SATISFY" name="A_RES_SATISFY" class="form-control"  data-rule="required ">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                <label class="col-md-2 col-sm-2 control-label">A端接入建设方案、资源情况:</label>
+                <div class="col-md-10 col-sm-10">
+                    <textarea id="SUB_A_CONSTRUCT_SCHEME" name="A_CONSTRUCT_SCHEME" class="form-control" rows="7" style="width: 450px" ></textarea>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-4 col-sm-4 control-label">
+                        <label class="control-label" id="amountL">A端投资金额(万):</label>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_A_INVESTMENT_AMOUNT" name="A_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-4 col-sm-4 control-label">
+                        <label class="control-label" id="periodL">A端建设工期(工作日):</label>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_A_CONSTRUCT_PERIOD" name="A_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="integer[+0];range[~100]">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--本地Z端-->
+        <div class="col-md-6 col-sm-6">
+            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                <div class="col-md-6 col-sm-6">
+                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端资源是否满足:</label>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_Z_RES_SATISFY" name="Z_RES_SATISFY" class="form-control"  data-rule="required ">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12" style="margin-bottom: 15px">
+                <label class="col-md-2 col-sm-2 control-label">Z端接入建设方案、资源情况:</label>
+                <div class="col-md-10 col-sm-10">
+                    <textarea id="SUB_Z_CONSTRUCT_SCHEME" name="Z_CONSTRUCT_SCHEME" class="form-control" rows="7" style="width: 450px" ></textarea>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-4 col-sm-4 control-label">
+                        <label class="control-label" id="amountZ">Z端投资金额(万):</label>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_Z_INVESTMENT_AMOUNT" name="Z_INVESTMENT_AMOUNT" class="form-control"  type="number" data-rule="amount" data-rule-amount="[/^([1-9]\d{1,9}|\d)(\.\d{1,2})?$/, '投资金额为正数,小数点两位']">
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-4 col-sm-4 control-label">
+                        <label class="control-label" id="ZperiodL">Z端建设工期(工作日):</label>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <input id="SUB_Z_CONSTRUCT_PERIOD" name="Z_CONSTRUCT_PERIOD" class="form-control"  type="number" data-rule="integer[+0];range[~100]">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">提交</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>
+

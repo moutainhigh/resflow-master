@@ -1,0 +1,866 @@
+<!-- 裸光纤 -->
+
+<div class="modal-header">
+    <h4 class="modal-title" id="applicat-Page-Title"></h4>
+</div>
+
+<div class="modal-body">
+    <form class="form-horizontal" id="bareFiber-Form">
+        <div id="accordion" class="ui-accordion" style="position: relative">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color: #eb4a4b;color: #fff;">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <a>业务信息
+                            <span class="glyphicon glyphicon-user pull-right"></span>
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="operTaskManagement-searchCodeDiv1">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4"  id = "APPLY_ORD_ID_CODE">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">申请单编号</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="APPLY_ORD_ID" name="APPLY_ORD_ID" class="form-control" value="" readonly="readonly">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">定单主题</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="APPLY_ORD_NAME" name="APPLY_ORD_NAME" class="form-control" value="" >
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span
+                                            style="color: red">*</span>申请单编号</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="TRADE_ID" name="TRADE_ID" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="col-md-4 col-sm-4" id="SUBSCRIBE_ID_CODE">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户订单号</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="SUBSCRIBE_ID" name="SUBSCRIBE_ID" class="form-control"
+                                               value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">合同编号</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CONTRACT_ID" name="CONTRACT_ID" class="form-control"
+                                               value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">合同名称</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CONTRACT_NAME" name="CONTRACT_NAME" class="form-control"
+                                               value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="SERVICE_ID" name="SERVICE_ID"
+                                               class="form-control menu product_code" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">电路要求</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="ACTIVE_TYPE" name="ACTIVE_TYPE"
+                                               class="form-control menu operate_type">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">关联B域核查单</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="RELE_B_INSPECT_ORDER" name="RELE_B_INSPECT_ORDER"
+                                               class="form-control" value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">关联O域核查单</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="input-group">
+                                            <input id="RELE_O_INSPECT_ORDER" name="RELE_O_INSPECT_ORDER" class="form-control" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>受理人</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="HANDLE_MAN_NAME" name="HANDLE_MAN_NAME" class="form-control"
+                                               value="" data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>受理人联系方式</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="HANDLE_MAN_TEL" name="HANDLE_MAN_TEL" class="form-control"
+                                               value="" data-rule="required; ">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>受理区域</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="input-group">
+                                        <input id="HANDLE_DEP" name="HANDLE_DEP" class="form-control" value="" data-rule="required">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>受理地市 </label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="input-group">
+                                        <input id="HANDLE_CITY" name="HANDLE_CITY" class="form-control"
+                                               value="" data-rule="required">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">受理时间</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="input-group">
+                                            <input id="HANDLE_TIME" name="HANDLE_TIME"
+                                                   class="form-control date">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">发起方项目经理</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="INIT_AM_NAME" name="INIT_AM_NAME" class="form-control"
+                                               value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">省项目经理</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="PROVINCE_PM_NAME" name="PROVINCE_PM_NAME"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                          <!--  <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">集团项目经理信息</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="PROVINCE_PM_TEL" name="PROVINCE_PM_TEL" class="form-control">
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户经理</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_MANAGER" name="CUST_MANAGER" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       <!-- <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">竞合方式</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="COOPERATION_MODE" name="COOPERATION_MODE"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">其他运营商流水号</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="OTHER_OPERA_SER_NUM" name="OTHER_OPERA_SER_NUM"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">业务协调部门</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="input-group">
+                                        <input id="BUSINESS_COORD_DEP" name="BUSINESS_COORD_DEP"
+                                               class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">批次</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="BATCH" name="BATCH" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">备注</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <textarea id="REMARK" name="REMARK" style="width: 430%;height: 36px"
+                                                  class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="display: none">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">单据类型</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="ORDER_TYPE" name="ORDER_TYPE" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class=" form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">附件：</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <span class="btn btn-default fileinput-button" style="margin-top: 0px">
+                                            <input id="ANNEX" class="js-select-file" type="file" name="uploadFiles" multiple="">
+                                         </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"></label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <ul id="ANNEX_down" class="file-list list-group"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-sm-8">
+                                      <!--  <div id="progress" class="progress">
+                                            <div class="progress-bar progress-bar-success"></div>
+                                        </div>-->
+                                        <label id="attaceFinsh"></label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 control-label" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--业务信息-->
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <a>客户信息
+                            <span class="glyphicon glyphicon-gift pull-right"></span>
+                        </a>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="operTaskManagement-searchCodeDiv">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>客户名称</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_NAME_CHINESE" name="CUST_NAME_CHINESE"
+                                               class="form-control" data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户编码</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_ID" name="CUST_ID" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户类型</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_TYPE" name="CUST_TYPE" class="form-control menu CustType" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户行业</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_INDUSTRY" name="CUST_INDUSTRY"
+                                               class="form-control  10001014">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>客户联系人</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_CONTACT_MAN_NAME" name="CUST_CONTACT_MAN_NAME" class="form-control" data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+
+                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>客户联系电话</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_TEL" name="CUST_TEL" class="form-control"  data-rule="required; ">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">客户联系EMAIL</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="CUST_EMAIL" name="CUST_EMAIL" class="form-control" data-rule="email">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-md-4 col-sm-4 control-label">是否集团直管客户</label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input id="IS_GROUP_CUST" name="IS_GROUP_CUST" class="form-control menu IS_GROUP_CUST">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--客户信息-->
+            <div class="panel panel-default">
+                <div class="panel-heading" style="color: #fff;background-color: #eb4a4b">
+                    <h3 class="panel-title" style=" font-size: 16px">
+                        <span class="glyphicon glyphicon-list-alt pull-right"></span>
+                        <a>电路信息</a>
+                    </h3>
+                </div>
+
+                <div class="panel-collapse">
+                    <div class="panel-body">
+                        <div id="operTaskManagement-searchCodeDiv3">
+                            <div id="gridId"></div>
+                            <div id="add-circuit-button" style="padding-top:5px;">
+                                <button class="btn btn-danger" type="button" id="addAndSelectRow">添加电路</button>
+                            </div>
+                            <hr/>
+                            <div id="circuit-Info-Form">
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label"><span
+                                                    style="color: red">*</span>业务订单号</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="tradeId" name="tradeId" class="form-control"
+                                                       data-rule="required">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label"><span
+                                                    style="color: red">*</span>业务号码 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="serialNumber" name="serialNumber"
+                                                       class="form-control" data-rule="required;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="serviceId" name="serviceId" class="form-control menu product_code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">电路要求 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="circuitReq" name="circuitReq" class="form-control menu operate_type">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label" id="dynamicRequired">电路编号</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div class="input-group">
+                                                    <input id="circuitCode" name="circuitCode" class="form-control" data-rule="required" >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>电路用途</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="cirUse" name="cirUse" class="form-control menu 10000506" data-rule="required">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>电路租用范围 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="cirLeaseRange" name="cirLeaseRange" class="form-control menu 10000101" data-rule="required">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">工程缓急程度</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="proPriDeg" name="proPriDeg" class="form-control menu CON0095" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>全程要求完成时间</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div class="input-group">
+                                                    <input id="requFineTime" name="requFineTime"
+                                                           class="form-control date" data-rule="required">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">租用芯数</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="RentCoreCount" name="RentCoreCount" class="form-control menu 10001007">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">光纤长度</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="FiberLength" name="FiberLength" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">光纤长度单位</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="FiberLengthUnit" name="FiberLengthUnit" class="form-control menu 10001009">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">SLA标识</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="slaFlag" name="slaFlag" class="form-control menu 10000516" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">SLA业务开通 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="slaServOpen" name="slaServOpen" class="form-control menu 10000513" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">SLA网络质量保证 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="slaNetQuAss" name="slaNetQuAss" class="form-control menu 10000514" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">SLA售后服务</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="slaSaleServ" name="slaSaleServ" class="form-control menu 10000515" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3" id="old_Circuit_Code">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">原电路编号</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="oldCircuitCode" name="oldCircuitCode" class="form-control  10001421" disabled="disabled">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        <div class="form-group">
+                                            <label class="col-md-4 col-sm-4 control-label">创建时间 </label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div class="input-group">
+                                                    <input id="createTime" name="createTime"
+                                                           class="form-control date">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: none">实例ID<input id="INSTANCE_ID" name="INSTANCE_ID"></div>
+
+                                <div class="row" style="border-top: 1px #bbb dashed;margin:0 -5px;">
+                                    <div class="col-md-6 col-sm-6"  style="border-right:1px #bbb dashed;padding-top: 15px">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端归属省</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_belong_province" name="A_belong_province"
+                                                                   class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端归属地市</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_belong_city" name="A_belong_city"
+                                                                   class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端归属区县</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_belong_county" name="A_belong_county"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端归属分公司</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_belong_region" name="A_belong_region" class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端联系人</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="A_contact_man" name="A_contact_man"
+                                                               class="form-control" data-rule="required">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>A端联系电话</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="A_contact_tel" name="A_contact_tel"
+                                                               class="form-control" data-rule="required; ">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端客户经理</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="A_customer_manager" name="A_customer_manager"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端客户经理联系方式</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="A_customer_manager_tel" name="A_customer_manager_tel"
+                                                               class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 col-sm-2 control-label"><span style="color: red">*</span>A端装机地址</label>
+                                                    <div class="col-md-10 col-sm-10">
+                                                        <input id="A_installed_add" name="A_installed_add"
+                                                               class="form-control" data-rule="required">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12" id="A_old_installed_add_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 col-sm-2 control-label">A端原装机地址</label>
+                                                    <div class="col-md-10 col-sm-10">
+                                                        <input id="A_old_installed_add" name="A_old_installed_add"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端客户名称</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="A_customer_name" name="A_customer_name"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6" id="A_old_belong_region_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端原归属分公司</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_old_belong_region" name="A_old_belong_region" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6" id="A_old_belong_county_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">A端原归属区县</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="A_old_belong_county" name="A_old_belong_county"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6"  style="padding-top: 15px">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端归属省</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_belong_province" name="Z_belong_province"
+                                                                   class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端归属地市</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_belong_city" name="Z_belong_city"
+                                                                   class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端归属区县</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_belong_county" name="Z_belong_county"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端归属分公司</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_belong_region" name="Z_belong_region"  class="form-control" data-rule="required">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端联系人</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="Z_contact_man" name="Z_contact_man"
+                                                               class="form-control" data-rule="required">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>Z端联系电话</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="Z_contact_tel" name="Z_contact_tel"
+                                                               class="form-control" data-rule="required;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端客户经理</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="Z_customer_manager" name="Z_customer_manager"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端客户经理联系方式</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="Z_customer_manager_tel" name="Z_customer_manager_tel"
+                                                               class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 col-sm-2 control-label"><span style="color: red">*</span>Z端装机地址</label>
+                                                    <div class="col-md-10 col-sm-10">
+                                                        <input id="Z_installed_add" name="Z_installed_add"
+                                                               class="form-control" data-rule="required">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12" id="Z_old_installed_add_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 col-sm-2 control-label">Z端原装机地址</label>
+                                                    <div class="col-md-10 col-sm-10">
+                                                        <input id="Z_old_installed_add" name="Z_old_installed_add"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端客户名称</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <input id="Z_customer_name" name="Z_customer_name"
+                                                               class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6" id="Z_old_belong_region_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端原归属分公司</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_old_belong_region" name="Z_old_belong_region"  class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6" id="Z_old_belong_county_code">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 col-sm-4 control-label">Z端原归属区县</label>
+                                                    <div class="col-md-8 col-sm-8">
+                                                        <div class="input-group">
+                                                            <input id="Z_old_belong_county" name="Z_old_belong_county"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="border-top: 1px #bbb dashed;margin:0 -5px;padding-top: 15px">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-1 control-label">备注</label>
+                                            <div class="col-md-11 col-sm-11">
+                                                <textarea id="cir_remark" name="cir_remark" style="height: 36px" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--电路信息-->
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div style="float: right;margin-right: 50px;" >
+        <button type="button" class="btn btn-danger " id="submit" style="margin-left: 10px;">提交调度</button>
+        <button type="button" class="btn btn-default " id="save" style="margin-left: 10px;">保存草稿</button>
+        <button type="button" class="btn btn-default " id="UpdateSave" style="margin-left: 10px;display:none;" >
+            更新草稿
+        </button>
+        <button type="button" class="btn btn-default " id="reset"  style="margin-left: 10px;">重置</button>
+        <button type="button" class="btn btn-default " id="cancel" style="margin-left: 10px;">取消</button>
+    </div>
+</div>

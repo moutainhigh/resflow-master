@@ -1,0 +1,117 @@
+<div class="col-md-12" id="orderDeal-mainPanel">
+    <div class="row" style="margin: 15px;margin-bottom: 0px;padding: 0px">
+        <form class="form-horizontal" id="orderDeal-form">
+            <div class="row orderDeal-btn-row">
+                <div id="orderDeal-searchCodeDiv" class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="userName" name="userName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">申请单标题</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="autocomplete" name="autocomplete" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">客户名称</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="userName1" name="userName1" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">调度单编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="userName11" name="userName" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">调度单标题</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="userName2" name="userName1" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input class="combobox form-control" name="productType" id="productType" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">环节要求完成时间</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input class="form-control" id="finishDate" name="finishDate" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">环节要求结束时间</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input class="form-control" id="endDate" name="endDate" type="text" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div id="searchBtnDiv" class="col-md-12" >
+                        <div style="float: right;margin-right: 30px" >
+                            <button type="button" id="findBtn" class="btn btn-danger">查询</button>
+                            <button type="button" class="btn btn-default">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- 此tab导航和实际的内容页并没有关联，因为各内容页展示的东西基本一致，所以只需要捕捉这个导航条的点击事件然后修改内容页的部分内容即可，避免了重复代码 -->
+    <div id="orderDeal-tab" class="row ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li>
+                <a id="tabs-a-link" data-target="tabs-a" class="ui-tabs-anchor">First</a>
+            </li>
+            <li>
+                <a id="tabs-b-link" data-target="tabs-b" class="ui-tabs-anchor">Second</a>
+            </li>
+            <li>
+                <a id="tabs-c-link" data-target="tabs-c" class="ui-tabs-anchor">Third</a>
+            </li>
+        </ul>
+        <div id="tabs-a" class="ui-tabs-panel"></div>
+        <div id="tabs-b" class="ui-tabs-panel"></div>
+        <div id="tabs-c" class="ui-tabs-panel"></div>
+    </div>
+
+    <!-- 实际的内容页 -->
+    <div class="row" style="width: 99%">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="orderDeal-grid"></div>
+            </div>
+        </div>
+    </div>
+</div>

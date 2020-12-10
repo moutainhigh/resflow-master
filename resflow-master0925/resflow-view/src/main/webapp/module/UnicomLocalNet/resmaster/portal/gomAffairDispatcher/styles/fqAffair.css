@@ -1,0 +1,175 @@
+
+.fileinput-button {
+    position: relative;
+    overflow: hidden;
+}
+.fileinput-button input,
+.fileinput-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    font-size: 200px;
+    direction: ltr;
+    cursor: pointer;
+    z-index: 1;
+}
+.fileinput-input {
+    width: 38px;
+    height: 32px;
+    overflow: hidden;
+    bottom: auto;
+}
+.fileinput-container {
+    position: relative;
+}
+.input-group-addon.fileinput-container {
+    padding: 0;
+}
+.input-group-addon.fileinput-container .fileinput-pick {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: -2px;
+    height: 32px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    text-align: center;
+    background-color: #eeeeee;
+    border-radius: 0;
+}
+.fileinput-container .fileinput-pick {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background: #00b7ee;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.requireds > label:before {
+    content: "*";
+    color: red;
+    padding-right: 4px;
+    vertical-align: middle;
+    display: inline-block;
+}
+.row .col-md-12{
+    padding: 0px;
+}
+#ui-tabs-nav{
+    margin-top: 10px;
+}
+/*ul li a标签的样式*/
+.ui-tabs-nav li {
+    text-align:center;
+
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li a {
+    margin-bottom: 0;
+    border: 2px solid #E2E2E2;
+    color:  #666666;
+    border-radius: 4px;
+    background-color: #F2F2F2;
+}
+/*a标签上鼠标划过 鼠标不划过等样式*/
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li.ui-tabs-active > a:focus {
+    margin-bottom: 1px;
+    padding-bottom: 4px;
+    border-width: 2px;
+    border-style: solid;
+    color: #fff;
+    background-color:  #EB4A4B;
+    border-color:#E2E2E2;
+    border-bottom: 1px solid #f06e69 ;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:hover,
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:focus {
+    border-width: 1px;
+    border-style: solid;
+    color: #fff;
+    background-color:  #f06e69 ;
+    border-color:  #f06e69 ;
+    border-bottom: 1px solid #f06e69;
+}
+.ui-tabs.tabs-pill > .ui-tabs-nav li a:hover{
+    background-color:  #EB4A4B;
+    border: 1px solid #E2E2E2;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-default {
+    margin-left: 0px;
+    padding-right: 2px;
+}
+/*a标签的 圆角样式控制*/
+/*第一个li*/
+.tabs-pill .ui-tabs-nav > .ui-state-default:first-child:not(:last-child) > a {
+    border-radius: 0px 0px 0px 0px;
+}
+/*最后一个li*/
+.tabs-pill .ui-tabs-nav > .ui-state-default:last-child:not(:first-child) > a {
+    border-radius: 0px 0px 0px 0px;
+}
+
+.input-group .form-control:last-child, .input-group-addon:last-child, .input-group-btn:last-child > .btn, .input-group-btn:last-child > .btn-group > .btn, .input-group-btn:last-child > .dropdown-toggle, .input-group-btn:first-child > .btn:not(:first-child), .input-group-btn:first-child > .btn-group:not(:first-child) > .btn {
+    border-radius: 4px;
+}
+
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+
+.ui-tabs .ui-tabs-panel-new {
+    padding: 0px 0px 0px 0px;
+}
+
+.affair {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.affair .row {
+    margin: 0px 0px 5px 0px;
+    padding-top: 5px;
+    border: #c2cad8 1px solid;
+}
+
+.affair .form-group {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 5px;
+}
+
+.affair .form-control {
+    width: 100%;
+}
+
+.panel .panel-default {
+    margin-bottom: 17px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 0px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-default > .panel-heading {
+    color: #333333;
+    background-color: #f5f5f5;
+    border-color: #ddd;
+}
+
+.panel-default > .panel-body {
+    border-left: 1px solid #F2F2F2;
+    border-right: 1px solid #F2F2F2;
+}

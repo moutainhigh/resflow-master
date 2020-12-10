@@ -1,0 +1,532 @@
+<!-- 更新MPLS-VPN页面 -->
+
+<div class="modal-header">
+    <h4 class="modal-title" id="sub_sevAPIManagePopupTitle">修改电路信息</h4>
+</div>
+<div class="modal-body">
+    <div class="panel-body">
+        <form class="form-horizontal" id="sub_sevMenuForm">
+            <div id="circuit-Info-Form">
+                <div class="row">
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label"><span
+                                    style="color: red">*</span>业务订单号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_tradeId" name="tradeId" class="form-control" data-rule="required" style="background-color: #eeeeee" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>业务号码</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_serialNumber" name="serialNumber" class="form-control"
+                                       data-rule="required;" style="background-color: #eeeeee" readonly="readonly">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_serviceId" name="serviceId" class="form-control menu sub_product_code">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">电路要求</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_circuitReq" name="circuitReq" class="form-control menu sub_operate_type">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label" id="sub_dynamicRequired">电路编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_circuitCode" name="circuitCode" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>接入带宽</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_speed" name="speed"
+                                           class="form-control menu sub_10000102" data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">电路租用范围
+                                </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_cirLeaseRange" name="cirLeaseRange"
+                                           class="form-control menu sub_10000101">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">接入电路类型 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_AccessCircuitType" name="AccessCircuitType"
+                                           class="form-control menu sub_10000161">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clearfix">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">SLA标识</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_slaFlag" name="slaFlag" class="form-control menu sub_10000516">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">SLA业务开通 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_slaServOpen" name="slaServOpen" class="form-control menu sub_10000513">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">SLA网络质量保证 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_slaNetQuAss" name="slaNetQuAss" class="form-control menu sub_10000514">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">SLA售后服务</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_slaSaleServ" name="slaSaleServ" class="form-control menu sub_10000515">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">QOS</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_qos" name="qos" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">QOS类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_qosType" name="qosType" class="form-control menu sub_qosType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">是否接入在用网络</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_isUseInInternet" name="isUseInInternet"
+                                           class="form-control menu sub_10000176">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">路由协议</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_routing_protocol" name="routing_protocol"
+                                           class="form-control menu sub_10000174">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">AsNumber号(对端AS号/协议类型)</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_AsNumbe" name="AsNumbe" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">内网地址/掩码</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_intranetAddrOrMask" name="intranetAddrOrMask" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">开启组播功能</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_EnableMulticast" name="EnableMulticast" class="form-control menu sub_EnableMulticast" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">是否组播源</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_isnetmanage" name="isnetmanage" class="form-control menu sub_isnetmanage" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">IP地址类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_IPAddrType" name="IPAddrType"
+                                           class="form-control menu sub_ipAddressType">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span
+                                        style="color: red">*</span>全程要求完成时间</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_requFineTime" name="requFineTime" class="form-control date"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">接入运营商 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_AccessOperator" name="AccessOperator"
+                                           class="form-control menu sub_20000038">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">等级流量标识是否服从CU</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_isGradeFlowMarkObeyCU" name="isGradeFlowMarkObeyCU"
+                                           class="form-control menu sub_10000173">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">工程缓急程度</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_proPriDeg" name="proPriDeg" class="form-control menu sub_CON0095">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">计费ID</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_BILLID" name="BILLID" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">创建时间 </label>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="input-group">
+                                    <input id="sub_createTime" name="createTime" class="form-control date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3" id="sub_old_CircuitCode">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">原电路编号</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="sub_oldCircuitCode" name="oldCircuitCode" class="form-control  10001421" disabled="disabled">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="border-top: 1px #bbb dashed;margin:0 -5px;">
+                    <div class="col-md-6 col-sm-6" style="border-right:1px #bbb dashed;padding-top: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>PE端归属省</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_PE_BelongProv" name="PE_BelongProv" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>PE端归属地市</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_A_belong_city" name="A_belong_city" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端归属区县</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_PE_BelongCounty" name="PE_BelongCounty" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端归属分公司</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_PE_BelongRegin" name="PE_BelongRegin" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端口范围</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_PE_PortRange" name="PE_PortRange"
+                                           class="form-control menu sub_10000168">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>PE端接口类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_PE_interfaceType" name="PE_interfaceType"
+                                           class="form-control menu sub_10000170" data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label class="col-md-2 col-sm-2 control-label">PE地址</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <input id="sub_PE_Addr" name="PE_Addr" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">IPv4互联IP/掩码(PE)</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_PE_IPV4Mask" name="PE_IPV4Mask" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">IPv6互联IP/掩码(PE)</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_PE_IPV6Mask" name="PE_IPV6Mask" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6" id="sub_PE_old_Belong_Regin">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端原归属分公司</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_PE_oldBelongRegin" name="PE_oldBelongRegin" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6" id="sub_PE_old_Belong_County">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端原归属区县</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_PE_oldBelongCounty" name="PE_oldBelongCounty"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" id="sub_PE_old_Addr">
+                            <div class="form-group">
+                                <label class="col-md-2 col-sm-2 control-label">PE端原安装地址</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <input id="sub_PE_oldAddr" name="PE_oldAddr" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">PE端口速率</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_PE_PortRate" name="PE_PortRate"
+                                           class="form-control menu sub_10000169">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6" style="padding-top: 15px">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>CE端归属省
+                                </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_CE_BelongProv" name="CE_BelongProv" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>CE端归属地市
+                                </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_Z_belong_city" name="Z_belong_city" class="form-control"
+                                               data-rule="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">CE端归属区县 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_CE_BelongCounty" name="CE_BelongCounty" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">CE端归属分公司
+                                </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_CE_BelongRegin" name="CE_BelongRegin" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">CE端客户名称 </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_CE_CustName" name="CE_CustName" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label"><span style="color: red">*</span>CE端接口类型
+                                </label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_CE_interfaceType" name="CE_interfaceType"
+                                           class="form-control menu sub_10000165" data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label class="col-md-2 col-sm-2 control-label"><span style="color: red">*</span>CE端安装地址
+                                </label>
+                                <div class="col-md-10 col-sm-10">
+                                    <input id="sub_Z_installed_add" name="Z_installed_add" class="form-control"
+                                           data-rule="required">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">IPv4互联IP/掩码(CE)</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_CE_IPV4Mask" name="CE_IPV4Mask" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">IPv6互联IP/掩码(CE)</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="sub_CE_IPV6Mask" name="CE_IPV6Mask" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6" id="sub_CE_old_Belong_Regin">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">CE端原归属分公司</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_CE_oldBelongRegin" name="CE_oldBelongRegin" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6" id="sub_CE_old_Belong_County">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">CE端原归属区县</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="sub_CE_oldBelongCounty" name="CE_oldBelongCounty"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" id="sub_CE_old_Addr">
+                            <div class="form-group">
+                                <label class="col-md-2 col-sm-2 control-label">CE端原安装地址</label>
+                                <div class="col-md-10 col-sm-10">
+                                    <input id="sub_Z_old_installed_add" name="Z_old_installed_add" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="border-top: 1px #bbb dashed;margin:0 -5px;padding-top: 15px">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="form-group">
+                            <label class="col-md-1 col-sm-1 control-label">备注</label>
+                            <div class="col-md-11 col-sm-11">
+                                <textarea id="sub_cir_remark" name="cir_remark" style="height: 36px" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" id="sub_save-button">确定</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal" id="sub_cancel-button">取消</button>
+</div>

@@ -1,0 +1,277 @@
+<div class="modal-header">
+    <h4 class="modal-title">本地核查信息</h4>
+</div>
+<div class="modal-body">
+    <div id="isa-operTaskManagement-mainPanel" style="overflow-x: hidden"><!-- background-color: #EDEDED;-->
+        <div style="margin:10px 2px;padding: 0px;height: 20%">
+            <form class="form-horizontal form-ui-label" id="operTaskManagement-Qryform">
+                <div id="operTaskManagement-searchCodeDiv">
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">反馈人</label>
+                            <div id="USER_REAL_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">区域</label>
+                            <div id="AREA" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">资源是否满足</label>
+                            <div id="RES_SATISFY" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">投资金额</label>
+                            <div id="INVESTMENT_AMOUNT" class="form-order-info" style="overflow:auto">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">建设工期</label>
+                            <div id="CONSTRUCT_PERIOD" class="form-order-info" style="overflow:auto">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label class="col-md-4 col-sm-4 control-label">局端接入机房</label>
+                            <div id="ACCESS_ROOM" class="form-order-info" style="max-height:100px;width:800px;overflow:auto">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label class="col-md-4 col-sm-4 control-label">建设方案</label>
+                            <div id="CONSTRUCT_SCHEME" class="form-order-info" style="max-height:100px;width:800px;overflow:auto">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12 col-sm-12">
+                            <label class="col-md-4 col-sm-4 control-label">资源提供方式</label>
+                            <div id="RES_PROVIDE_STAND_NAME" class="form-order-info" style="max-height:100px;width:800px;overflow:auto">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">板卡备货情况</label>
+                            <div id="BOARD_READY_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">传输设备备货情况</label>
+                            <div id="TRANS_READY_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">光缆及配件备货情况</label>
+                            <div id="OPTICAL_READY_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">板卡采购工期</label>
+                            <div id="BOARD_PERIOD" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">板卡设备金额</label>
+                            <div id="BOARD_AMOUNT" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">板卡设备类型</label>
+                            <div id="BOARD_TYPE" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">板卡设备型号</label>
+                            <div id="BOARD_MODEL" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">传输设备采购工期</label>
+                            <div id="TRANS_PERIOD" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">传输设备金额</label>
+                            <div id="TRANS_AMOUNT" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">传输设备类型</label>
+                            <div id="TRANS_TYPE_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">其他设备类型</label>
+                            <div id="OTHER_TYPE" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">传输设备型号</label>
+                            <div id="TRANS_MODEL" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">光缆及配件采购工期</label>
+                            <div id="OPTICAL_PERIOD" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">客户接入工程造价概算</label>
+                            <div id="OPTICAL_AMOUNT" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">建设工期</label>
+                            <div id="CONSTRUCT_PERIOD_STAND" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">工程造价概算</label>
+                            <div id="PROJECT_AMOUNT" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">工程概述</label>
+                            <div id="PROJECT_OVERVIEW" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">是否需要市政报批</label>
+                            <div id="MUNICIPAL_APPROVAL_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">报批工作日</label>
+                            <div id="APPROVAL_PERIOD" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">资源情况描述</label>
+                            <div id="RES_DESC" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">物业红线区域内施工是否涉及物业问题</label>
+                            <div id="PROPERTY_REDLINE_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">物业问题描述</label>
+                            <div id="PROPERTY_DESC" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">客户机房是否具备接入条件</label>
+                            <div id="CUST_ROOM_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">接入工程方案</label>
+                            <div id="ACCESS_PROJECT_SCHEME" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">勘查人</label>
+                            <div id="RES_EXPLORER" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">勘查人联系电话</label>
+                            <div id="RES_EXPLOR_CONTACT" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">资源是否具备</label>
+                            <div id="RES_HAVE_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">投资总金额</label>
+                            <div id="TOTAL_AMOUNT" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">最长工期</label>
+                            <div id="LONGEST_PERIOD" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">备注</label>
+                            <div id="UNABLE_RELOVE" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">接入电路方式类型</label>
+                            <div id="ACCESS_CIR_TYPE_NAME" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">其他接入电路方式类型</label>
+                            <div id="OTHER_ACE_CIR_TYPE" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6 col-sm-6">
+                            <label class="col-md-4 col-sm-4 control-label">上联节点及端口</label>
+                            <div id="UPLINK_NODE_PORT" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div  style="float: right;margin-right: 30px; height: 30px;" >
+                            <button type="button" class="btn btn-danger" id="close">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

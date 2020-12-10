@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zres.project.localnet.portal.local.dao.UnicomLocalOrderDao">
+
+    <!--非草稿单查询sql -->
+    <sql id="queryLocalApplyOrderOracle">
+        select
+        info.SRV_ORD_ID as srvOrdId,
+        info.ORDER_ID as orderId,
+        info.CST_ORD_ID as cstOrdID,
+        info.ORDER_TYPE as itemType,
+        c.CUST_NAME_CHINESE as custName,
+        info.SERIAL_NUMBER as serialNumber,
+        info.TRADE_ID as tradeId,
+        o.ORDER_CODE as orderCode,
+        c.APPLY_ORD_ID as applyOrdId,
+        c.APPLY_ORD_NAME as applyOrdName,
+        attr.attr_value as dianlNo,
+        pc.code_value as prodBustType,
+        pc.code_content as prodBustTypeName,
+        pt.code_value as actCode,
+        pt.code_content as actCodeName,
+        '' as actTypeName,
+        o.ORDER_STATE as actTypeState,
+        vs.user_name as dispObjName,
+        case when info.CREATE_DATE is not null then to_char(info.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as createDateStr,
+        o.PARENT_ORDER_ID as omlParentOrderId,
+        o.OLD_ORDER_ID as omlOrderId
+        from GOM_BDW_CST_ORD c
+        inner join GOM_BDW_SRV_ORD_INFO info
+        on info.cst_ord_id = c.cst_ord_id
+        inner join
+        (select to_char(f.staff_id) as staff_id,
+        f.user_name,
+        f.login_name,
+        f.department
+        from vw_pub_staff f) vs
+        on vs.staff_id = info.user_id
+        left join gom_order o
+        on info.order_id = o.order_id
+        left join gom_BDW_srv_ord_attr_info attr
+        on info.SRV_ORD_ID = attr.SRV_ORD_ID
+        and attr.ATTR_CODE = '20000064'
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc
+        on info.SERVICE_ID = pc.code_value
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt
+        on info.ACTIVE_TYPE = pt.code_value
+        where 1=1
+        and info.SYSTEM_RESOURCE = 'second-schedule-lt'
+        <!--订单来源-->
+        <if test="isLocalUnicom != null and isLocalUnicom != '' ">
+            and info.RESOURCES = #{isLocalUnicom}
+        </if>
+        <!--订单状态 -->
+        <if test="orderState != null and orderState != '' ">
+            and info.SRV_ORD_STAT = #{orderState}
+        </if>
+        <!--全部申请单状态 排除法 -->
+        <if test="wholeOrderState != null and wholeOrderState != '' ">
+            <![CDATA[
+            and info.SRV_ORD_STAT <> #{wholeOrderState}
+          ]]>
+        </if>
+        <!--申请单编码 -->
+        <if test="applyOrdId != null and applyOrdId != '' ">
+            and c.APPLY_ORD_ID like '%'||#{applyOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="applyOrdName != null and applyOrdName != '' ">
+            and c.APPLY_ORD_NAME like  '%'||#{applyOrdName}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and c.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+        </if>
+        <!-- 产品类型 -->
+        <if test="productType != null and productType != '' ">
+            and info.SERVICE_ID = #{productType}
+        </if>
+        <!--动作类型 -->
+        <if test="actType != null and actType != '' ">
+            and info.ACTIVE_TYPE = #{actType}
+        </if>
+        <!--用户id -->
+        <if test="operStaffId != null and operStaffId != '' ">
+            and vs.staff_id = #{operStaffId}
+        </if>
+        <!--单据类型 -->
+        <if test="orderType != null and orderType != '' ">
+            and info.ORDER_TYPE = #{orderType}
+        </if>
+        order by info.CREATE_DATE desc
+    </sql>
+
+    <!-- 核查单显示列-->
+    <sql id="queryApplyOrderColumn">
+        distinct
+        c.CUST_NAME_CHINESE as custName,
+        c.APPLY_ORD_ID as applyOrdId,
+        c.APPLY_ORD_NAME as applyOrdName,
+        pc.code_value as prodBustType,
+        pc.code_content as prodBustTypeName,
+        pt.code_value as actCode,
+        pt.code_content as actCodeName,
+        srv.num as num
+    </sql>
+
+    <!--关联核查单查询sql -->
+    <sql id="queryApplyOrderOracle">
+        select
+        <include refid="queryApplyOrderColumn"/>
+        from GOM_BDW_CST_ORD c
+        inner join GOM_BDW_SRV_ORD_INFO info
+        on info.cst_ord_id = c.cst_ord_id
+        join (select count(srv_ord_id) as num,cst_ord_id
+        from GOM_BDW_SRV_ORD_INFO where SRV_ORD_STAT = '10F' group by cst_ord_id) srv
+        on srv.cst_ord_id = c.cst_ord_id
+        inner join
+        (select to_char(f.staff_id) as staff_id,
+        f.user_name,
+        f.login_name,
+        f.department
+        from vw_pub_staff f) vs
+        on vs.staff_id = info.user_id
+        inner join gom_order o
+        on info.order_id = o.order_id
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc
+        on info.SERVICE_ID = pc.code_value
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt
+        on info.ACTIVE_TYPE = pt.code_value
+        /*添加连接省份的删选*/
+        RIGHT JOIN (
+        SELECT
+        u.USER_ID AS userId
+        FROM
+        GOM_USER_ORG_VIEW u
+        WHERE
+        u.AREA_ID = (
+        SELECT u.AREA_ID FROM gom_user_s u
+        LEFT JOIN gom_org_s o ON o.org_id = u.ORG_ID
+        LEFT JOIN gom_area_s s ON s.id = u.area_id
+        LEFT JOIN gom_bdw_code_info gbc ON gbc.code_value = s.id AND gbc.code_type = 'if_designation_user_or_job'
+        WHERE 1=1
+        <!--用户id -->
+        <if test="operStaffId != null and operStaffId != '' ">
+            and u.user_id = #{operStaffId}
+        </if>
+        )
+        ) qz on qz.userId = info.user_id
+        where 1=1
+            and info.SYSTEM_RESOURCE = 'second-schedule-lt'
+        <!--订单来源-->
+        <if test="isLocalUnicom != null and isLocalUnicom != '' ">
+            and info.RESOURCES = #{isLocalUnicom}
+        </if>
+        <!--订单状态 -->
+        <if test="orderState != null and orderState != '' ">
+            and info.SRV_ORD_STAT = #{orderState}
+        </if>
+        <!--全部申请单状态 排除法 -->
+        <if test="wholeOrderState != null and wholeOrderState != '' ">
+            <![CDATA[
+            and info.SRV_ORD_STAT <> #{wholeOrderState}
+          ]]>
+        </if>
+        <!--申请单编码 -->
+        <if test="applyOrdId != null and applyOrdId != '' ">
+            and c.APPLY_ORD_ID like '%'||#{applyOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="applyOrdName != null and applyOrdName != '' ">
+            and c.APPLY_ORD_NAME like  '%'||#{applyOrdName}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and c.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+        </if>
+        <!-- 产品类型 -->
+        <if test="productType != null and productType != '' ">
+            and info.SERVICE_ID = #{productType}
+        </if>
+        <!--动作类型 -->
+        <if test="actType != null and actType != '' ">
+            and info.ACTIVE_TYPE = #{actType}
+        </if>
+        <!--用户id -->
+        <!-- <if test="operStaffId != null and operStaffId != '' ">
+             and vs.staff_id = #{operStaffId}
+         </if> -->
+         <!--单据类型 -->
+        <if test="orderType != null and orderType != '' ">
+            and info.ORDER_TYPE = #{orderType}
+        </if>
+    </sql>
+    <!--分页查询数据非草稿单 -->
+    <select id="queryLocalApplyOrderData" resultType="com.zres.project.localnet.portal.local.domain.UnicomLocalOrderPo">
+        <if test="databaseType == 'oracle' ">
+            select z.*
+            From (
+            <include refid="queryLocalApplyOrderOracle"/>
+            ) z
+            where 1=1
+            <if test="sortname != null and sortname != '' ">
+                order by z.createDateStr desc,${sortname} ${sortorder}
+            </if>
+            <if test="sortname == null or sortname == '' ">
+                order by z.cstOrdID desc,z.createDateStr desc
+            </if>
+        </if>
+    </select>
+    <!--分页查询数据核查单 -->
+    <select id="queryApplyOrderData" resultType="com.zres.project.localnet.portal.local.domain.UnicomLocalOrderPo">
+        <if test="databaseType == 'oracle' ">
+            select z.*
+            From (
+            <include refid="queryApplyOrderOracle"/>
+            ) z
+            where 1=1
+        </if>
+    </select>
+    <!--查询数据数量非草稿单 -->
+    <select id="queryLocalApplyOrderCount" resultType="int">
+        select count(1)
+        From (
+        <include refid="queryLocalApplyOrderOracle"/>
+        ) y
+
+    </select>
+
+    <select id="queryLocalExportApplyOrderDataPo" resultType="com.zres.project.localnet.portal.local.domain.UnicomLocalExportData">
+        <if test="databaseType == 'oracle' ">
+            select
+            z.srvOrdId as srvOrdId,
+            z.orderId as orderId,
+            z.cstOrdID as cstOrdID,
+            z.custName as custName,
+            case z.itemType
+            when '101' then '开通单'
+            when '102' then '核查单'
+            else '' end as itemTypeName,
+            z.serialNumber as serialNumber,
+            z.tradeId as tradeId,
+            z.applyOrdId as applyOrdId,
+            z.orderCode as orderCode,
+            z.applyOrdName as applyOrdName,
+            z.dianlNo as dianlNo,
+            z.prodBustType as prodBustType,
+            z.prodBustTypeName as prodBustTypeName,
+            z.actCode as actCode,
+            z.actCodeName as actCodeName,
+            z.actTypeName as actTypeName,
+            case z.actTypeState
+            when '200000001' then '未启流程'
+            when '200000002' then '已启流程'
+            when '200000003' then '回退中'
+            when '200000004' then '已结束'
+            when '200000005' then '已撤销'
+            else '' end as actTypeState,
+            z.dispObjName as dispObjName,
+            z.createDateStr as createDateStr,
+            z.omlParentOrderId as omlParentOrderId,
+            z.omlOrderId as omlOrderId
+            From (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.createDateStr desc) AS rowindex, y.*
+            From (
+            <include refid="queryLocalApplyOrderOracle"/>
+            ) y
+            ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+        </if>
+    </select>
+
+    <!--查询非草稿单导出数据 -->
+    <select id="queryLocalExportApplyOrderData" resultType="map">
+        <if test="databaseType == 'oracle' ">
+            select
+            z.srvOrdId as srvOrdId,
+            z.orderId as orderId,
+            z.cstOrdID as cstOrdID,
+            z.custName as custName,
+            case z.itemType
+            when '101' then '开通单'
+            when '102' then '核查单'
+            else '' end as itemTypeName,
+            z.serialNumber as serialNumber,
+            z.tradeId as tradeId,
+            z.applyOrdId as applyOrdId,
+            z.orderCode as orderCode,
+            z.applyOrdName as applyOrdName,
+            z.dianlNo as dianlNo,
+            z.prodBustType as prodBustType,
+            z.prodBustTypeName as prodBustTypeName,
+            z.actCode as actCode,
+            z.actCodeName as actCodeName,
+            z.actTypeName as actTypeName,
+            case z.actTypeState
+            when '200000001' then '未启流程'
+            when '200000002' then '已启流程'
+            when '200000003' then '回退中'
+            when '200000004' then '已结束'
+            when '200000005' then '已撤销'
+            else '' end as actTypeState,
+            z.dispObjName as dispObjName,
+            z.createDateStr as createDateStr,
+            z.omlParentOrderId as omlParentOrderId,
+            z.omlOrderId as omlOrderId
+            From (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.createDateStr desc) AS rowindex, y.*
+            From (
+            <include refid="queryLocalApplyOrderOracle"/>
+            ) y
+            ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+        </if>
+    </select>
+
+    <!--查询数据草稿单数量(分组) -->
+    <select id="queryLocalApplyAllOrderOracleCount" resultType="int">
+        select count(1)
+        From (
+        <include refid="queryLocalApplyAllOrderOracle"/>
+        ) y
+    </select>
+
+    <!--分页查询草稿单数据 (分组)-->
+    <select id="queryLocalApplyAllOrderOracleData" resultType="com.zres.project.localnet.portal.local.domain.UnicomLocalOrderPo">
+        <if test="databaseType == 'oracle' ">
+            select
+            z.srvOrdId as srvOrdId,
+            z.srvordIds as srvordIds,
+            z.circodeCount as circodeCount,
+            z.orderId as orderId,
+            z.cstOrdID as cstOrdID,
+            z.itemType as itemType,
+            z.custName as custName,
+            z.serialNumber as serialNumber,
+            z.tradeId as tradeId,
+            z.orderCode as orderCode,
+            z.applyOrdId as applyOrdId,
+            z.applyOrdName as applyOrdName,
+            z.dianlNo as dianlNo,
+            z.prodBustType as prodBustType,
+            z.prodBustTypeName as prodBustTypeName,
+            z.actCode as actCode,
+            z.actCodeName as actCodeName,
+            z.actTypeName as actTypeName,
+            z.actTypeState as actTypeState,
+            z.dispObjName as dispObjName,
+            z.createDateStr as createDateStr,
+            z.omlParentOrderId as omlParentOrderId,
+            z.omlOrderId as omlOrderId
+            From (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.createDateStr desc) AS rowindex, y.*
+            From (
+            <include refid="queryLocalApplyAllOrderOracle"/>
+            ) y
+            where 1=1
+            <if test="sortname != null and sortname != '' ">
+                order by y.createDateStr desc,${sortname} ${sortorder}
+            </if>
+            <if test="sortname == null or sortname == '' ">
+                order by y.cstOrdID desc,y.createDateStr desc
+            </if>
+            ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	        ]]>
+        </if>
+    </select>
+
+    <!-- 草稿单(分组)-->
+    <sql id="queryLocalApplyAllOrderOracle">
+        select
+        info.SRV_ORD_ID as srvOrdId,
+        info.srv_ord_ids as srvordIds,
+        info.circodeCount as circodeCount,
+        info.ORDER_ID as orderId,
+        info.CST_ORD_ID as cstOrdID,
+        info.ORDER_TYPE as itemType,
+        c.CUST_NAME_CHINESE as custName,
+        '' as serialNumber,
+        '' as tradeId,
+        '' as orderCode,
+        c.APPLY_ORD_ID as applyOrdId,
+        c.APPLY_ORD_NAME as applyOrdName,
+        attr.ATTR_VALUE as dianlNo,
+        pc.code_value as prodBustType,
+        pc.code_content as prodBustTypeName,
+        pt.code_value as actCode,
+        pt.code_content as actCodeName,
+        '' as actTypeName,
+        o.ORDER_STATE as actTypeState,
+        vs.user_name as dispObjName,
+        case when info.CREATE_DATE is not null then to_char(info.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as createDateStr,
+        o.PARENT_ORDER_ID as omlParentOrderId,
+        o.OLD_ORDER_ID as omlOrderId
+        from GOM_BDW_CST_ORD c
+        inner join
+        (select f.cst_ord_id,f.srv_ord_id,f.srv_ord_ids,f.circodeCount,r.ORDER_ID,r.ORDER_TYPE,r.CREATE_DATE,r.SERVICE_ID,r.user_id,r.ACTIVE_TYPE
+        from GOM_BDW_SRV_ORD_INFO r
+        inner join
+        (select cst_ord_id,max(srv_ord_id) as srv_ord_id,WM_CONCAT(srv_ord_id) as srv_ord_ids,count(*) as circodeCount
+        from GOM_BDW_SRV_ORD_INFO
+        where 1=1
+        <!--订单来源  -->
+        <if test="isLocalUnicom != null and isLocalUnicom != '' ">
+            and RESOURCES = #{isLocalUnicom}
+        </if>
+        <!--订单状态 -->
+        <if test="orderState != null and orderState != '' ">
+            and SRV_ORD_STAT = #{orderState}
+        </if>
+        <!--全部申请单状态 排除法 -->
+        <if test="wholeOrderState != null and wholeOrderState != '' ">
+            <![CDATA[
+              and SRV_ORD_STAT <> #{wholeOrderState}
+              ]]>
+        </if>
+        <!-- 产品类型 -->
+        <if test="productType != null and productType != '' ">
+            and SERVICE_ID = #{productType}
+        </if>
+        <!--动作类型 -->
+        <if test="actType != null and actType != '' ">
+            and ACTIVE_TYPE = #{actType}
+        </if>
+        <if test="orderType != null and orderType != '' ">
+            and ORDER_TYPE = #{orderType}
+        </if>
+        group by cst_ord_id) f
+        on r.cst_ord_id = f.cst_ord_id
+        and r.srv_ord_id = f.srv_ord_id
+        where r.SYSTEM_RESOURCE = 'second-schedule-lt'
+        order by r.CREATE_DATE desc) info
+        on info.cst_ord_id = c.cst_ord_id
+        inner join
+        (select to_char(f.staff_id) as staff_id,
+        f.user_name,
+        f.login_name,
+        f.department
+        from vw_pub_staff f) vs
+        on vs.staff_id = info.user_id
+        left join (select SRV_ORD_ID,ATTR_VALUE FROM GOM_BDW_SRV_ORD_ATTR_INFO where attr_code = '20000064' group by SRV_ORD_ID,ATTR_VALUE) attr
+        on info.SRV_ORD_ID = attr.SRV_ORD_ID
+        left join gom_order o
+        on info.order_id = o.order_id
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc
+        on info.SERVICE_ID = pc.code_value
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt
+        on info.ACTIVE_TYPE = pt.code_value
+        where 1=1
+        <!--申请单编码 -->
+        <if test="applyOrdId != null and applyOrdId != '' ">
+            and c.APPLY_ORD_ID like '%'||#{applyOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="applyOrdName != null and applyOrdName != '' ">
+            and c.APPLY_ORD_NAME like  '%'||#{applyOrdName}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and c.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+        </if>
+        <!--用户id -->
+        <if test="operStaffId != null and operStaffId != '' ">
+            and vs.staff_id = #{operStaffId}
+        </if>
+    </sql>
+
+    <!-- 草稿单查询 -->
+    <sql id="queryLocalApplyDraftOrderOracle">
+        select
+        info.SRV_ORD_ID as srvOrdId,
+        info.ORDER_ID as orderId,
+        info.CST_ORD_ID as cstOrdID,
+        info.ORDER_TYPE as itemType,
+        c.CUST_NAME_CHINESE as custName,
+        info.SERIAL_NUMBER as serialNumber,
+        info.TRADE_ID as tradeId,
+        '' as orderCode,
+        c.APPLY_ORD_ID as applyOrdId,
+        c.APPLY_ORD_NAME as applyOrdName,
+        '' as dianlNo,
+        pc.code_value as prodBustType,
+        pc.code_content as prodBustTypeName,
+        pt.code_value as actCode,
+        pt.code_content as actCodeName,
+        '' as actTypeName,
+        '' as actTypeState,
+        vs.user_name as dispObjName,
+        case when info.CREATE_DATE is not null then to_char(info.CREATE_DATE, 'yyyy-MM-dd hh24:mi:ss') else '' end as createDateStr,
+        '' as omlParentOrderId,
+        '' as omlOrderId
+        from GOM_BDW_CST_ORD c
+        inner join
+        (select *
+        from (select f.*,row_number() over(partition by CST_ORD_ID order by SRV_ORD_ID asc) rn from GOM_BDW_SRV_ORD_INFO f where 1=1
+        <!--订单来源  -->
+        <if test="isLocalUnicom != null and isLocalUnicom != '' ">
+            and f.RESOURCES = #{isLocalUnicom}
+        </if>
+        <!--订单状态 -->
+        <if test="orderState != null and orderState != '' ">
+            and f.SRV_ORD_STAT = #{orderState}
+        </if>
+        <!-- 产品类型 -->
+        <if test="productType != null and productType != '' ">
+            and f.SERVICE_ID = #{productType}
+        </if>
+        <!--动作类型 -->
+        <if test="actType != null and actType != '' ">
+            and f.ACTIVE_TYPE = #{actType}
+        </if>
+        <if test="orderType != null and orderType != '' ">
+            and f.ORDER_TYPE = #{orderType}
+        </if>
+        order by f.CREATE_DATE desc
+        )
+        where rn = 1) info
+        on info.cst_ord_id = c.cst_ord_id
+        inner join
+        (select to_char(f.staff_id) as staff_id,
+        f.user_name,
+        f.login_name,
+        f.department
+        from vw_pub_staff f) vs
+        on vs.staff_id = info.user_id
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc
+        on info.SERVICE_ID = pc.code_value
+        left join (
+        select code_content,code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt
+        on info.ACTIVE_TYPE = pt.code_value
+        where 1=1
+            and info.SYSTEM_RESOURCE = 'second-schedule-lt'
+        <!--申请单编码 -->
+        <if test="applyOrdId != null and applyOrdId != '' ">
+            and c.APPLY_ORD_ID like '%'||#{applyOrdId}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="applyOrdName != null and applyOrdName != '' ">
+            and c.APPLY_ORD_NAME like  '%'||#{applyOrdName}||'%'
+        </if>
+        <!--客户名称-->
+        <if test="custName != null and custName != '' ">
+            and c.CUST_NAME_CHINESE like  '%'||#{custName}||'%'
+        </if>
+        <!--用户id -->
+        <if test="operStaffId != null and operStaffId != '' ">
+            and vs.staff_id = #{operStaffId}
+        </if>
+    </sql>
+
+    <!--分页查询草稿单数据 -->
+    <select id="queryLocalApplyDraftOrderData" resultType="com.zres.project.localnet.portal.local.domain.UnicomLocalOrderPo">
+        <if test="databaseType == 'oracle' ">
+            select
+            z.srvOrdId as srvOrdId,
+            z.orderId as orderId,
+            z.cstOrdID as cstOrdID,
+            z.itemType as itemType,
+            z.custName as custName,
+            z.serialNumber as serialNumber,
+            z.tradeId as tradeId,
+            z.orderCode as orderCode,
+            z.applyOrdId as applyOrdId,
+            z.applyOrdName as applyOrdName,
+            z.dianlNo as dianlNo,
+            z.prodBustType as prodBustType,
+            z.prodBustTypeName as prodBustTypeName,
+            z.actCode as actCode,
+            z.actCodeName as actCodeName,
+            z.actTypeName as actTypeName,
+            z.actTypeState as actTypeState,
+            z.dispObjName as dispObjName,
+            z.createDateStr as createDateStr,
+            z.omlParentOrderId as omlParentOrderId,
+            z.omlOrderId as omlOrderId
+            From (
+            <include refid="queryLocalApplyDraftOrderOracle"/>
+            ) z
+            where 1=1
+            <if test="sortname != null and sortname != '' ">
+                order by z.createDateStr desc,${sortname} ${sortorder}
+            </if>
+            <if test="sortname == null or sortname == '' ">
+                order by z.cstOrdID desc,z.createDateStr desc
+            </if>
+        </if>
+    </select>
+    <select id="queryResData"  resultType="java.util.Map">
+        select CUST_NAME_CHINESE,
+        circuitCode,
+        SERIAL_NUMBER,
+        CODE_CONTENT,
+        act_type,
+        case  when oprState='预占' then '占用' when oprState ='预释放' then '释放' when act_type='停机'  then '释放' else oprState end as oprState ,
+        routeInfo,
+        SRVORDID,
+        SERVICEID
+        from (select  CO.CUST_NAME_CHINESE,           --客户名称
+        attr.ATTR_VALUE as circuitCode, --电路编码
+        SO.SERIAL_NUMBER,               --业务号码
+        SO.SERVICE_ID,                  --产品类型Id
+        pc.CODE_CONTENT ,                --产品类型名称
+        SO.ACTIVE_TYPE,                 --动作类型Id
+        pt.CODE_CONTENT as act_type,               --动作类型名称
+        rescir.OPR_STATE as oprState,   -- 路由状态
+        rescir.ROUTE_INFO as routeInfo,  --业务路由信息
+        SO.SRV_ORD_ID SRVORDID,
+        SO.SERVICE_ID SERVICEID,
+        CO.CREATE_DATE
+        from  GOM_BDW_SRV_ORD_INFO SO
+        join GOM_BDW_CST_ORD CO on CO.CST_ORD_ID = SO.CST_ORD_ID
+        join (
+        select ORG_ID from GOM_ORG_S
+        START WITH  oRG_ID =(SELECT ORG_ID FROM GOM_ORG_S a where a.PARENT_ORG_ID =1
+        START WITH  a.ORG_ID=(select ORG_ID from gom_user_s  where user_id=#{user_id})  CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+        )  CONNECT BY  PARENT_ORG_ID=prior ORG_ID
+        )b  on CO.handle_dep_id=b.org_id
+        left join  gom_bdw_srv_ord_res_circuit  rescir on  so.srv_ord_id=rescir.srv_ord_id
+        left join gom_BDW_srv_ord_attr_info attr on SO.SRV_ORD_ID = attr.SRV_ORD_ID and attr.ATTR_CODE = '20000064'
+        left join (
+        select code_content, code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt on SO.ACTIVE_TYPE = pt.code_value
+        left join (
+        select code_content, code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc on SO.SERVICE_ID = pc.code_value
+        where 1=1 and SO.ORDER_TYPE != '102'
+          AND SO.ACTIVE_TYPE NOT IN ('104','105')
+          AND SO.SYSTEM_RESOURCE='second-schedule-lt'
+        UNION ALL
+        select CO.CUST_NAME_CHINESE,           --客户名称
+        attr.ATTR_VALUE as circuitCode, --电路编码
+        SO.SERIAL_NUMBER,               --业务号码
+        SO.SERVICE_ID,                  --产品类型Id
+        pc.CODE_CONTENT ,                --产品类型名称
+        SO.ACTIVE_TYPE,                 --动作类型Id
+        pt.CODE_CONTENT as act_type,               --动作类型名称
+        rescir.OPR_STATE as oprState,   -- 路由状态
+        rescir.ROUTE_INFO as routeInfo,  --业务路由信息
+        SO.SRV_ORD_ID SRVORDID,
+        SO.SERVICE_ID SERVICEID,
+        CO.CREATE_DATE
+        from (select a.*  from (
+        select
+        a.CST_ORD_ID,a.SERIAL_NUMBER,a.SERVICE_ID,a.ACTIVE_TYPE,a.SRV_ORD_ID,a.ORDER_TYPE,a.SYSTEM_RESOURCE,
+        b.SRV_ORD_ID as srv_ord_id_pre
+        from(
+        select max(b.SRV_ORD_ID) SRV_ORD_ID,a.instance_id
+        from gom_bdw_srv_ord_info a
+        left join gom_bdw_srv_ord_info b on a.instance_id = b.instance_id
+        where 1=1 and b.ACTIVE_TYPE in('101','103','106')  and a.ACTIVE_TYPE in('104','105')
+        group by a.instance_id
+        ) b left join   gom_bdw_srv_ord_info a on a.instance_id = b.instance_id  where  a.ACTIVE_TYPE in('104','105')
+        ) a
+        ) SO
+        JOIN  GOM_BDW_CST_ORD CO on CO.CST_ORD_ID = SO.CST_ORD_ID
+        join (
+        select ORG_ID from GOM_ORG_S
+        START WITH  oRG_ID =(SELECT ORG_ID FROM GOM_ORG_S a where a.PARENT_ORG_ID =1
+        START WITH  a.ORG_ID=(select ORG_ID from gom_user_s  where user_id=#{user_id})  CONNECT BY prior a.PARENT_ORG_ID=a.ORG_ID
+        )  CONNECT BY  PARENT_ORG_ID=prior ORG_ID
+        )b  on CO.handle_dep_id=b.org_id
+        left join  gom_bdw_srv_ord_res_circuit rescir on so.srv_ord_id_pre = rescir.srv_ord_id
+        left join gom_BDW_srv_ord_attr_info attr on SO.SRV_ORD_ID = attr.SRV_ORD_ID and attr.ATTR_CODE = '20000064'
+        left join (
+        select code_content, code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'operate_type'
+        ) pt on SO.ACTIVE_TYPE = pt.code_value
+        left join (
+        select code_content, code_value
+        from GOM_BDW_CODE_INFO_SECOND
+        where CODE_type = 'product_code'
+        ) pc on SO.SERVICE_ID = pc.code_value
+        where 1=1 and SO.ORDER_TYPE != '102'
+        AND SO.ACTIVE_TYPE NOT IN ('101','102','103','106')
+        AND SO.SYSTEM_RESOURCE='second-schedule-lt'
+        ) t WHERE  1=1
+        <!--客户名称-->
+        <if test="serialNumber != null and serialNumber != '' ">
+            and t.serial_number like  '%'||#{serialNumber}||'%'
+        </if>
+        <!--电路编号 -->
+        <if test="circuitCode != null and circuitCode != '' ">
+            and t.circuitCode like '%'||#{circuitCode}||'%'
+        </if>
+        <!--申请单标题 -->
+        <if test="custNameChinese != null and custNameChinese != '' ">
+            and t.CUST_NAME_CHINESE like  '%'||#{custNameChinese}||'%'
+        </if>
+        order by t.CREATE_DATE desc
+    </select>
+    <!--查询数据草稿单数量 -->
+    <select id="queryLocalApplyDraftOrderCount" resultType="int">
+        select count(1)
+        From (
+        <include refid="queryLocalApplyDraftOrderOracle"/>
+        ) y
+    </select>
+
+    <!-- 查询草稿单导出的数据-->
+    <select id="queryLocalExportDraftOrderData" resultType="map">
+        <if test="databaseType == 'oracle' ">
+            select
+            z.srvOrdId as srvOrdId,
+            z.orderId as orderId,
+            z.cstOrdID as cstOrdID,
+            z.itemType as itemType,
+            case z.itemType
+            when '101' then '开通单'
+            when '102' then '核查单'
+            else '' end as itemTypeName,
+            z.custName as custName,
+            z.serialNumber as serialNumber,
+            z.tradeId as tradeId,
+            z.orderCode as orderCode,
+            z.applyOrdId as applyOrdId,
+            z.applyOrdName as applyOrdName,
+            z.dianlNo as dianlNo,
+            z.prodBustType as prodBustType,
+            z.prodBustTypeName as prodBustTypeName,
+            z.actCode as actCode,
+            z.actCodeName as actCodeName,
+            z.actTypeName as actTypeName,
+            z.actTypeState as actTypeState,
+            z.dispObjName as dispObjName,
+            z.createDateStr as createDateStr,
+            z.omlParentOrderId as omlParentOrderId,
+            z.omlOrderId as omlOrderId
+            From (
+            SELECT ROW_NUMBER() OVER (ORDER BY y.createDateStr desc) AS rowindex, y.*
+            From (
+            <include refid="queryLocalApplyDraftOrderOracle"/>
+            ) y
+            ) z
+            where 1=1
+            <![CDATA[
+	        and z.rowindex >#{startRow,jdbcType=INTEGER} and z.rowindex <=#{endRow,jdbcType=INTEGER}
+	      ]]>
+        </if>
+    </select>
+
+
+
+    <update id="testSrv">
+        UPDATE GOM_BDW_SRV_ORD_INFO set create_date = #{testDate} where order_id = #{orderId,jdbcType=INTEGER}
+    </update>
+
+    <select id="queryCountByInstanceId" resultType="int" parameterType="map">
+        SELECT COUNT(INSTANCE_ID) FROM GOM_BDW_SRV_ORD_INFO WHERE INSTANCE_ID = #{instanceId}
+    </select>
+
+    <select id="queryCircuitInfoBySrvOrdId" parameterType="map" resultType="map">
+        SELECT * FROM (SELECT
+                           SOI.SRV_ORD_ID AS SRVORDID,
+                           SOI.SERVICE_ID AS SERVICEID,
+                           SOI.SRV_ORD_STAT AS STATE,
+                           CO.APPLY_ORD_ID,
+                           CO.CUST_ID,
+                           CO.CUST_ADDRESS,
+                           CO.cust_contact_man_name as link_man,
+                           SOI.SYSTEM_RESOURCE
+                       FROM GOM_BDW_SRV_ORD_INFO SOI
+                          JOIN GOM_BDW_CST_ORD CO ON SOI.CST_ORD_ID = CO.CST_ORD_ID
+                       WHERE SOI.INSTANCE_ID = #{instanceId} and SOI.SRV_ORD_STAT!='10X' ORDER BY SOI.CREATE_DATE DESC)  WHERE ROWNUM=1
+    </select>
+
+</mapper>

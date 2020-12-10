@@ -1,0 +1,96 @@
+<div class="modal-header">
+    <h4 class="modal-title">机房/放置点信息配置</h4>
+</div>
+<div class="modal-body">
+    <div class="col-md-12" id="isa-operTaskManagement-mainPanel" style="background-color: #FFFFFF; overflow-x: hidden"><!-- background-color: #EDEDED;-->
+    <div style="margin-left: 2px;margin-right: 2px;margin-bottom: 10px;margin-top: 10px;padding: 0px;background-color:#FFFFFF;height: 20%">
+        <form class="form-horizontal" id="operTaskManagement-Qryform">
+            <div class="row operTaskManagement-btn-row">
+                <div id="operTaskManagement-searchCodeDiv" class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4">资源类型:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input id="resType" name="resType" class="form-control" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4">机房/放置点名称:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="resourceName" name="resourceName" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <!--    <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4" >放置点编码:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="macroomNum" name="macroomNum" class="form-control" disabled="true">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4">归属省份:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="provinceName" name="provinceName" class="form-control" disabled="true">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4" >归属地市:</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <div class="input-group">
+                                        <input id="cityName" name="cityName" class="form-control" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-sm-2">
+                            <div class="form-group">
+                                <div class="col-md-12" >
+                                    <button type="button" class="btn btn-danger" id="queryLocalApply">查询</button>
+                                    <button type="button" class="btn btn-default" id="resetLocalApply">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="localApplyTabs" class="row ui-tabs">
+        <ul class="ui-tabs-nav">
+
+            <li>
+                <a href="#local_apply_tabs_completed" id="local_apply_tabs_completed_link">机房/放置点信息<span class="redge pull-right clearfix" id="comSpan">0</span></a>
+            </li>
+
+        </ul>
+
+
+
+    </div>
+    <div class="row" style="width: 98%;margin-left: 5px;margin-right: 5px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="Config-draftGr"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>

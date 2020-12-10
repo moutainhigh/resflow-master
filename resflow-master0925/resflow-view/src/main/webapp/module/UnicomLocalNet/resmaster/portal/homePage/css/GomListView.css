@@ -1,0 +1,56 @@
+.pd-10{padding: 10px;}
+.operTaskManagement-advSearchFields-row {
+	margin-right: 5px;
+}
+#operTaskManagement-panel-body .btn {
+    padding: 3px 8px;
+    font-size: 13px;
+    line-height: 1.4285;
+    border-radius: 4px;
+}
+#operTaskManagement-operBtnDiv button {
+	margin-right: 3px;
+}
+#operTaskManagement-searchBtn {
+	margin-left: -20px;
+}
+#operTaskManagement-advSearchBtn {
+	margin-left: 10px;
+}
+.operTaskManagement-workOrderCode-container {
+	padding-left: 0px;
+}
+.operTaskManagement-btn-row input {
+	border-radius: 4px;
+}
+.operTaskManagement-severeOT-icon {
+	margin-left: 20px;
+	color: #ea421b;
+}
+.operTaskManagement-overtime-icon {
+	margin-left: 5px;
+	color: #dbaa00;
+}
+.operTaskManagement-alert-icon {
+	margin-left: 5px;
+	color: #abca02;
+}
+.operTaskManagement-normal-icon {
+	margin-left: 5px;
+	color: #0085ff;
+}
+#operTaskManagement-grid {
+	margin-top: -10px;
+}
+#operTaskManagement-grid * {
+	text-align: center;
+}
+#operTaskManagement-panel {
+	border-top: none;
+}
+#operTaskManagement-tab .ui-tabs-nav {
+	border-bottom: none;
+}
+#operTaskManagement_finishWorkOrder_workOrderCodes_multi span {
+	max-width: none;
+}

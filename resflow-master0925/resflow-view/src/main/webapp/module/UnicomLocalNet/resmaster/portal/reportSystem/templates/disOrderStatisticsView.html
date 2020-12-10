@@ -1,0 +1,66 @@
+<div id="affairDispatcher-mainPanel">
+    <div style="padding: 20px 15px;">
+        <form class="form-horizontal" id="disOrderDetailStatistics-form">
+            <div class="row">
+                <div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="disOrderDetailStatistics-productType" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">动作类型</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="disOrderDetailStatistics-operateType" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">是否资源补录</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input class="combobox form-control" name="isSupplement" id="isSupplement">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">创建开始时间</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="disOrderDetailStatistics-beginDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">
+                                创建截止时间
+                            </label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="disOrderDetailStatistics-endDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12" style="text-align: right;padding-right: 15px;">
+                    <button id="disOrderDetailStatistics-queryBtn" type="button" class="btn btn-danger">查询</button>
+                    <button id="disOrderDetailStatistics-exportBtn" type="button" class="btn btn-default">导出
+                    </button>
+                    <button type="reset" class="btn btn-default">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="tab-content-model col-md-12 col-sm-12">
+        <div id="disOrderDetailStatistics-grid"></div>
+    </div>
+</div>

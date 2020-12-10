@@ -1,0 +1,303 @@
+<div class="modal-header">
+    <h4 class="modal-title">定单详情</h4>
+</div>
+<div class="modal-body" style="padding:0px;">
+    <div class="handle-order-div">
+        <div class="handle-order-content" id="btnClassDiv">
+            <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="cc_confirm">确认</button>
+            <div class="col-md-2 col-sm-2 control-label" id="ifBackOrder" hidden
+                 style="float:right;padding-top:2px;padding-left: 50px;font-size:20px;font-weight:bold;color: #ffffff">【回退单】</div>
+        </div>
+
+    </div>
+    <div id="all-order-tabs">
+        <div id="tabs-relate-pill" class="tabs-relate-pill ui-tabs">
+            <ul class="ui-tabs-relate-nav">
+                <li id="tabs-relate-order"><a href="#tabs-relate-order-a">定单信息</a></li>
+                <li id="tabs-relate-dispatchOrder"><a href="#tabs-relate-order-n">调单信息</a></li>
+                <li id="tabs-relate-circuit"><a href="#tabs-relate-order-b">电路信息</a></li>
+            </ul>
+            <div id="tabs-relate-order-a">
+                <!-- 客户信息 -->
+                <form class="form-horizontal form-ui-label" id="consumer-info">
+                    <div class="title_left">
+                        <span class="title_left_span">客户信息</span>
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 20px;" id="custInfo">
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户名称</label>
+                            <div id="relate-cust_name_chinese" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户编码</label>
+                            <div id="relate-cust_id" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户类型</label>
+                            <div id="relate-cust_type" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group oneDry" style="display: none">
+                            <label class="control-label">客户地址</label>
+                            <div id="relate-cust_addr" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户行业</label>
+                            <div id="relate-cust_industry" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group" id="is_group_cust_div">
+                            <label class="control-label">是否集团直管</label>
+                            <div id="relate-is_group_cust" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户联系电话</label>
+                            <div id="relate-cust_tel" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户联系Email</label>
+                            <div id="relate-cust_email" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户联系人</label>
+                            <div id="relate-cust_contact_man_name" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户联系人电话</label>
+                            <div id="relate-cust_contact_man_tel" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">客户联系人Email</label>
+                            <div id="relate-cust_contact_man_email" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- 定单信息-->
+                <form class="form-horizontal form-ui-label" id="orderDetails-form">
+                    <div class="title_left">
+                        <span class="title_left_span">定单信息</span>
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 20px;" id="relate-orderDeatail">
+                    </div>
+                </form>
+            </div>
+            <div id="tabs-relate-order-n">
+                <!--调单信息-->
+                <div id="relate-dispatch-grid"></div>
+                <form class="form-horizontal form-ui-label" id="relate-dispatch-info" hidden>
+                    <div class="title_left">
+                        <span class="title_left_span">调单详情</span>
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 8px;">
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">调度单号</label>
+                            <div id="relate-dispatch_order_no" class=" form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">处理人姓名</label>
+                            <div id="relate-staff_name" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">处理人电话</label>
+                            <div id="relate-staff_tel" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 8px;">
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">调单类型</label>
+                            <div id="relate-dispatch_type" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">调单状态</label>
+                            <div id="relate-state" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">处理人部门</label>
+                            <div id="relate-staff_org" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 8px;">
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">调单等级</label>
+                            <div id="relate-dispatch_grade" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">调单缓急</label>
+                            <div id="relate-dispatch_urgency" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class=" control-label">签发时间</label>
+                            <div id="relate-send_date" class="form-order-info">
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="row" style="margin-left: 30px;margin-top: 8px;">-->
+                    <!--<div class="col-md-4 form-group">-->
+                    <!--<label class="control-label">数据制作</label>-->
+                    <!--<div id="draft_data_make" class="form-order-info">-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-md-4 form-group">-->
+                    <!--<label class="control-label">是否转资源分配</label>-->
+                    <!--<div id="draft_istran_resouce" class="form-order-info">-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-md-4 form-group">-->
+                    <!--<label class="control-label">分配专业</label>-->
+                    <!--<div id="draft_dis_resouce" class="form-order-info">-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <div class="row" style="margin-left: 30px;margin-top: 8px;">
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">发往单位</label>
+                            <div id="relate-send_org" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">抄送单位</label>
+                            <div id="relate-copy_org" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label">签发人</label>
+                            <div id="relate-issuer" class="form-order-info">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row" style="margin-left: 30px;margin-top: 8px;">
+                        <div class="col-md-12 form-group">
+                            <label class=" control-label">调单标题</label>
+                            <div id="relate-dispatch_title" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class="control-label">调单内容</label>
+                            <div id="relate-dispatch_text" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class="control-label">调单说明</label>
+                            <div id="relate-dispatch_remark" class="form-order-info">
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class=" control-label">附件:</label>
+                            <div id="relate-attachs" class="form-order-info"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="tabs-relate-order-b">
+                <div id="relate-orderDetailsTabGrid-grid"></div>
+                <!-- 电路信息-->
+                <form class="form-horizontal form-ui-label" id="dianlu-form">
+                    <div id="tabsCirNum-pill" class="tabs-relate-pill ui-tabs">
+                        <ul class="ui-tabs-relate-nav">
+                            <li id="tabs-relate-circuitSub"><a href="#tabs-relate-order-bSub">电路属性信息</a></li><!--
+                            <li id="tabs-relate-resourceOrder-w"><a href="#tabs-relate-order-w">一干资源信息</a></li>-->
+                            <li id="tabs-relate-resourceOrder"><a href="#tabs-relate-order-x">二干资源信息</a></li>
+                            <li id="tabs-relate-resourceOrder-y"><a href="#tabs-relate-order-y">本地资源信息</a></li>
+                            <li id="tabs-relate-feedback"><a style="display: none" href="#tabs-relate-order-feed">核查信息</a></li>
+                            <li id="tabs-relate-attach"><a href="#tabs-relate-order-c">附件信息</a></li>
+                            <li id="tabs-relate-changeorder"><a href="#tabs-relate-order-d">异常单信息</a></li>
+                            <li id="tabs-relate-task-second"><a href="#tabs-relate-order-s">二干任务列表</a></li>
+                            <li id="tabs-relate-task-local"><a href="#tabs-relate-order-l">本地任务列表</a></li>
+                            <li id="tabs-relate-flow"><a href="#tabs-relate-order-flow">流程跟踪</a></li>
+                            <li id="tabs-relate-otherInfo"><a href="#tabs-relate-order-otherInfo">对端省份信息</a></li>
+                            <li id="tabs-relate-log"><a href="#tabs-relate-order-f">日志</a></li>
+                            <li id="tabs-relate-idea"><a href="#tabs-relate-order-g">阶段性意见</a></li>
+                            <li id="tabs-relate-relevance"><a href="#tabs-relate-order-h" style="display: none">关联主/子工单</a></li>
+                            <li id="tabs-relate-warning"><a href="#tabs-relate-order-m">预警/超时信息</a></li>
+                        </ul>
+                        <div id="tabs-relate-order-bSub">
+                            <!-- 电路信息-->
+                            <form class="form-horizontal" id="relate-circuit-form">
+                                <div class="orderDetailDemo_content" >
+                                    <div id="relate-otherInfo" class="row"></div>
+                                    <table class="row" style="width: 100%" id="relate-azpeInfo">
+                                        <tr style="border:1px dashed #FF0000;">
+                                            <td class="col-md-6 col-sm-6" style="border-right: 1px dashed #FF0000;" id="relate-apeInfo"></td>
+                                            <td class="col-md-6 col-sm-6" id="relate-zceInfo" style="border-right: 1px dashed #FF0000;"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="tabs-relate-order-c">
+                            <!--附件信息列表-->
+                            <div id="relate-attach-grid">
+                            </div>
+                        </div>
+                        <div id="tabs-relate-order-d">
+                            <!-- 异常单信息实际的内容页 -->
+                            <div id="relate-changeOrder-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-s">
+                            <!--二干任务列表-->
+                            <div id="relate-task-grid-second"></div>
+                        </div>
+                        <div id="tabs-relate-order-l">
+                            <!--本地任务列表-->
+                            <div id="relate-task-grid-local"></div>
+                        </div>
+                        <div id="tabs-relate-order-f">
+                            <!--日志信息-->
+                            <div id="relate-log-grid"></div>
+                        </div>
+                        <div id="relate-tabs-relate-order-g">
+                            <!--阶段处理意见-->
+                            <div id="relate-idea-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-h">
+                            <!--关联主/子单信息-->
+                            <div id="relate-relevance-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-m">
+                            <!--预警超时信息-->
+                            <div id="relate-warning-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-x">
+                            <!--二干资源信息-->
+                            <div id="relate-resource-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-y">
+                            <!--本地资源信息-->
+                            <div id="relate-resource-grid-y"></div>
+                        </div>
+                        <div id="tabs-relate-order-feed">
+                            <!--反馈信息-->
+                            <div id="relate-feedback-grid"></div>
+                        </div>
+                        <div id="tabs-relate-order-flow">
+                            <div id="relate-flow-info-div"></div>
+                        </div>
+                        <div id="tabs-relate-order-otherInfo">
+                            <div id="relate-otherInfo-grid"></div>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--阿里云产品演示流程引擎 -->
+<Context>
+
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+    <Resource name="jdbc/RESFLOW" auth="Container" type="javax.sql.DataSource"
+              maxActive="100" maxIdle="30" maxWait="10000"
+              username="DD_CUJT_DEV" password="DD_CUJT_DEV" driverClassName="oracle.jdbc.driver.OracleDriver"
+              url="jdbc:oracle:thin:@10.45.59.189:1521:orcl"/>
+
+</Context>

@@ -1,0 +1,70 @@
+<div class="modal-header">
+    <h4 class="modal-title">电路信息</h4>
+</div>
+<div class="handle-order-div" id="handle-order-div">
+    <div class="handle-order-content" id="btnDev-resource">
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="touchGet_2" value="get" >签收</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="releaseTouchGet_2" value="free" >释放签收</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resource_initiate" >发起补录</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resConfig" >资源配置</button>
+        <button class="btn handle-order-btn" style="border:1px solid #fff; display: none" id="resSubmit" >提交</button>
+    </div>
+</div>
+<div class="modal-body">
+
+    <div id="isa-operTaskManagement-mainPanel" style="overflow-x: hidden"><!-- background-color: #EDEDED;-->
+        <div id="tabs-order-b">
+            <!-- 电路信息-->
+            <form class="form-horizontal form-ui-label" id="dianlu-form">
+                <div id="tabsCirNum-pill" class="tabs-pill ui-tabs">
+                    <ul class="ui-tabs-nav">
+                        <li id="tabs-circuitSub"><a href="#tabs-order-bSub">电路属性信息</a></li>
+                        <li id="tabs-resourceOrder-w"><a href="#tabs-order-w">一干资源信息</a></li>
+                        <li id="tabs-resourceOrder"><a href="#tabs-order-x">二干资源信息</a></li>
+                        <li id="tabs-resourceOrder-y"><a href="#tabs-order-y">本地资源信息</a></li>
+                        <li id="tabs-resourceOrder-sec"><a href="#tabs-order-sec">二干补录资源信息</a></li>
+                        <li id="tabs-resourceOrder-local"><a href="#tabs-order-local">本地补录资源信息</a></li>
+                    </ul>
+                    <div id="tabs-order-bSub">
+                        <!-- 电路信息-->
+                        <form class="form-horizontal" id="circuit-form">
+                            <div class="orderDetailDemo_content" >
+                                <div id="otherInfo" class="row"></div>
+                                <table class="row" style="width: 100%" id="azpeInfo">
+                                    <tr style="border:1px dashed #FF0000;">
+                                        <td class="col-md-6 col-sm-6" style="border-right: 1px dashed #FF0000;" id="apeInfo"></td>
+                                        <td class="col-md-6 col-sm-6" id="zceInfo" style="border-right: 1px dashed #FF0000;"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="tabs-order-w">
+                        <!--一干资源信息-->
+                        <div id="resource-grid-w"></div>
+                    </div>
+                    <div id="tabs-order-x">
+                        <!--二干资源信息-->
+                        <div id="resource-grid"></div>
+                    </div>
+                    <div id="tabs-order-y">
+                        <!--本地资源信息-->
+                        <div id="resource-grid-y"></div>
+                    </div>
+                    <div id="tabs-order-sec">
+                        <!--二干补录资源信息-->
+                        <div id="resource-grid-sec"></div>
+                    </div>
+                    <div id="tabs-order-local">
+                        <!--本地补录资源信息-->
+                        <div id="resource-grid-local"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+<div class="modal-footer" style="text-align: center">
+   <!-- <button type="button" class="btn btn-danger" id="close">关闭</button>-->
+</div>

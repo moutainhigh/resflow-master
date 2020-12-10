@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.OrderQrySecondaryDao">
+
+    <select id="qrySrvOrderBelongSys" resultType="map" parameterType="map">
+        SELECT distinct srv.SYSTEM_RESOURCE,srv.RESOURCES,srv.ORDER_TYPE,srv.ACTIVE_TYPE
+        FROM gom_bdw_srv_ord_info srv
+        <where>
+            1=1
+            <if test='cstOrdId != null'>
+                and SRV.CST_ORD_ID = #{cstOrdId}
+            </if>
+            <if test='srvOrdId != null'>
+                and SRV.SRV_ORD_ID = #{srvOrdId}
+            </if>
+            <!--
+            <if test='orderId != null'>
+                and SRV.order_id = #{orderId}
+            </if>
+            -->
+        </where>
+    </select>
+
+    <select id="qryParentPsIdBySubOrderId" resultType="map">
+        select f.PS_ID,s.PARENT_ORDER_ID from GOM_ORDER s join GOM_ORDER f on s.PARENT_ORDER_ID = f.ORDER_ID where s.ORDER_ID = #{orderId}
+    </select>
+    <select id="qryParentPsIdByOrderId" resultType="map">
+        select s.PS_ID,s.PARENT_ORDER_ID from GOM_ORDER s where s.ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qrySrvOrderSourceSec" resultType="map" parameterType="String">
+        SELECT SRV.RESOURCES FROM GOM_BDW_SRV_ORD_INFO SRV
+        LEFT JOIN GOM_ORDER o ON o.parent_order_id = SRV.ORDER_ID
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="qryRentOrTestTacheNum" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_order O
+        LEFT JOIN gom_bdw_sec_local_relate_info info ON info.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_ORD_S OS ON OS.id = O.PS_ID
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE OS.ID IN ('1000209','1000210') AND ut.id = #{tacheId}
+        AND w.WO_STATE = '290000002'
+        AND info.PARENT_ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryRentOrTestCrossTacheNum" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_order O
+        LEFT JOIN gom_bdw_sec_local_relate_info info ON info.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_ORD_S OS ON OS.id = O.PS_ID
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE OS.ID IN ('1000209','1000210') AND ut.id = #{tacheId}
+        AND w.WO_STATE not in ('290000004','290000005','290000006','290000007')
+        AND info.PARENT_ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryCrossFlowNum" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_order O
+        LEFT JOIN gom_bdw_sec_local_relate_info info ON info.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_ORD_S OS ON OS.id = O.PS_ID
+        WHERE OS.ID IN ('1000209','1000210') AND o.order_state = '200000002'
+        AND info.PARENT_ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qryLocalChildFlowAllNum" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_order o ON o.parent_order_id = info.order_id
+        WHERE info.PARENT_ORDER_ID = #{orderId} AND o.order_state = '200000002'
+    </select>
+
+    <select id="qryLocalChildFlowFinishNum" resultType="int" parameterType="String">
+        SELECT count(*) FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_order o ON o.parent_order_id = info.order_id
+				LEFT JOIN GOM_PS_2_ORD_S OS ON OS.id = O.PS_ID
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE info.PARENT_ORDER_ID =  #{orderId}
+		AND ut.tache_code = 'CHILDFLOWWAIT'
+		AND OS.obj_type = 'LOCAL_CHILDFLOW'
+        AND w.WO_STATE = '290000002'
+    </select>
+
+    <select id="qrySecLocalOrder" resultType="map" parameterType="String">
+        SELECT o.parent_order_id,w.wo_id FROM gom_bdw_srv_ord_info srv
+        LEFT JOIN gom_order o ON o.parent_order_id = SRV.order_id
+        LEFT JOIN gom_wo w ON w.order_id = srv.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ut.id = '510101083' AND o.order_id = #{orderId}
+    </select>
+
+    <select id="qrySecTestTacheOrder" resultType="map" parameterType="String">
+        SELECT w.wo_id FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_wo w ON w.order_id = INFO.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE INFO.parent_order_id = #{orderId} AND INFO.ifmainorg = 0 AND w.old_wo_id IS NULL
+        AND ut.id = '500001168' AND w.WO_STATE NOT IN ('290000004','290000005','290000006','290000007')
+    </select>
+
+    <select id="qryDispatchData" resultType="map" parameterType="String">
+       SELECT srv.cst_ord_id,srv.srv_ord_id,cst.handle_dep_id,ki.region_id,
+       disp.res_allocate,disp.TO_BDW,disp.specialty,disp.netmanage,
+       disp.ASS_MKDATA_PERSON,disp.MKDATA_PERSON_ID,disp.IS_ASSIGN_PERSON,
+       DISP.RES_ASS_PERSION_ID,DISP.IS_RES_MAKE,DISP.RES_MAKE_PERSION,
+       DISP.RES_MAKE_PERSION_ID,disp.RESCONSTRUCTION
+       FROM gom_bdw_srv_ord_info srv
+       LEFT JOIN gom_bdw_cst_ord cst ON cst.cst_ord_id = srv.cst_ord_id
+       LEFT JOIN gom_order o ON o.order_id = srv.order_id
+       LEFT JOIN gom_ord_key_info ki ON ki.order_id = o.order_id
+       LEFT JOIN GOM_BDW_DISPATCH_DEPT disp ON disp.srv_ord_id = srv.srv_ord_id AND disp.cst_ord_id = srv.cst_ord_id
+       WHERE o.order_id = #{orderId} AND disp.delete_state = '0'
+    </select>
+
+    <select id="qryDispatchTacheCompUser" resultType="map" parameterType="String">
+        SELECT * FROM (
+        SELECT w.order_id,w.wo_id,w.comp_user_id FROM gom_order o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE  UT.tache_code IN ('SECONDARY_SCHEDULE','SECONDARY_SCHEDULE_2') AND w.comp_user_id != '-2000'
+              AND o.order_id = #{orderId} ORDER BY w.CREATE_DATE DESC
+        ) WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryDispatchTacheWoId" resultType="map" parameterType="String">
+        SELECT w.order_id,w.wo_id FROM gom_order o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE UT.tache_code IN ('SECONDARY_SCHEDULE','SECONDARY_SCHEDULE_2') AND w.comp_user_id != '-2000'
+        AND o.order_id = #{orderId} and w.wo_state = '290000004' ORDER BY w.CREATE_DATE DESC
+    </select>
+
+    <insert id="insertSecLocalRelate" parameterType="map">
+        INSERT INTO gom_bdw_sec_local_relate_info (RELATE_INFO_ID, CST_ORD_ID, SRV_ORD_ID, ORDER_ID, REGION_ID,
+        INSTANCE_ID, CREATE_DATE,DISPATCH_ORDER_ID,PARENT_ORDER_ID,RESOURCES,IFMAINORG,CONFIGSTATE) VALUES (
+            seq_gom_bdw_srv_ord_info.nextval,#{cstOrdId},#{srvOrdId},
+            #{orderId},#{regionId},#{instanceId},#{createDate},#{dispatchOrderId},
+            #{parentOrderId},#{resources},#{ifMainOrg},#{configState})
+    </insert>
+
+    <select id="selectSecLocalRelate" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM gom_bdw_sec_local_relate_info r
+        WHERE r.cst_ord_id = #{cstOrdId}
+        AND r.srv_ord_id = #{srvOrdId}
+        AND r.instance_id = #{instanceId}
+        AND r.region_id = #{regionId}
+        AND r.ifmainorg = #{ifMainOrg}
+    </select>
+
+    <update id="updateSecLocalRelate" parameterType="map">
+        UPDATE gom_bdw_sec_local_relate_info r
+        SET r.order_id = #{orderId}, r.create_date = #{createDate}, r.configState = #{configState}
+        WHERE r.cst_ord_id = #{cstOrdId}
+        AND r.srv_ord_id = #{srvOrdId}
+        AND r.instance_id = #{instanceId}
+        AND r.region_id = #{regionId}
+        AND r.ifmainorg = #{ifMainOrg}
+        AND r.configState = '10X'
+    </update>
+
+    <select id="qryRentTacheOrder" resultType="map" parameterType="String">
+        SELECT w.wo_id,info.RELATE_INFO_ID,INFO.order_id,ut.id
+        FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_wo w ON w.order_id = INFO.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE INFO.parent_order_id = #{orderId}
+          AND ut.id in ('500001222','1010101084')
+          AND w.WO_STATE = '290000002'
+    </select>
+
+    <select id="qryRentTacheLocal" resultType="map" parameterType="String">
+        SELECT w.wo_id AS woId,o.ORDER_ID AS orderId,ut.id AS tacheId
+        FROM GOM_ORDER o
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE w.order_id =
+            (SELECT info.order_id FROM gom_bdw_sec_local_relate_info INFO
+            LEFT JOIN gom_ord_key_info ki ON ki.order_id = INFO.order_id
+            WHERE INFO.parent_order_id = #{orderId}
+            AND ki.region_id = (SELECT dept.master_region FROM gom_bdw_srv_ord_info srv
+                LEFT JOIN GOM_BDW_DISPATCH_DEPT dept ON dept.cst_ord_id = srv.cst_ord_id AND dept.srv_ord_id = srv.srv_ord_id
+                WHERE srv.order_id = #{orderId} AND dept.delete_state = '0'))
+        AND w.wo_state = '290000002'
+    </select>
+
+    <select id="qrySecondDataMake" resultType="map">
+        SELECT KI.SPECIALTY_CODE,pds.pub_date_name,o.order_id,w.wo_id FROM gom_bdw_srv_ord_info SRV
+        LEFT JOIN gom_order o ON o.parent_order_id = SRV.order_id
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = o.order_id
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE srv.order_id = #{orderId} AND o.parent_order_code = 'NETMANAGE'
+        AND w.wo_state = '290000002'
+        <if test="spacialtyCode != null">
+            AND KI.SPECIALTY_CODE = #{spacialtyCode}
+        </if>
+    </select>
+
+    <select id="qrySecondResMake" resultType="map">
+        SELECT KI.SPECIALTY_CODE,pds.pub_date_name,o.order_id,w.wo_id FROM gom_bdw_srv_ord_info SRV
+        LEFT JOIN gom_order o ON o.parent_order_id = SRV.order_id
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = o.order_id
+        LEFT JOIN GOM_PUB_DATE_S pds ON pds.pub_date_id = KI.SPECIALTY_CODE AND pds.DF_TYPE = 'SPECIALTY_TYPE'
+        WHERE srv.order_id = #{orderId} AND o.parent_order_code = 'RESCONSTRUCTION'
+        AND w.wo_state = '290000002'
+        <if test="spacialtyCode != null">
+            AND KI.SPECIALTY_CODE = #{spacialtyCode}
+        </if>
+    </select>
+
+    <select id="qrySecToLocalData" resultType="map">
+        SELECT ki.region_id,dept.dept_name,o.order_id,w.wo_id
+        FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_order o ON o.order_id = info.order_id
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = o.order_id
+        LEFT JOIN department dept ON dept.dept_id = ki.region_id
+        WHERE info.parent_order_id =  #{orderId} AND w.wo_state IN ('290000002','290000113','290000111')
+        <if test="regionId != null">
+            AND ki.region_id = #{regionId}
+        </if>
+    </select>
+
+    <!--<select id="qryTacheNum" resultType="int">
+        SELECT count(*) FROM gom_order O
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE o.order_id = #{orderId} AND ut.id = #{tacheId}
+    </select>-->
+
+    <select id="qryWoOrderIfBack" resultType="map">
+        SELECT old_wo_id,priv_forward_wo_id,is_ze_fan FROM gom_wo WHERE wo_id = #{woId}
+    </select>
+
+    <select id="qryOrderIfConfigDispatch" resultType="int">
+        SELECT COUNT(*) from GOM_BDW_DISPATCH_DEPT WHERE srv_ord_id = #{srvOrdId} AND DELETE_STATE = '0'
+    </select>
+
+    <!--<select id="qryOrderKeyInfo" resultType="map">
+        SELECT KI.id,KI.order_id,KI.region_id,KI.specialty_code,KI.product_type,KI.act_type
+        FROM gom_ord_key_info ki WHERE order_id = #{orderId} AND rec_state = '170000001'
+    </select>-->
+
+    <select id="qryAttrParams" resultType="String" parameterType="String">
+        SELECT attr_val FROM (
+          SELECT attr_val FROM gom_wo_oper_attr where order_id = #{orderId}
+          AND attr_id = #{flagKey} and attr_val = '1'
+          ORDER BY CREATE_DATE DESC
+        ) WHERE rownum = 1
+    </select>
+
+    <!--<select id="qryDispObj" resultType="String">
+        SELECT NVL2(D.DISP_OBJ_ID,
+        D.DISP_OBJ_TYPE || '_J!G@F_' || D.DISP_OBJ_ID|| '_J!G@F_' ||D.IS_AUTO,
+        B.DISP_OBJ_TYPE || '_J!G@F_' || B.DISP_OBJ_ID|| '_J!G@F_' ||'210000002')
+        from gom_disp_srv_s        A,
+           GOM_PS_2_WO_S         B,
+           UOS_TACHE             C,
+           GOM_DISP_DETAIL_SRV_S D,
+           gom_ord_key_info      E
+        where B.id = #{psId}
+           AND E.Order_Id = #{orderId}
+           AND B.tache_id = C.id
+           and A.tache_code = C.tache_code
+           AND D.DISP_SRV_ID = A.ID
+           AND A.AREA_ID = E.REGION_ID
+           <if test='actType != null and actType != "" '>
+               AND D.ACT_TYPE = E.ACT_TYPE
+           </if>
+           <if test='specialtyCode != null and specialtyCode != "" '>
+               AND D.SPECIALTY_ID=E.SPECIALTY_CODE
+           </if>
+           <if test='productType != null and productType != "" '>
+               AND D.PRODUCT_TYPE=E.PRODUCT_TYPE
+           </if>
+           AND A.REC_STATE = '170000001'
+           AND D.REC_STATE='170000001'
+    </select>-->
+
+    <!--<select id="qryRelateInfoId" resultType="String">
+        SELECT info.relate_info_id FROM gom_bdw_srv_ord_info SRV
+        JOIN gom_bdw_sec_local_relate_info INFO
+        ON info.parent_order_id = SRV.ORDER_ID and INFO.srv_ord_id = SRV.SRV_ORD_ID
+        WHERE SRV.SRV_ORD_ID = #{srvOrdId} and INFO.CONFIGSTATE in('10A')
+    </select>-->
+
+    <select id="qryRelateInfoId" resultType="String">
+        SELECT info.relate_info_id FROM gom_bdw_srv_ord_info SRV
+        JOIN gom_bdw_sec_local_relate_info INFO
+        ON info.parent_order_id = SRV.ORDER_ID and INFO.srv_ord_id = SRV.SRV_ORD_ID
+        WHERE SRV.SRV_ORD_ID = #{srvOrdId}   AND INFO.CONFIGSTATE  <![CDATA[ <> ]]> '10X'
+    </select>
+
+    <select id="qryRelateInfoIdBySrvordId" resultType="String">
+      SELECT R.RELATE_INFO_ID
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO R
+        WHERE R.SRV_ORD_ID = #{srvOrdId}
+        AND R.CONFIGSTATE  <![CDATA[ <> ]]> '10X'
+    </select>
+
+    <select id="qryAutitObj" resultType="String">
+        SELECT autit_id
+        FROM gom_bdw_cst_ord cst
+        LEFT JOIN gom_bdw_srv_ord_info srv ON SRV.cst_ord_id = CST.cst_ord_id
+        LEFT JOIN gom_order o ON o.order_id = srv.order_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="qryCircuitNum" resultType="map">
+        SELECT ATTR.ATTR_INFO_ID,ATTR.ATTR_VALUE FROM gom_bdw_srv_ord_info soi
+        LEFT JOIN GOM_BDW_SRV_ORD_ATTR_INFO attr ON ATTR.srv_ord_id = SOI.srv_ord_id
+        where SOI.srv_ORD_ID = #{srvOrdId} AND ATTR.ATTR_CODE = '20000064'
+    </select>
+
+    <select id="qryCircuitIfConfig" resultType="String">
+        SELECT RES_ALLOCATE FROM GOM_BDW_DISPATCH_DEPT WHERE srv_ORD_ID = #{srvOrdId} AND DELETE_STATE = '0'
+    </select>
+
+    <insert id="insertCircuitNum" parameterType="map">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (ATTR_INFO_ID, SRV_ORD_ID, ATTR_ACTION, ATTR_CODE, ATTR_NAME,
+        ATTR_VALUE, ATTR_VALUE_NAME, CREATE_DATE, SOURSE) VALUES
+        (SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.nextval, #{srvOrdId}, '0', '20000064', '电路编号',
+        #{circuitNum}, 'circuitCode', to_date(to_char(sysdate,'yyyy-MM-dd hh24:mi:ss'),'yyyy-MM-dd hh24:mi:ss'), 'JIKE')
+    </insert>
+
+    <update id="updateCircuitNum" parameterType="map">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO attr SET ATTR.ATTR_VALUE = #{circuitNum}
+        WHERE ATTR.srv_ORD_ID = #{srvOrdId} AND ATTR.ATTR_CODE = '20000064'
+    </update>
+
+    <select id="qrySecToLocalChildFlowDate" resultType="map">
+        SELECT o.order_id,w.wo_id,INFO.RELATE_INFO_ID,ut.id FROM gom_bdw_sec_local_relate_info info
+        LEFT JOIN gom_order o ON o.parent_order_id = info.order_id
+		LEFT JOIN GOM_PS_2_ORD_S OS ON OS.id = O.PS_ID
+        LEFT JOIN gom_wo w ON w.order_id = o.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE info.PARENT_ORDER_ID = #{orderId}
+		AND ut.tache_code = 'CHILDFLOWWAIT'
+		AND OS.obj_type = 'LOCAL_CHILDFLOW'
+        AND w.WO_STATE = '290000002'
+    </select>
+
+    <select id="qryCopySendObj" resultType="map">
+        SELECT DO.DISPATCH_COPY_ORG,DO.DISPATCH_COPY_ORG_NAME FROM GOM_BDW_DISPATCH_DEPT dd
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER do ON DO.DISPATCH_ORDER_ID = DD.DISPATCH_ORDER_ID
+        WHERE DD.SRV_ORD_ID = #{srvOrdId} AND dd.delete_state = '0' AND do.state = '10A'
+    </select>
+    <select id="qryFtpJiKeData" resultType="String">
+        select CODE_VALUE from gom_BDW_code_info where CODE_TYPE = #{codeType} and CODE_TYPE_NAME = #{keyValue}
+    </select>
+    <select id="qryFtpJiKeDirData" resultType="String">
+        select SORT_NO from gom_BDW_code_info where CODE_TYPE = #{codeType} and CODE_TYPE_NAME = #{keyValue}
+    </select>
+
+    <select id="qrySrvOrderSource" resultType="String" parameterType="String">
+        SELECT SRV.RESOURCES FROM gom_bdw_srv_ord_info srv WHERE srv.order_id = #{orderId}
+    </select>
+
+    <select id="qrySrvOrderSourceFromSec" resultType="String" parameterType="String">
+        SELECT SRV.RESOURCES FROM gom_bdw_srv_ord_info srv
+        LEFT JOIN gom_bdw_sec_local_relate_info info ON info.parent_order_id = srv.order_id
+        WHERE info.order_id = #{orderId}
+    </select>
+
+    <select id="qryChildOrderState" resultType="String" parameterType="String">
+        SELECT t.order_state FROM (
+            SELECT o.order_state FROM gom_order o
+            LEFT JOIN gom_ord_key_info k ON k.order_id = o.order_id
+            WHERE o.parent_order_id = #{orderId}
+            AND k.specialty_code = #{specialtyCode}
+            AND o.parent_order_code = #{subName} ORDER BY o.create_date DESC
+        ) t WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryChildOrderDealing" resultType="int" parameterType="String">
+        SELECT COUNT(*) FROM gom_order r WHERE r.parent_order_id = #{orderId} AND r.order_state = '200000002'
+    </select>
+
+    <select id="qryToLocalChildOrderDealing" resultType="int" parameterType="String">
+        SELECT COUNT(*)
+          FROM GOM_BDW_SEC_LOCAL_RELATE_INFO INFO
+          LEFT JOIN GOM_ORDER O
+            ON O.PARENT_ORDER_ID = INFO.ORDER_ID
+         WHERE INFO.PARENT_ORDER_ID = #{orderId}
+           AND O.ORDER_STATE = '200000002'
+    </select>
+
+    <select id="qryToLocalChildOrderState" resultType="String" parameterType="String">
+        SELECT *
+          FROM (SELECT O.ORDER_STATE
+                  FROM GOM_BDW_SEC_LOCAL_RELATE_INFO R
+                  LEFT JOIN GOM_ORDER O
+                    ON O.ORDER_ID = R.ORDER_ID
+                 WHERE R.REGION_ID = #{regionId}
+                   AND R.PARENT_ORDER_ID = #{orderId}
+                 ORDER BY O.CREATE_DATE DESC)
+         WHERE ROWNUM = 1
+    </select>
+
+    <select id="qryDealingChildFlowTache" resultType="map" parameterType="String">
+        SELECT wo.order_id AS orderId,wo.wo_id AS woId,ut.tache_code AS tacheCode,
+        ut.tache_name AS tacheName,wo.wo_state AS woState FROM gom_wo wo
+        LEFT JOIN gom_ps_2_wo_s ws ON ws.id = wo.ps_id
+        LEFT JOIN uos_tache ut ON ut.id = ws.tache_id
+        WHERE wo.order_id = #{orderId} AND wo.wo_state = #{woState}
+    </select>
+
+    <select id="querySec2LocalInfo" resultType="map" parameterType="String">
+
+        SELECT order_Id FROM gom_bdw_sec_local_relate_info
+            where parent_order_id=(SELECT parent_order_id
+        FROM gom_order where order_id=#{orderId})
+    </select>
+    <select id="queryOrderIdList" resultType="map" parameterType="String">
+        SELECT DISTINCT SOI.ORDER_ID
+        FROM GOM_BDW_CST_ORD  CO
+        JOIN GOM_BDW_SRV_ORD_INFO_VIEW SOI ON CO.CST_ORD_ID=SOI.CST_ORD_ID
+        WHERE CO.CST_ORD_ID = #{cstOrdId}
+    </select>
+
+    <select id="querySecToLocalOrderCircuitDispatch" resultType="map" parameterType="string">
+        SELECT sec.relate_info_id,sec.srv_ord_id,wo.order_id,wo.wo_id,wo.wo_state,ut.tache_code,ut.tache_name
+        FROM gom_bdw_sec_local_relate_info sec
+        LEFT JOIN gom_wo wo ON wo.order_id = sec.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE sec.srv_ord_id = #{srvOrdId} AND ut.tache_code = 'CIRCUIT_DISPATCH'
+    </select>
+
+    <select id="qryIfFromSecondary" resultType="map" parameterType="String">
+        SELECT RELATE_INFO_ID,CST_ORD_ID,SRV_ORD_ID,ORDER_ID,PARENT_ORDER_ID,RESOURCES,INSTANCE_ID,REGION_ID
+         from gom_bdw_sec_local_relate_info WHERE ORDER_ID = #{orderId}
+    </select>
+
+    <select id="qrySourceDispatch" resultType="map" parameterType="String">
+        SELECT ord.order_id, ord.parent_order_id, wo.wo_id, ut.tache_code, wo.wo_state
+        FROM GOM_ORDER ord
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.parent_order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ord.order_id = #{orderId}
+        AND ut.tache_code IN ('SEC_SOURCE_DISPATCH','SEC_SOURCE_DISPATCH_2')
+        AND wo.wo_state <![CDATA[ <> ]]> '290000005'
+        ORDER BY wo.CREATE_DATE DESC
+    </select>
+
+    <select id="qrySourceDispatchSpecialty" resultType="map" parameterType="String">
+        SELECT ord.order_id,ki.specialty_code,ds.pub_date_name ,ut.tache_code,wo.wo_state
+        FROM gom_order ord
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = ord.order_id
+        LEFT JOIN gom_pub_date_s ds ON ds.pub_date_id = ki.specialty_code AND ds.df_type = 'SPECIALTY_TYPE'
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ord.parent_order_id = #{orderId}
+        AND ord.parent_order_code = 'SPECIALTY'
+        AND ord.order_state = '200000002'
+        AND ut.tache_code = 'FINISH_SOURCES_DISP'
+        AND wo.wo_state = '290000002'
+    </select>
+
+    <select id="qrySourceDispatchFinishWoOrder" resultType="map" parameterType="map">
+        SELECT ord.order_id, wo.wo_id, ut.tache_code, ki.specialty_code, ut.ID FROM gom_order ord
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN gom_ord_key_info ki ON ki.order_id = ord.order_id
+        LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = wo.ps_id
+        LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+        WHERE ki.specialty_code = #{specialtyCode} AND ut.tache_code = 'FINISH_SOURCES_DISP'
+        AND wo.wo_state = '290000002' AND ord.parent_order_id = #{orderId}
+    </select>
+
+    <select id="qryMainAreaOrderState" resultType="map" parameterType="map">
+        SELECT * FROM (
+            SELECT sec.relate_info_id,sec.order_id,ord.order_state FROM gom_bdw_sec_local_relate_info sec
+            LEFT JOIN gom_order ord ON ord.order_id = sec.order_id
+            WHERE sec.cst_ord_id = #{cstOrdId}
+            AND sec.srv_ord_id = #{srvOrdId}
+            AND sec.region_id = #{regionId} ORDER BY ord.create_date DESC
+        ) r WHERE ROWNUM = 1
+    </select>
+
+    <select id="qrySourceDispatchDealingWoOrderNum" resultType="int" parameterType="string">
+        SELECT COUNT(*) FROM gom_order ord
+        LEFT JOIN gom_wo wo ON wo.order_id = ord.order_id
+        LEFT JOIN gom_ps_2_wo_s ps ON ps.id = wo.ps_id
+        LEFT JOIN uos_tache ut ON ut.id = ps.tache_id
+        WHERE ord.parent_order_id = #{orderId}
+        AND ut.tache_code = 'SEC_SOURCE_DISPATCH_CLD'
+        AND wo.wo_state = '290000002'
+    </select>
+
+    <insert id="insertWoOrderOper" parameterType="map">
+        begin
+            insert into gom_wo_oper_attr (ID, WO_ID, ATTR_ID, ATTR_VAL, REC_STATE, CREATE_DATE, STATE_DATE, OLD_ID, IS_AUTO_SETVAL, ORDER_ID)
+            values (seq_gom_wo_oper_attr.nextval, #{woId}, 'woOrderBackFlag', #{forwardOrReverseFlag}, '170000001',
+            sysdate, sysdate, '', '', #{orderId});
+            insert into gom_bdw_wo_attr (WO_ID, ORDER_ID, BACK_FLAG)
+            values (#{woId}, #{orderId}, #{forwardOrReverseFlag});
+        end;
+    </insert>
+    <select id="qryRelateInstanceIdBySrvordId" resultType="String">
+        SELECT R.INSTANCE_ID
+        FROM GOM_BDW_SEC_LOCAL_RELATE_INFO R
+        WHERE R.SRV_ORD_ID = #{srvOrdId}
+        AND R.CONFIGSTATE  <![CDATA[ <> ]]> '10X'
+    </select>
+    <select id="queryCheckOrderStatBySrvOrdId" resultType="map" parameterType="string">
+        select  a.apply_ord_id,
+        case when b.order_type='101' then '开通单'
+        when b.order_type='102' then '核查单'
+        end as order_type
+        from gom_bdw_cst_ord a
+        join   gom_bdw_srv_ord_info b
+        on a.cst_ord_id=b.cst_ord_id
+        join (select instance_id from gom_bdw_srv_ord_info where srv_ord_id=#{srvOrdId})  c
+        on b.instance_id=c.instance_id  and b.srv_ord_stat='10N'
+        where b.srv_ord_id!=#{srvOrdId} and b.order_type='102' and b.system_resource='second-schedule-lt'
+    </select>
+
+    <select id="qryeSrvOrdStatBySrvOrdId" resultType="String" parameterType="String">
+       SELECT SRV_ORD_STAT FROM gom_bdw_srv_ord_info WHERE SRV_ORD_ID = #{srvOrdId}
+    </select>
+</mapper>

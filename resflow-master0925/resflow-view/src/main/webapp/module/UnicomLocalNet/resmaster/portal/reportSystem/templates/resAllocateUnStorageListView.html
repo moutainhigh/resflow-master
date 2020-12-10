@@ -1,0 +1,90 @@
+<div id="affairDispatcher-mainPanel">
+    <div style="padding: 15px;">
+        <form class="form-horizontal" id="resAllocateUnStorageList-form">
+            <div class="row" style="margin: 0 !important;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">单据来源</label>
+                            <div class="col-md-8 col-sm-8">
+                                <select id="resAllocateUnStorageList-resources" class="chosen-select"
+                                        data-placeholder="--请选择单据来源--" multiple="">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">资源分配提交开始时间</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="resAllocateUnStorageList-beginDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 col-sm-4 control-label">资源分配提交截至时间</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="resAllocateUnStorageList-endDate" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">资源分配专业</label>
+                            <div class="col-md-8 col-sm-8">
+                                <select id="resAllocateUnStorageList-specialtyType" class="ui-multiselect form-control"
+                                        data-placeholder="--请选择动作类型--" multiple="">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">申请单创建开始时间</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="apply-beginDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">申请单创建截至时间</label>
+                            <div class="col-md-8 col-sm-8">
+                                <input id="apply-endDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-4 col-sm-4 control-label">资源分配处理人所属分公司</label>
+                            <div class="col-md-8 col-sm-8">
+                                <select id="resAllocateUnStorageList-fpStaffOrg" class="ui-multiselect form-control"
+                                        data-placeholder="--请选择分公司--" multiple="">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    <div style="float: right">
+                        <button id="resAllocateUnStorageList-queryBtn" type="button" class="btn btn-danger">查询
+                        </button>
+                        <button id="resAllocateUnStorageList-exportBtn" type="button" class="btn btn-danger">导出
+                        </button>
+                        <button id="resAllocateUnStorageList-initStaBtn" type="button" class="btn btn-danger">生成汇总报表
+                        </button>
+                        <button type="reset" class="btn btn-default">重置</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding: 10px;">
+        <div id="resAllocateUnStorageList-grid"></div>
+    </div>
+</div>

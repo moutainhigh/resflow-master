@@ -1,0 +1,62 @@
+.mgb-15{margin-bottom: 15px;}
+
+.fileinput-button {
+    position: relative;
+    overflow: hidden;
+}
+.fileinput-button input,
+.fileinput-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    font-size: 200px;
+    direction: ltr;
+    cursor: pointer;
+    z-index: 1;
+}
+.fileinput-input {
+    width: 38px;
+    height: 32px;
+    overflow: hidden;
+    bottom: auto;
+}
+.fileinput-container {
+    position: relative;
+}
+.input-group-addon.fileinput-container {
+    padding: 0;
+}
+.input-group-addon.fileinput-container .fileinput-pick {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: -2px;
+    height: 32px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    text-align: center;
+    background-color: #eeeeee;
+    border-radius: 0;
+}
+.fileinput-container .fileinput-pick {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background: #00b7ee;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.requireds > label:before {
+    content: "*";
+    color: red;
+    padding-right: 4px;
+    vertical-align: middle;
+    display: inline-block;
+}

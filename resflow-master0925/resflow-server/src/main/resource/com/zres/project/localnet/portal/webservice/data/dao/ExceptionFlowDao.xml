@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.webservice.data.dao.ExceptionFlowDao">
+    <!--客户信息-->
+    <resultMap id="ResultCustomerInfoDTO" type="com.zres.project.localnet.portal.webservice.dto.CustomerInfoDTO">
+        <result column="CUST_NAME_CHINESE"  property="cnName"/>
+        <result column="CUST_NAME_ENGLISH"  property="enName"/>
+        <result column="CUST_ID"  property="code"/>
+        <result column="SERVICELEVEL"  property="serviceLevel" />
+        <result column="CUST_ADDRESS"  property="address" />
+        <result column="CUST_EMAIL"  property="email" />
+        <result column="CUST_TEL"  property="phone" />
+        <result column="CUST_CONTACT_MAN_NAME"  property="contact" />
+        <result column="CUST_INDUSTRY"  property="industry" />
+        <result column="UPPERCODE"  property="upperCode" />
+        <result column="UPPERNAME"  property="upperName" />
+        <result column="CST_ORD_ID"  property="cstOrdId"/>
+    </resultMap>
+    <select id="queryCustomerInfoDTO" parameterType="java.lang.String" resultMap="ResultCustomerInfoDTO">
+        SELECT
+            A.CUST_NAME_CHINESE,
+            A.CUST_NAME_ENGLISH,
+            A.CUST_ID,
+            A.SERVICELEVEL,
+            A.CUST_ADDRESS,
+            A.CUST_EMAIL,
+            A.CUST_TEL,
+            A.CUST_CONTACT_MAN_NAME,
+            A.CUST_INDUSTRY,
+            A.UPPERCODE,
+            A.UPPERNAME,
+            A.CST_ORD_ID
+        FROM GOM_BDW_CST_ORD A
+        WHERE A.CST_ORD_ID = #{cstOrdId}
+    </select>
+
+    <!--电路信息-->
+    <resultMap id="ResultProdInfoDTO" type="com.zres.project.localnet.portal.webservice.dto.ProdInfoDTO">
+        <!--TODO 需要确认secondaryOrg、prodInstId对应哪个字段-->
+      <!--  <result column="SERVICE_ID"  property="prodType"/>-->
+<!--        <result column="INSTANCE_ID"  property="prodInstId"/>-->
+       <!-- <result column="QCWOORDERCODE"  property="woOrderCode" />
+        <result column="OMORDERCODE"  property="omOrderCode" />
+        <result column="MAINORG"  property="mainOrg" />-->
+        <result column="MAINORG_BDW"  property="secondaryOrg" />
+        <result column="ACTIVE_TYPE"  property="actType" />
+        <result column="CST_ORD_ID"  property="cstOrdId" />
+        <result column="SRV_ORD_ID"  property="srvOrdId" />
+        <result column="ORDER_ID"  property="orderId" />
+        <result column="DISPATCH_ORDER_ID"  property="dispatchOrderId" />
+    </resultMap>
+    <select id="queryProdInfoDTOListByCstOrdId" parameterType="java.lang.String" resultMap="ResultProdInfoDTO">
+        SELECT distinct
+            /* A.SERVICE_ID,
+            A.INSTANCE_ID,
+            replace( b.CODE_CONTENT,' ','') AS prodName,
+            A.QCWOORDERCODE,
+            A.OMORDERCODE,
+            A.MAINORG,
+            A.MAINORG_BDW,*/
+            A.ACTIVE_TYPE,
+            A.CST_ORD_ID,
+            A.SRV_ORD_ID,
+            A.ORDER_ID,
+            GD.DISPATCH_ORDER_ID
+        FROM GOM_BDW_SRV_ORD_INFO A
+        LEFT JOIN GOM_BDW_CODE_INFO B ON A.SERVICE_ID = B.CODE_VALUE
+        LEFT JOIN GOM_BDW_DISPATCH_ORDER GD ON GD.CST_ORD_ID=A.CST_ORD_ID
+        WHERE 1 = 1
+        AND A.CST_ORD_ID = #{cstOrdId}
+        AND GD.DISPATCH_SOURCE = 'onedry'
+
+    </select>
+
+    <select id="queryProdInfoDTOListByCrmProdInstId" parameterType="java.lang.String" resultMap="ResultProdInfoDTO">
+        SELECT distinct
+        A.TRADE_TYPE_CODE,
+        /* A.SERVICE_ID,
+        replace( b.CODE_CONTENT,' ','') AS prodName,
+        A.QCWOORDERCODE,
+        A.OMORDERCODE,
+        A.MAINORG,
+        A.MAINORG_BDW,*/
+        A.ACTIVE_TYPE,
+        A.CST_ORD_ID,
+        A.SRV_ORD_ID,
+        A.ORDER_ID,
+        A.DISPATCH_ORDER_ID,
+        A.ORDER_TYPE
+        FROM GOM_BDW_SRV_ORD_INFO A
+        JOIN GOM_BDW_CST_ORD CO ON CO.CST_ORD_ID=A.CST_ORD_ID
+        LEFT JOIN GOM_BDW_CODE_INFO B ON A.SERVICE_ID = B.CODE_VALUE
+        WHERE 1 = 1
+        AND A.CRM_PROD_INST_ID = #{crmProdInstId}
+        AND A.TRADE_TYPE_CODE = #{tradeTypeCode}
+        AND A.ACTIVE_TYPE = #{actType}
+        AND CO.ONEDRY_AREA_CODE = #{onedryAreaCode}
+        AND A.SRV_ORD_STAT not in ('10X', '10F')
+        ORDER BY A.SRV_ORD_ID desc
+    </select>
+
+    <!--电路属性信息-->
+    <resultMap id="ResultProdAttrDTO" type="com.zres.project.localnet.portal.webservice.dto.ProdAttrDTO">
+        <result column="ATTR_NAME"  property="name"/>
+        <result column="ATTR_VALUE_NAME"  property="code"/>
+        <result column="ATTR_VALUE"  property="value" />
+    </resultMap>
+    <select id="queryProdAttrDTOList" parameterType="java.lang.String" resultMap="ResultProdAttrDTO">
+        SELECT
+            A.ATTR_NAME,
+            A.ATTR_VALUE_NAME,
+            A.ATTR_VALUE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <!--调单信息-->
+    <resultMap id="ResultDispatchInfoDTO" type="com.zres.project.localnet.portal.webservice.dto.DispatchInfoDTO">
+        <result column="DISPATCH_ORDER_NO"  property="dispatchOrderNo"/>
+        <result column="STAFF_NAME"  property="staffName"/>
+        <result column="STAFF_TEL"  property="staffTel" />
+        <result column="STAFF_ORG"  property="staffOrg" />
+        <result column="ISSUER"  property="issuer" />
+        <result column="SEND_DATE"  property="sendDate" />
+        <result column="DISPATCH_TYPE"  property="dispatchType" />
+        <result column="DISPATCH_GRADE"  property="dispatchGrade" />
+        <result column="DISPATCH_URGENCY"  property="dispatchUrgency" />
+        <result column="DISPATCH_TITLE"  property="dispatchTitle" />
+        <result column="DISPATCH_SEND_ORG"  property="dispatchSendOrg" />
+        <result column="DISPATCH_COPY_ORG"  property="dispatchCopyOrg" />
+        <result column="DISPATCH_TEXT"  property="dispatchText" />
+        <result column="CHANGE_BEFORE_TEXT"  property="changeBeforeText" />
+        <result column="CHANGE_AFTER_TEXT"  property="changeAfterText" />
+    </resultMap>
+    <select id="queryDispatchInfoDTO" parameterType="java.lang.String" resultMap="ResultDispatchInfoDTO">
+        SELECT
+          A.DISPATCH_ORDER_NO,
+          A.STAFF_NAME,
+          A.STAFF_TEL,
+          A.STAFF_ORG,
+          A.ISSUER,
+          A.SEND_DATE,
+          A.DISPATCH_TYPE,
+          A.DISPATCH_GRADE,
+          A.DISPATCH_URGENCY,
+          A.DISPATCH_TITLE,
+          A.DISPATCH_SEND_ORG,
+          A.DISPATCH_COPY_ORG,
+          A.DISPATCH_TEXT,
+          A.CHANGE_BEFORE_TEXT,
+          A.CHANGE_AFTER_TEXT
+        FROM GOM_BDW_DISPATCH_ORDER A
+        WHERE A.STATE = '10A' AND A.DISPATCH_ORDER_ID = #{dispatchOrderId}
+    </select>
+
+    <select id="queryMaxChangeVersion" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+          MAX(A.CHG_VERSION) AS MAX_VERSION
+        FROM GOM_CHANGE_ORDER_LOG_S A
+        WHERE A.IS_DELETE = '0'
+        AND A.SRC_CST_ORDER_ID = #{cstOrdId}
+        AND A.CHG_TYPE = #{type}
+    </select>
+
+    <insert id="insertChangeOrderLog">
+        INSERT INTO GOM_CHANGE_ORDER_LOG_S(
+            ID,
+            SRC_CST_ORDER_ID,
+            SRC_ORDER_ID,
+            CHG_ORDER_ID,
+            CHG_TYPE,
+            FILED_TYPE,
+            CHANGE_DATA,
+            CHANGE_MESSAGE,
+            CHG_VERSION
+        )VALUES(
+            SEQ_GOM_CHANGE_ORDER_LOG_S.NEXTVAL,
+            #{SRC_CST_ORDER_ID},
+            #{SRC_ORDER_ID},
+            #{CHG_ORDER_ID},
+            #{CHG_TYPE},
+            #{FILED_TYPE},
+            #{CHANGE_DATA},
+            #{CHANGE_MESSAGE},
+            #{CHG_VERSION}
+        )
+    </insert>
+
+    <select id="queryProdAttrHis" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM GOM_BDW_SRV_ORD_ATTR_INFO_HIS A
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_VALUE_NAME = #{attrValueName}
+    </select>
+
+    <insert id="insertProdAttrHis">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO_HIS(
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            SRV_ORD_ID_RELA,
+            ATTR_INFO_ID_RELA,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE,
+            SOURSE,
+            STATE
+        )
+        SELECT
+            A.ATTR_INFO_ID,
+            A.SRV_ORD_ID,
+            0,
+            0,
+            A.ATTR_ACTION,
+            A.ATTR_CODE,
+            A.ATTR_NAME,
+            A.ATTR_VALUE,
+            A.ATTR_VALUE_NAME,
+            sysdate,
+            A.SOURSE,
+            '10F'
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_VALUE_NAME = #{attrValueName}
+
+
+    </insert>
+
+    <update id="updateProdAttr">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO A
+        SET A.ATTR_VALUE = #{attrValue}
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_VALUE_NAME = #{attrValueName}
+    </update>
+
+    <select id="queryLastChangeOrderLog" parameterType="java.lang.String" resultType="map">
+        SELECT
+            B.SRV_ORD_ID,
+            A.FILED_TYPE,
+            A.CHANGE_DATA
+        FROM GOM_CHANGE_ORDER_LOG_S A
+        LEFT JOIN GOM_BDW_SRV_ORD_INFO B ON A.SRC_ORDER_ID = B.ORDER_ID
+        WHERE A.IS_DELETE = '0'
+        AND A.SRC_CST_ORDER_ID = #{cstOrdId}
+        AND A.CHG_VERSION  = #{version}
+        AND A.CHG_TYPE = #{type}
+    </select>
+
+    <select id="queryCustomerInfoHis" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM GOM_BDW_CST_ORD_HIS WHERE CST_ORD_ID = #{cstOrdId}
+    </select>
+
+    <insert id="insertCustomerInfoHis">
+        INSERT INTO GOM_BDW_CST_ORD_HIS(
+            CUST_NAME_CHINESE,
+            CUST_NAME_ENGLISH,
+            CUST_ID,
+            SERVICELEVEL,
+            CUST_ADDRESS,
+            CUST_EMAIL,
+            CUST_TEL,
+            CUST_CONTACT_MAN_NAME,
+            CUST_INDUSTRY,
+            UPPERCODE,
+            UPPERNAME,
+            CST_ORD_ID,
+            CREATE_DATE,
+            CST_ORD_ID_RELA
+        )
+        SELECT
+            A.CUST_NAME_CHINESE,
+            A.CUST_NAME_ENGLISH,
+            A.CUST_ID,
+            A.SERVICELEVEL,
+            A.CUST_ADDRESS,
+            A.CUST_EMAIL,
+            A.CUST_TEL,
+            A.CUST_CONTACT_MAN_NAME,
+            A.CUST_INDUSTRY,
+            A.UPPERCODE,
+            A.UPPERNAME,
+            A.CST_ORD_ID,
+            sysdate,
+            0
+        FROM GOM_BDW_CST_ORD A
+        WHERE A.CST_ORD_ID = #{cstOrdId}
+    </insert>
+
+    <update id="updateCustomerInfo" parameterType="java.util.Map">
+        UPDATE GOM_BDW_CST_ORD SET
+        <foreach item="value" index="key" collection="params.entrySet()" separator=",">
+            <if test="key != 'CST_ORD_ID'">
+                <if test="key != 'HANDLE_TIME'">
+                    ${key} =  #{value}
+                </if>
+                <if test="key == 'HANDLE_TIME'">
+                    ${key} =  TO_DATE(#{value}, 'yyyy-mm-dd hh24:mi:ss')
+                </if>
+            </if>
+        </foreach>
+        WHERE CST_ORD_ID = #{params.CST_ORD_ID}
+
+    </update>
+
+    <select id="queryDispatchInfoHis" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM GOM_BDW_DISPATCH_ORDER_HIS WHERE DISPATCH_ORDER_ID = #{dispatchOrderId}
+    </select>
+
+    <insert id="insertDispatchInfoHis">
+        INSERT INTO GOM_BDW_DISPATCH_ORDER_HIS(
+            DISPATCH_ORDER_ID,
+            DISPATCH_ORDER_NO,
+            CREATE_DATE,
+            DISPATCH_TITLE,
+            DISPATCH_TEXT
+        )
+        SELECT
+            A.DISPATCH_ORDER_ID,
+            A.DISPATCH_ORDER_NO,
+            sysdate,
+            A.DISPATCH_TITLE,
+            A.DISPATCH_TEXT
+        FROM GOM_BDW_DISPATCH_ORDER A
+        WHERE A.DISPATCH_ORDER_ID = #{dispatchOrderId}
+    </insert>
+
+    <update id="updateDispatchInfo" parameterType="java.util.Map">
+        UPDATE GOM_BDW_DISPATCH_ORDER SET
+        <foreach item="value" index="key" collection="params.entrySet()" separator=",">
+            <if test="key != 'DISPATCH_ORDER_ID'">
+                ${key} =  #{value}
+            </if>
+        </foreach>
+        WHERE DISPATCH_ORDER_ID = #{params.DISPATCH_ORDER_ID}
+    </update>
+
+    <select id="queryProdInfoHis" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM GOM_BDW_SRV_ORD_INFO_HIS WHERE SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <insert id="insertProdInfoHis">
+        INSERT INTO GOM_BDW_SRV_ORD_INFO_HIS(
+            SRV_ORD_ID,
+            CST_ORD_ID,
+            ORDER_ID,
+            CST_ORD_ID_RELA,
+            SRV_ORD_ID_RELA,
+            SERVICE_ID,
+            QCWOORDERCODE,
+            OMORDERCODE,
+            MAINORG,
+            MAINORG_BDW,
+            ACTIVE_TYPE
+        )
+        SELECT
+            A.SRV_ORD_ID,
+            A.CST_ORD_ID,
+            A.ORDER_ID,
+            0,
+            0,
+            A.SERVICE_ID,
+            A.QCWOORDERCODE,
+            A.OMORDERCODE,
+            A.MAINORG,
+            A.MAINORG_BDW,
+            A.ACTIVE_TYPE
+        FROM GOM_BDW_SRV_ORD_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+    </insert>
+
+    <update id="updateProdInfo" parameterType="java.util.Map">
+        UPDATE GOM_BDW_SRV_ORD_INFO SET
+        <foreach item="value" index="key" collection="params.entrySet()" separator=",">
+            <if test="key != 'SRV_ORD_ID'">
+                ${key} =  #{value}
+            </if>
+        </foreach>
+        WHERE SRV_ORD_ID = #{params.SRV_ORD_ID}
+    </update>
+
+    <select id="getOrderSpec" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT
+            A.AREA_ID,
+            B.OBJ_TYPE,
+            B.ACT_TYPE
+        FROM GOM_ORDER A
+        LEFT JOIN GOM_PS_2_ORD_S B ON A.PS_ID=B.ID
+        WHERE A.ORDER_ID=#{orderId}
+    </select>
+
+    <update id="updateOrderReqFinDate">
+        UPDATE GOM_ORDER A SET A.REQ_FIN_DATE = TO_DATE(#{reqFinDate}, 'yyyy-mm-dd hh24:mi:ss')
+        WHERE A.ORDER_ID = (SELECT ORDER_ID FROM GOM_BDW_SRV_ORD_INFO WHERE SRV_ORD_ID = #{srvOrdId})
+    </update>
+
+    <select id="queryProdAttrDTOListByAttrValueName" parameterType="java.lang.String" resultMap="ResultProdAttrDTO">
+        SELECT
+            A.ATTR_NAME,
+            A.ATTR_VALUE_NAME,
+            A.ATTR_VALUE
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+        AND A.ATTR_VALUE_NAME = #{attrValueName}
+    </select>
+
+    <insert id="insertProdAttr">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            ATTR_ACTION,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE,
+            SOURSE
+        ) VALUES (
+            SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL,
+            #{srvOrdId},
+            '0',
+            #{attrName},
+            #{attrValue},
+            #{attrValueName},
+            sysdate,
+            'onedry'
+        )
+    </insert>
+
+    <insert id="insertProdAttrForSure">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            ATTR_ACTION,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE
+        )
+        select
+            SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL ,
+            #{srvOrdId},
+            '0',
+            (select max(attr_name) || '' from  gom_BDW_srv_ord_attr_info where attr_value_name = #{attrValueName}) as attr_name,
+            #{attrValue},
+            #{attrValueName},
+            sysdate
+        from dual
+    </insert>
+
+
+    <!--集客异常单接口的方法start-->
+    <!--电路基本信息-->
+    <resultMap id="JiKeResultProdInfoDTO" type="com.zres.project.localnet.portal.webservice.dto.JiKeProdInfoDTO">
+        <result column="SERVICE_ID"  property="serviceId"/>
+        <result column="TRADE_TYPE_CODE"  property="tradeTypeCode"/>
+        <result column="ACTIVE_TYPE"  property="activeType"/>
+        <result column="SERVICE_OFFER_ID"  property="serviceOfferId"/>
+        <result column="SERIAL_NUMBER"  property="serialNumber"/>
+        <result column="TRADE_ID"  property="tradeId"/>
+        <result column="TRADE_ID_RELA"  property="tradeIdRela"/>
+        <result column="USER_ID"  property="userId"/>
+        <result column="FLOW_ID"  property="flowId"/>
+        <result column="CST_ORD_ID"  property="cstOrdId" />
+        <result column="SRV_ORD_ID"  property="srvOrdId" />
+        <result column="ORDER_ID"  property="orderId" />
+    </resultMap>
+    <select id="queryProdInfoDTOListByTradeId" parameterType="java.lang.String" resultMap="JiKeResultProdInfoDTO">
+        SELECT
+        A.SERVICE_ID,
+        replace( B.CODE_CONTENT,' ','') AS serviceName,
+        A.TRADE_TYPE_CODE,
+        A.ACTIVE_TYPE,
+        A.SERVICE_OFFER_ID,
+        A.SERIAL_NUMBER,
+        A.TRADE_ID,
+        A.TRADE_ID_RELA,
+        A.USER_ID,
+        A.FLOW_ID,
+        A.CST_ORD_ID,
+        A.SRV_ORD_ID,
+        A.ORDER_ID,
+        A.ORDER_TYPE
+        FROM GOM_BDW_SRV_ORD_INFO A
+        LEFT JOIN GOM_BDW_CODE_INFO B ON A.SERVICE_ID = B.CODE_VALUE  and code_type='product_code'
+        WHERE 1 = 1
+        AND A.TRADE_ID = #{tradeIdRela} and srv_ord_stat='10N'
+        <if test="serviceOfferId != null and serviceOfferId != '' ">
+            and service_offer_id=#{serviceOfferId}
+        </if>
+        order by a.create_date desc
+    </select>
+
+    <select id="queryJiKeProdInfoDTOListByCstOrdId" parameterType="java.lang.String" resultMap="JiKeResultProdInfoDTO">
+        SELECT
+            A.SERVICE_ID,
+            replace( B.CODE_CONTENT,' ','') AS serviceName,
+            A.TRADE_TYPE_CODE,
+            A.ACTIVE_TYPE,
+            A.SERVICE_OFFER_ID,
+            A.SERIAL_NUMBER,
+            A.TRADE_ID,
+            A.TRADE_ID_RELA,
+            A.USER_ID,
+            A.FLOW_ID,
+            A.CST_ORD_ID,
+            A.SRV_ORD_ID,
+            A.ORDER_ID
+        FROM GOM_BDW_SRV_ORD_INFO A
+         JOIN GOM_BDW_CODE_INFO B ON A.SERVICE_ID = B.CODE_VALUE and code_type='product_code'
+        WHERE 1 = 1
+        AND A.CST_ORD_ID = #{cstOrdId}
+    </select>
+
+    <!--电路属性信息-->
+    <resultMap id="JiKeResultProdAttrDTO" type="com.zres.project.localnet.portal.webservice.dto.JiKeProdAttrDTO">
+        <result column="ATTR_ACTION"  property="attrAction"/>
+        <result column="ATTR_CODE"  property="attrCode"/>
+        <result column="ATTR_NAME"  property="attrName"/>
+        <result column="ATTR_VALUE"  property="attrValue" />
+        <result column="ATTR_VALUE_NAME"  property="attrValueName"/>
+    </resultMap>
+    <select id="queryJiKeProdAttrDTOList" parameterType="java.lang.String" resultMap="JiKeResultProdAttrDTO">
+        SELECT
+            A.ATTR_ACTION,
+            A.ATTR_CODE,
+            A.ATTR_NAME,
+            A.ATTR_VALUE,
+            A.ATTR_VALUE_NAME
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+    </select>
+
+    <!--客户信息-->
+    <resultMap id="JiKeResultCustomerInfoDTO" type="com.zres.project.localnet.portal.webservice.dto.JiKeCustomInfoDTO">
+        <result column="PROJECT_TYPE"  property="projectType"/>
+        <result column="NETWORK_LEVEL"  property="networkLevel"/>
+        <result column="DEAL_AREA_CODE"  property="dealAreaCode"/>
+        <result column="GROUP_PM_ID"  property="groupPmId"/>
+        <result column="GROUP_PM_NAME"  property="groupPmName"/>
+
+        <result column="GROUP_PM_TEL"  property="groupPmTel"/>
+        <result column="GROUP_PM_EMAIL"  property="groupPmEmail"/>
+        <result column="PROVINCE_PM_ID"  property="provincePmId"/>
+        <result column="PROVINCE_PM_NAME"  property="provincePmName"/>
+        <result column="PROVINCE_PM_TEL"  property="provincePmTel"/>
+
+        <result column="PROVINCE_PM_EMAIL"  property="provincePmEmail"/>
+        <result column="INIT_AM_ID"  property="initAmId"/>
+        <result column="INIT_AM_NAME"  property="initAmName"/>
+        <result column="INIT_AM_TEL"  property="initAmTel"/>
+        <result column="INIT_AM_EMAIL"  property="initAmEmail"/>
+
+        <result column="HANDLE_TIME"  property="acceptDate"/>
+        <result column="HANDLE_CITY_ID"  property="tradeEparchyCode"/>
+        <result column="HANDLE_DEP"  property="departName"/>
+        <result column="HANDLE_MAN_NAME"  property="tradeStaffName"/>
+        <result column="HANDLE_MAN_TEL"  property="tradeStaffPhone"/>
+
+        <result column="REMARK"  property="remark"/>
+        <result column="CUST_ID"  property="custId"/>
+        <result column="CONTRACT_ID"  property="contractId"/>
+        <result column="CONTRACT_NAME"  property="contractName"/>
+        <result column="CUST_NAME_CHINESE"  property="custNameChinese"/>
+
+        <result column="CUST_NAME_ENGLISH"  property="custNameEnglish"/>
+        <result column="CUST_ADDRESS"  property="custAddress"/>
+        <result column="CUST_INDUSTRY"  property="custIndustry"/>
+        <result column="CUST_TYPE"  property="custType"/>
+        <result column="CUST_PROVINCE"  property="custProvince"/>
+
+        <result column="CUST_CITY"  property="custCity"/>
+        <result column="CUST_TEL"  property="custTel"/>
+        <result column="CUST_FAX"  property="custFax"/>
+        <result column="CUST_EMAIL"  property="custEmail"/>
+        <result column="CUST_CONTACT_MAN_ID"  property="custContactManId"/>
+
+        <result column="CUST_CONTACT_MAN_NAME"  property="custContactManName"/>
+        <result column="CUST_CONTACT_MAN_TEL"  property="custContactManTel"/>
+        <result column="CUST_CONTACT_MAN_EMAIL"  property="custContactManEmail"/>
+        <result column="CUST_OPERATOR_NAME"  property="custOperatorName"/>
+        <result column="CUST_OPERATOR_TEL"  property="custOperatorTel"/>
+
+        <result column="CUST_OPERATOR_EMAIL"  property="custOperatorEmail"/>
+
+    </resultMap>
+    <select id="queryJiKeCustomerInfoDTO" parameterType="java.lang.String" resultMap="JiKeResultCustomerInfoDTO">
+        SELECT
+            A.PROJECT_TYPE,
+            A.NETWORK_LEVEL,
+            A.DEAL_AREA_CODE,
+            A.GROUP_PM_ID,
+            A.GROUP_PM_NAME,
+            A.GROUP_PM_TEL,
+            A.GROUP_PM_EMAIL,
+            A.PROVINCE_PM_ID,
+            A.PROVINCE_PM_NAME,
+            A.PROVINCE_PM_TEL,
+            A.PROVINCE_PM_EMAIL,
+            A.INIT_AM_ID,
+            A.INIT_AM_NAME,
+            A.INIT_AM_TEL,
+            A.INIT_AM_EMAIL,
+            A.HANDLE_TIME,
+            A.HANDLE_CITY_ID,
+            A.HANDLE_DEP,
+            A.HANDLE_MAN_NAME,
+            A.HANDLE_MAN_TEL,
+            A.REMARK,
+            A.CUST_ID,
+            A.CONTRACT_ID,
+            A.CONTRACT_NAME,
+            A.CUST_NAME_CHINESE,
+            A.CUST_NAME_ENGLISH,
+            A.CUST_ADDRESS,
+            A.CUST_INDUSTRY,
+            A.CUST_TYPE,
+            A.CUST_PROVINCE,
+            A.CUST_CITY,
+            A.CUST_TEL,
+            A.CUST_FAX,
+            A.CUST_EMAIL,
+            A.CUST_CONTACT_MAN_ID,
+            A.CUST_CONTACT_MAN_NAME,
+            A.CUST_CONTACT_MAN_TEL,
+            A.CUST_CONTACT_MAN_EMAIL,
+            A.CUST_OPERATOR_NAME,
+            A.CUST_OPERATOR_TEL,
+            A.CUST_OPERATOR_EMAIL
+        FROM GOM_BDW_CST_ORD A
+        WHERE A.CST_ORD_ID = #{cstOrdId}
+    </select>
+
+    <select id="getPropertyNameById"  parameterType="java.lang.String" resultType="String">
+        SELECT PROPERTY_NAME FROM gom_bdw_property_info WHERE PROPERTY_ID = #{propertyId}
+    </select>
+
+    <insert id="insertJiKeCustomerInfoHis">
+        INSERT INTO GOM_BDW_CST_ORD_HIS(
+            PROJECT_TYPE,
+            NETWORK_LEVEL,
+            DEAL_AREA_CODE,
+            GROUP_PM_ID,
+            GROUP_PM_NAME,
+            GROUP_PM_TEL,
+            GROUP_PM_EMAIL,
+            PROVINCE_PM_ID,
+            PROVINCE_PM_NAME,
+            PROVINCE_PM_TEL,
+            PROVINCE_PM_EMAIL,
+            INIT_AM_ID,
+            INIT_AM_NAME,
+            INIT_AM_TEL,
+            INIT_AM_EMAIL,
+            HANDLE_TIME,
+            HANDLE_CITY,
+            HANDLE_DEP,
+            HANDLE_MAN_NAME,
+            HANDLE_MAN_TEL,
+            REMARK,
+            CUST_ID,
+            CONTRACT_ID,
+            CONTRACT_NAME,
+            CUST_NAME_CHINESE,
+            CUST_NAME_ENGLISH,
+            CUST_ADDRESS,
+            CUST_INDUSTRY,
+            CUST_TYPE,
+            CUST_PROVINCE,
+            CUST_CITY,
+            CUST_TEL,
+            CUST_FAX,
+            CUST_EMAIL,
+            CUST_CONTACT_MAN_ID,
+            CUST_CONTACT_MAN_NAME,
+            CUST_CONTACT_MAN_TEL,
+            CUST_CONTACT_MAN_EMAIL,
+            CUST_OPERATOR_NAME,
+            CUST_OPERATOR_TEL,
+            CUST_OPERATOR_EMAIL,
+            CST_ORD_ID,
+            CREATE_DATE,
+            CST_ORD_ID_RELA
+        )
+        SELECT
+            A.PROJECT_TYPE,
+            A.NETWORK_LEVEL,
+            A.DEAL_AREA_CODE,
+            A.GROUP_PM_ID,
+            A.GROUP_PM_NAME,
+            A.GROUP_PM_TEL,
+            A.GROUP_PM_EMAIL,
+            A.PROVINCE_PM_ID,
+            A.PROVINCE_PM_NAME,
+            A.PROVINCE_PM_TEL,
+            A.PROVINCE_PM_EMAIL,
+            A.INIT_AM_ID,
+            A.INIT_AM_NAME,
+            A.INIT_AM_TEL,
+            A.INIT_AM_EMAIL,
+            A.HANDLE_TIME,
+            A.HANDLE_CITY,
+            A.HANDLE_DEP,
+            A.HANDLE_MAN_NAME,
+            A.HANDLE_MAN_TEL,
+            A.REMARK,
+            A.CUST_ID,
+            A.CONTRACT_ID,
+            A.CONTRACT_NAME,
+            A.CUST_NAME_CHINESE,
+            A.CUST_NAME_ENGLISH,
+            A.CUST_ADDRESS,
+            A.CUST_INDUSTRY,
+            A.CUST_TYPE,
+            A.CUST_PROVINCE,
+            A.CUST_CITY,
+            A.CUST_TEL,
+            A.CUST_FAX,
+            A.CUST_EMAIL,
+            A.CUST_CONTACT_MAN_ID,
+            A.CUST_CONTACT_MAN_NAME,
+            A.CUST_CONTACT_MAN_TEL,
+            A.CUST_CONTACT_MAN_EMAIL,
+            A.CUST_OPERATOR_NAME,
+            A.CUST_OPERATOR_TEL,
+            A.CUST_OPERATOR_EMAIL,
+            A.CST_ORD_ID,
+            sysdate,
+            0
+        FROM GOM_BDW_CST_ORD A
+        WHERE A.CST_ORD_ID = #{cstOrdId}
+    </insert>
+
+    <insert id="insertJiKeProdInfoHis">
+        INSERT INTO GOM_BDW_SRV_ORD_INFO_HIS(
+            SERVICE_ID,
+            TRADE_TYPE_CODE,
+            ACTIVE_TYPE,
+            SERVICE_OFFER_ID,
+            SERIAL_NUMBER,
+            TRADE_ID,
+            TRADE_ID_RELA,
+            USER_ID,
+            FLOW_ID,
+            CST_ORD_ID,
+            SRV_ORD_ID,
+            ORDER_ID,
+            CST_ORD_ID_RELA,
+            SRV_ORD_ID_RELA
+        )
+        SELECT
+            A.SERVICE_ID,
+            A.TRADE_TYPE_CODE,
+            A.ACTIVE_TYPE,
+            A.SERVICE_OFFER_ID,
+            A.SERIAL_NUMBER,
+            A.TRADE_ID,
+            A.TRADE_ID_RELA,
+            A.USER_ID,
+            A.FLOW_ID,
+            A.CST_ORD_ID,
+            A.SRV_ORD_ID,
+            A.ORDER_ID,
+            0,
+            0
+        FROM GOM_BDW_SRV_ORD_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+    </insert>
+
+    <select id="queryJiKeProdAttrHis" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM GOM_BDW_SRV_ORD_ATTR_INFO_HIS A
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_CODE = #{attrCode}
+    </select>
+
+    <insert id="insertJiKeProdAttrHis">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO_HIS(
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            SRV_ORD_ID_RELA,
+            ATTR_INFO_ID_RELA,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_NAME,
+            ATTR_VALUE,
+            ATTR_VALUE_NAME,
+            CREATE_DATE,
+            SOURSE,
+            STATE
+        )
+        SELECT
+            A.ATTR_INFO_ID,
+            A.SRV_ORD_ID,
+            0,
+            0,
+            A.ATTR_ACTION,
+            A.ATTR_CODE,
+            A.ATTR_NAME,
+            A.ATTR_VALUE,
+            A.ATTR_VALUE_NAME,
+            sysdate,
+            A.SOURSE,
+            '10F'
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_CODE = #{attrCode}
+    </insert>
+
+    <update id="updateJiKeProdAttr">
+        UPDATE GOM_BDW_SRV_ORD_ATTR_INFO A
+        SET A.ATTR_VALUE = #{attrValue}
+        WHERE A.SRV_ORD_ID = #{srvOrdId} AND A.ATTR_CODE = #{attrCode}
+    </update>
+
+    <select id="getPropertyById" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select  distinct  property_id ,property_name from gom_bdw_property_info where selectstat=1 and PROPERTY_ID = #{propertyId}
+    </select>
+
+    <select id="getCodeContent"  parameterType="java.lang.String" resultType="String">
+        select code_content from gom_bdw_code_info where code_type = #{codeType} and code_value= #{codeValue}
+    </select>
+
+    <select id="queryJiKeProdAttrDTOListByAttrCode" parameterType="java.lang.String" resultMap="JiKeResultProdAttrDTO">
+        SELECT
+            A.ATTR_ACTION,
+            A.ATTR_CODE,
+            A.ATTR_NAME,
+            A.ATTR_VALUE,
+            A.ATTR_VALUE_NAME
+        FROM GOM_BDW_SRV_ORD_ATTR_INFO A
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+        AND A.ATTR_CODE = #{attrCode}
+    </select>
+
+    <select id="lstCldOrderIds" resultType="java.lang.String">
+        SELECT ORDER_ID FROM GOM_ORDER WHERE PARENT_ORDER_ID = #{pOrderId} AND ORDER_STATE = #{orderState}
+        UNION ALL
+        SELECT A.ORDER_ID FROM GOM_BDW_SEC_LOCAL_RELATE_INFO A
+                                   JOIN GOM_ORDER B ON B.ORDER_ID = A.ORDER_ID
+        WHERE A.PARENT_ORDER_ID = #{pOrderId} AND B.ORDER_STATE = #{orderState}
+    </select>
+
+    <insert id="insertJiKeProdAttr">
+        INSERT INTO GOM_BDW_SRV_ORD_ATTR_INFO (
+            ATTR_INFO_ID,
+            SRV_ORD_ID,
+            ATTR_ACTION,
+            ATTR_CODE,
+            ATTR_VALUE,
+            CREATE_DATE,
+            SOURSE
+        ) VALUES (
+            SEQ_GOM_BDW_SRV_ORD_ATTR_INFO.NEXTVAL,
+            #{srvOrdId},
+            '0',
+            #{attrCode},
+            #{attrValue},
+            sysdate,
+            'jike'
+        )
+    </insert>
+
+    <!--集客异常单接口的方法end-->
+
+    <update id="updateSrvOrdState">
+         UPDATE GOM_BDW_SRV_ORD_INFO A
+        SET A.SRV_ORD_STAT = #{srvOrdStat}
+        WHERE A.SRV_ORD_ID = #{srvOrdId}
+    </update>
+
+    <update id="updStateCancelOrder" parameterType="string">
+        begin
+            UPDATE GOM_ORDER
+               SET ORDER_STATE = '200000005', STATE_DATE = sysdate
+             WHERE ORDER_ID = #{orderId} ;
+             UPDATE GOM_WO SET WO_STATE = '290000005', STATE_DATE = sysdate
+             WHERE WO_ID IN (SELECT WO_ID
+                               FROM GOM_WO WO
+                              WHERE WO.ORDER_ID = #{orderId}
+                                AND WO.WO_STATE = '290000002');
+        end;
+    </update>
+
+</mapper>

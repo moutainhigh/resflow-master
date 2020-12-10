@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zres.project.localnet.portal.flowdealinfo.data.dao.CheckFeedbackDao">
+    <select id="queryInfoByWoId"  resultType="map">
+        SELECT ID,SRV_ORD_ID,WO_ID,A_CONSTRUCT_SCHEME,A_ACCESS_ROOM,A_INVESTMENT_AMOUNT,A_CONSTRUCT_PERIOD,A_RES_SATISFY,Z_CONSTRUCT_SCHEME,Z_ACCESS_ROOM,Z_INVESTMENT_AMOUNT,Z_CONSTRUCT_PERIOD,Z_RES_SATISFY,L_SPECIAL_INVESTMENT_AMOUNT,CREATE_DATE,A_RES_PROVIDE,Z_RES_PROVIDE,A_RES_ACCESS,Z_RES_ACCESS,A_EQUIP_READY,Z_EQUIP_READY
+        FROM GOM_BDW_CHECK_FEEDBACK WHERE WO_ID= #{woId}
+    </select>
+    <select id="queryCheckFeedBackInfoByWoId"  resultType="map">
+       SELECT A.ID,A.SRV_ORD_ID,A.WO_ID,A.A_CONSTRUCT_SCHEME,A.A_ACCESS_ROOM,A.A_INVESTMENT_AMOUNT,A.A_CONSTRUCT_PERIOD,A.A_RES_SATISFY,A.Z_CONSTRUCT_SCHEME,A.Z_ACCESS_ROOM,A.Z_INVESTMENT_AMOUNT,A.Z_CONSTRUCT_PERIOD,A.Z_RES_SATISFY,A.CREATE_DATE,A.A_RES_PROVIDE,A.Z_RES_PROVIDE,A.A_RES_ACCESS,A.Z_RES_ACCESS,A.A_EQUIP_READY,A.Z_EQUIP_READY,
+	   A.Z_RES_PROVIDE_STAND,A.A_RES_PROVIDE_STAND,
+        A.A_BOARD_READY,A.Z_BOARD_READY,
+		A.A_TRANS_READY,A.Z_TRANS_READY,
+		A.A_OPTICAL_READY,A.Z_OPTICAL_READY,
+		A.A_BOARD_PERIOD,A.Z_BOARD_PERIOD,A.A_BOARD_AMOUNT,A.Z_BOARD_AMOUNT,
+		A.A_BOARD_TYPE,A.Z_BOARD_TYPE,A.A_BOARD_MODEL,A.Z_BOARD_MODEL,
+		A.A_TRANS_PERIOD,A.Z_TRANS_PERIOD,A.A_TRANS_AMOUNT,A.Z_TRANS_AMOUNT,
+		A.A_TRANS_TYPE,A.Z_TRANS_TYPE,
+		A.A_OTHER_TYPE,A.Z_OTHER_TYPE,
+		A.A_TRANS_MODEL,A.Z_TRANS_MODEL,A.A_OPTICAL_PERIOD,A.Z_OPTICAL_PERIOD,
+		A.A_OPTICAL_AMOUNT,A.Z_OPTICAL_AMOUNT,A.A_CONSTRUCT_PERIOD_STAND,A.Z_CONSTRUCT_PERIOD_STAND,
+		A.A_PROJECT_AMOUNT,A.Z_PROJECT_AMOUNT,A.A_PROJECT_OVERVIEW,A.Z_PROJECT_OVERVIEW,
+		A.A_MUNICIPAL_APPROVAL,Z_MUNICIPAL_APPROVAL,
+		A.A_APPROVAL_PERIOD,A.Z_APPROVAL_PERIOD,
+        A.A_RES_DESC,A.Z_RES_DESC,
+		A.A_PROPERTY_REDLINE,A.Z_PROPERTY_REDLINE,
+		A.A_PROPERTY_DESC,A.Z_PROPERTY_DESC,
+		A.A_CUST_ROOM,A.Z_CUST_ROOM,
+		A.A_ACCESS_PROJECT_SCHEME,A.Z_ACCESS_PROJECT_SCHEME,A.A_RES_EXPLORER,A.Z_RES_EXPLORER,
+		A.A_RES_EXPLOR_CONTACT,A.Z_RES_EXPLOR_CONTACT,
+		A.A_RES_HAVE,A.Z_RES_HAVE,
+		A.A_TOTAL_AMOUNT,A.Z_TOTAL_AMOUNT,A.A_LONGEST_PERIOD,A.Z_LONGEST_PERIOD,
+		A.A_UNABLE_RELOVE,A.Z_UNABLE_RELOVE,A.ACCESS_CIR_TYPE,A.OTHER_ACE_CIR_TYPE,A.UPLINK_NODE_PORT,
+		A.COLLECT_RES,A.COLLECT_MONEY,
+		A.COLLECT_DAY,A.COLLECT_DESC,A.TACHE_ID
+		FROM GOM_BDW_CHECK_FEEDBACK A WHERE A.WO_ID= #{woId}
+    </select>
+    <select id="queryCheckFeedBackInfoByWoIdList"  resultType="map">
+        SELECT A.ID,A.SRV_ORD_ID,A.WO_ID,A.A_CONSTRUCT_SCHEME,A.A_ACCESS_ROOM,A.A_INVESTMENT_AMOUNT,A.A_CONSTRUCT_PERIOD,A.A_RES_SATISFY,A.Z_CONSTRUCT_SCHEME,A.Z_ACCESS_ROOM,A.Z_INVESTMENT_AMOUNT,A.Z_CONSTRUCT_PERIOD,A.Z_RES_SATISFY,A.CREATE_DATE,A.A_RES_PROVIDE,A.Z_RES_PROVIDE,A.A_RES_ACCESS,A.Z_RES_ACCESS,A.A_EQUIP_READY,A.Z_EQUIP_READY,
+        A.Z_RES_PROVIDE_STAND,A.A_RES_PROVIDE_STAND,
+        A.A_BOARD_READY,A.Z_BOARD_READY,
+        A.A_TRANS_READY,A.Z_TRANS_READY,
+        A.A_OPTICAL_READY,A.Z_OPTICAL_READY,
+        A.A_BOARD_PERIOD,A.Z_BOARD_PERIOD,A.A_BOARD_AMOUNT,A.Z_BOARD_AMOUNT,
+        A.A_BOARD_TYPE,A.Z_BOARD_TYPE,A.A_BOARD_MODEL,A.Z_BOARD_MODEL,
+        A.A_TRANS_PERIOD,A.Z_TRANS_PERIOD,A.A_TRANS_AMOUNT,A.Z_TRANS_AMOUNT,
+        A.A_TRANS_TYPE,A.Z_TRANS_TYPE,
+        A.A_OTHER_TYPE,A.Z_OTHER_TYPE,
+        A.A_TRANS_MODEL,A.Z_TRANS_MODEL,A.A_OPTICAL_PERIOD,A.Z_OPTICAL_PERIOD,
+        A.A_OPTICAL_AMOUNT,A.Z_OPTICAL_AMOUNT,A.A_CONSTRUCT_PERIOD_STAND,A.Z_CONSTRUCT_PERIOD_STAND,
+        A.A_PROJECT_AMOUNT,A.Z_PROJECT_AMOUNT,A.A_PROJECT_OVERVIEW,A.Z_PROJECT_OVERVIEW,
+        A.A_MUNICIPAL_APPROVAL,Z_MUNICIPAL_APPROVAL,
+        A.A_APPROVAL_PERIOD,A.Z_APPROVAL_PERIOD,
+        A.A_RES_DESC,A.Z_RES_DESC,
+        A.A_PROPERTY_REDLINE,A.Z_PROPERTY_REDLINE,
+        A.A_PROPERTY_DESC,A.Z_PROPERTY_DESC,
+        A.A_CUST_ROOM,A.Z_CUST_ROOM,
+        A.A_ACCESS_PROJECT_SCHEME,A.Z_ACCESS_PROJECT_SCHEME,A.A_RES_EXPLORER,A.Z_RES_EXPLORER,
+        A.A_RES_EXPLOR_CONTACT,A.Z_RES_EXPLOR_CONTACT,
+        A.A_RES_HAVE,A.Z_RES_HAVE,
+        A.A_TOTAL_AMOUNT,A.Z_TOTAL_AMOUNT,A.A_LONGEST_PERIOD,A.Z_LONGEST_PERIOD,
+        A.A_UNABLE_RELOVE,A.Z_UNABLE_RELOVE,A.ACCESS_CIR_TYPE,A.OTHER_ACE_CIR_TYPE,A.UPLINK_NODE_PORT,
+        A.COLLECT_RES,A.COLLECT_MONEY,
+        A.COLLECT_DAY,A.COLLECT_DESC,A.TACHE_ID
+        FROM GOM_BDW_CHECK_FEEDBACK A WHERE A.WO_ID IN
+        <foreach collection="woIdList" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </select>
+    <select id="queryLocalInfoByWoId"  resultType="map">
+        SELECT L_CONSTRUCT_SCHEME,L_RES_SATISFY,L_INVESTMENT_AMOUNT,L_CONSTRUCT_PERIOD
+        FROM GOM_BDW_CHECK_FEEDBACK WHERE WO_ID= #{woId}
+    </select>
+    <delete id="deleteInfoByWoId" parameterType="java.lang.String">
+        DELETE FROM GOM_BDW_CHECK_FEEDBACK WHERE WO_ID= #{woId}
+    </delete>
+    <insert id="insertCheckInfo" parameterType="map">
+        INSERT INTO GOM_BDW_CHECK_FEEDBACK (ID,SRV_ORD_ID,WO_ID,TACHE_ID,AREAID,AREAA,AREAZ
+            <if test = "A_CONSTRUCT_SCHEME!=null">,A_CONSTRUCT_SCHEME</if>
+            <if test = "A_ACCESS_ROOM!=null">,A_ACCESS_ROOM</if>
+            <if test = "A_INVESTMENT_AMOUNT!=null">,A_INVESTMENT_AMOUNT</if>
+            <if test = "A_CONSTRUCT_PERIOD!=null">,A_CONSTRUCT_PERIOD</if>
+            <if test = "A_RES_SATISFY!=null">,A_RES_SATISFY</if>
+            <if test = "Z_CONSTRUCT_SCHEME!=null">,Z_CONSTRUCT_SCHEME</if>
+            <if test = "Z_ACCESS_ROOM!=null">,Z_ACCESS_ROOM</if>
+            <if test = "Z_INVESTMENT_AMOUNT!=null">,Z_INVESTMENT_AMOUNT</if>
+            <if test = "Z_CONSTRUCT_PERIOD!=null">,Z_CONSTRUCT_PERIOD</if>
+            <if test = "Z_RES_SATISFY!=null">,Z_RES_SATISFY</if>
+        <if test = "L_CONSTRUCT_SCHEME!=null">,L_CONSTRUCT_SCHEME</if>
+        <if test = "L_INVESTMENT_AMOUNT!=null">,L_INVESTMENT_AMOUNT</if>
+        <if test = "L_CONSTRUCT_PERIOD!=null">,L_CONSTRUCT_PERIOD</if>
+        <if test = "L_RES_SATISFY!=null">,L_RES_SATISFY</if>
+        <if test = "L_SPECIAL_INVESTMENT_AMOUNT!=null">,L_SPECIAL_INVESTMENT_AMOUNT</if>
+        <if test = "A_RES_PROVIDE!=null">,A_RES_PROVIDE</if>
+        <if test = "Z_RES_PROVIDE!=null">,Z_RES_PROVIDE</if>
+        <if test = "A_RES_ACCESS!=null">,A_RES_ACCESS</if>
+        <if test = "Z_RES_ACCESS!=null">,Z_RES_ACCESS</if>
+        <if test = "A_EQUIP_READY!=null">,A_EQUIP_READY</if>
+        <if test = "Z_EQUIP_READY!=null">,Z_EQUIP_READY</if>
+        /**  新增核查标准化字段   */
+        <if test = "A_RES_PROVIDE_STAND!=null">,A_RES_PROVIDE_STAND</if>
+        <if test = "A_BOARD_READY!=null">,A_BOARD_READY</if>
+        <if test = "A_TRANS_READY!=null">,A_TRANS_READY</if>
+        <if test = "A_OPTICAL_READY!=null">,A_OPTICAL_READY</if>
+        <if test = "A_BOARD_PERIOD!=null">,A_BOARD_PERIOD</if>
+        <if test = "A_BOARD_AMOUNT!=null">,A_BOARD_AMOUNT</if>
+        <if test = "A_BOARD_TYPE!=null">,A_BOARD_TYPE</if>
+        <if test = "A_BOARD_MODEL!=null">,A_BOARD_MODEL</if>
+        <if test = "A_TRANS_PERIOD!=null">,A_TRANS_PERIOD</if>
+        <if test = "A_TRANS_AMOUNT!=null">,A_TRANS_AMOUNT</if>
+        <if test = "A_TRANS_TYPE!=null">,A_TRANS_TYPE</if>
+        <if test = "A_OTHER_TYPE!=null">,A_OTHER_TYPE</if>
+        <if test = "A_TRANS_MODEL!=null">,A_TRANS_MODEL</if>
+        <if test = "A_OPTICAL_PERIOD!=null">,A_OPTICAL_PERIOD</if>
+        <if test = "A_OPTICAL_AMOUNT!=null">,A_OPTICAL_AMOUNT</if>
+        <if test = "A_CONSTRUCT_PERIOD_STAND!=null">,A_CONSTRUCT_PERIOD_STAND</if>
+        <if test = "A_PROJECT_AMOUNT!=null">,A_PROJECT_AMOUNT</if>
+        <if test = "A_PROJECT_OVERVIEW!=null">,A_PROJECT_OVERVIEW</if>
+        <if test = "A_MUNICIPAL_APPROVAL!=null">,A_MUNICIPAL_APPROVAL</if>
+        <if test = "A_APPROVAL_PERIOD!=null">,A_APPROVAL_PERIOD</if>
+        <if test = "A_RES_DESC!=null">,A_RES_DESC</if>
+        <if test = "A_PROPERTY_REDLINE!=null">,A_PROPERTY_REDLINE</if>
+        <if test = "A_PROPERTY_DESC!=null">,A_PROPERTY_DESC</if>
+        <if test = "A_CUST_ROOM!=null">,A_CUST_ROOM</if>
+        <if test = "A_ACCESS_PROJECT_SCHEME!=null">,A_ACCESS_PROJECT_SCHEME</if>
+        <if test = "A_RES_EXPLORER!=null">,A_RES_EXPLORER</if>
+        <if test = "A_RES_EXPLOR_CONTACT!=null">,A_RES_EXPLOR_CONTACT</if>
+        <if test = "A_RES_HAVE!=null">,A_RES_HAVE</if>
+        <if test = "A_TOTAL_AMOUNT!=null">,A_TOTAL_AMOUNT</if>
+        <if test = "A_LONGEST_PERIOD!=null">,A_LONGEST_PERIOD</if>
+        <if test = "A_UNABLE_RELOVE!=null">,A_UNABLE_RELOVE</if>
+        <if test = "Z_RES_PROVIDE_STAND!=null">,Z_RES_PROVIDE_STAND</if>
+        <if test = "Z_BOARD_READY!=null">,Z_BOARD_READY</if>
+        <if test = "Z_TRANS_READY!=null">,Z_TRANS_READY</if>
+        <if test = "Z_OPTICAL_READY!=null">,Z_OPTICAL_READY</if>
+        <if test = "Z_BOARD_PERIOD!=null">,Z_BOARD_PERIOD</if>
+        <if test = "Z_BOARD_AMOUNT!=null">,Z_BOARD_AMOUNT</if>
+        <if test = "Z_BOARD_TYPE!=null">,Z_BOARD_TYPE</if>
+        <if test = "Z_BOARD_MODEL!=null">,Z_BOARD_MODEL</if>
+        <if test = "Z_TRANS_PERIOD!=null">,Z_TRANS_PERIOD</if>
+        <if test = "Z_TRANS_AMOUNT!=null">,Z_TRANS_AMOUNT</if>
+        <if test = "Z_TRANS_TYPE!=null">,Z_TRANS_TYPE</if>
+        <if test = "Z_OTHER_TYPE!=null">,Z_OTHER_TYPE</if>
+        <if test = "Z_TRANS_MODEL!=null">,Z_TRANS_MODEL</if>
+        <if test = "Z_OPTICAL_PERIOD!=null">,Z_OPTICAL_PERIOD</if>
+        <if test = "Z_OPTICAL_AMOUNT!=null">,Z_OPTICAL_AMOUNT</if>
+        <if test = "Z_CONSTRUCT_PERIOD_STAND!=null">,Z_CONSTRUCT_PERIOD_STAND</if>
+        <if test = "Z_PROJECT_AMOUNT!=null">,Z_PROJECT_AMOUNT</if>
+        <if test = "Z_PROJECT_OVERVIEW!=null">,Z_PROJECT_OVERVIEW</if>
+        <if test = "Z_MUNICIPAL_APPROVAL!=null">,Z_MUNICIPAL_APPROVAL</if>
+        <if test = "Z_APPROVAL_PERIOD!=null">,Z_APPROVAL_PERIOD</if>
+        <if test = "Z_RES_DESC!=null">,Z_RES_DESC</if>
+        <if test = "Z_PROPERTY_REDLINE!=null">,Z_PROPERTY_REDLINE</if>
+        <if test = "Z_PROPERTY_DESC!=null">,Z_PROPERTY_DESC</if>
+        <if test = "Z_CUST_ROOM!=null">,Z_CUST_ROOM</if>
+        <if test = "Z_ACCESS_PROJECT_SCHEME!=null">,Z_ACCESS_PROJECT_SCHEME</if>
+        <if test = "Z_RES_EXPLORER!=null">,Z_RES_EXPLORER</if>
+        <if test = "Z_RES_EXPLOR_CONTACT!=null">,Z_RES_EXPLOR_CONTACT</if>
+        <if test = "Z_RES_HAVE!=null">,Z_RES_HAVE</if>
+        <if test = "Z_TOTAL_AMOUNT!=null">,Z_TOTAL_AMOUNT</if>
+        <if test = "Z_LONGEST_PERIOD!=null">,Z_LONGEST_PERIOD</if>
+        <if test = "Z_UNABLE_RELOVE!=null">,Z_UNABLE_RELOVE</if>
+        <if test = "ACCESS_CIR_TYPE!=null">,ACCESS_CIR_TYPE</if>
+        <if test = "OTHER_ACE_CIR_TYPE!=null">,OTHER_ACE_CIR_TYPE</if>
+        <if test = "UPLINK_NODE_PORT!=null">,UPLINK_NODE_PORT</if>
+        <if test = "COLLECT_RES!=null">,COLLECT_RES</if>
+        <if test = "COLLECT_MONEY!=null">,COLLECT_MONEY</if>
+        <if test = "COLLECT_DAY!=null">,COLLECT_DAY</if>
+        <if test = "COLLECT_DESC!=null">,COLLECT_DESC</if>
+        ,CREATE_DATE)
+        VALUES(SEQ_GOM_BDW_CHECK_FEEDBACK.nextval+1,#{srvOrdId},#{woId},#{tacheId},#{areaId},#{areaA},#{areaZ}
+            <if test = "A_CONSTRUCT_SCHEME!=null">,#{A_CONSTRUCT_SCHEME}</if>
+            <if test = "A_ACCESS_ROOM!=null">,#{A_ACCESS_ROOM}</if>
+            <if test = "A_INVESTMENT_AMOUNT!=null">,#{A_INVESTMENT_AMOUNT}</if>
+            <if test = "A_CONSTRUCT_PERIOD!=null">,#{A_CONSTRUCT_PERIOD}</if>
+            <if test = "A_RES_SATISFY!=null">,#{A_RES_SATISFY}</if>
+            <if test = "Z_CONSTRUCT_SCHEME!=null">,#{Z_CONSTRUCT_SCHEME}</if>
+            <if test = "Z_ACCESS_ROOM!=null">,#{Z_ACCESS_ROOM}</if>
+            <if test = "Z_INVESTMENT_AMOUNT!=null">,#{Z_INVESTMENT_AMOUNT}</if>
+            <if test = "Z_CONSTRUCT_PERIOD!=null">,#{Z_CONSTRUCT_PERIOD}</if>
+            <if test = "Z_RES_SATISFY!=null">,#{Z_RES_SATISFY}</if>
+        <if test = "L_CONSTRUCT_SCHEME!=null">,#{L_CONSTRUCT_SCHEME}</if>
+        <if test = "L_INVESTMENT_AMOUNT!=null">,#{L_INVESTMENT_AMOUNT}</if>
+        <if test = "L_CONSTRUCT_PERIOD!=null">,#{L_CONSTRUCT_PERIOD}</if>
+        <if test = "L_RES_SATISFY!=null">,#{L_RES_SATISFY}</if>
+        <if test = "L_SPECIAL_INVESTMENT_AMOUNT!=null">,#{L_SPECIAL_INVESTMENT_AMOUNT}</if>
+        <if test = "A_RES_PROVIDE!=null">,#{A_RES_PROVIDE}</if>
+        <if test = "Z_RES_PROVIDE!=null">,#{Z_RES_PROVIDE}</if>
+        <if test = "A_RES_ACCESS!=null">,#{A_RES_ACCESS}</if>
+        <if test = "Z_RES_ACCESS!=null">,#{Z_RES_ACCESS}</if>
+        <if test = "A_EQUIP_READY!=null">,#{A_EQUIP_READY}</if>
+        <if test = "Z_EQUIP_READY!=null">,#{Z_EQUIP_READY}</if>
+        /**  新增核查标准化字段   */
+        <if test = "A_RES_PROVIDE_STAND!=null">,#{A_RES_PROVIDE_STAND}</if>
+        <if test = "A_BOARD_READY!=null">,#{A_BOARD_READY}</if>
+        <if test = "A_TRANS_READY!=null">,#{A_TRANS_READY}</if>
+        <if test = "A_OPTICAL_READY!=null">,#{A_OPTICAL_READY}</if>
+        <if test = "A_BOARD_PERIOD!=null">,#{A_BOARD_PERIOD}</if>
+        <if test = "A_BOARD_AMOUNT!=null">,#{A_BOARD_AMOUNT}</if>
+        <if test = "A_BOARD_TYPE!=null">,#{A_BOARD_TYPE}</if>
+        <if test = "A_BOARD_MODEL!=null">,#{A_BOARD_MODEL}</if>
+        <if test = "A_TRANS_PERIOD!=null">,#{A_TRANS_PERIOD}</if>
+        <if test = "A_TRANS_AMOUNT!=null">,#{A_TRANS_AMOUNT}</if>
+        <if test = "A_TRANS_TYPE!=null">,#{A_TRANS_TYPE}</if>
+        <if test = "A_OTHER_TYPE!=null">,#{A_OTHER_TYPE}</if>
+        <if test = "A_TRANS_MODEL!=null">,#{A_TRANS_MODEL}</if>
+        <if test = "A_OPTICAL_PERIOD!=null">,#{A_OPTICAL_PERIOD}</if>
+        <if test = "A_OPTICAL_AMOUNT!=null">,#{A_OPTICAL_AMOUNT}</if>
+        <if test = "A_CONSTRUCT_PERIOD_STAND!=null">,#{A_CONSTRUCT_PERIOD_STAND}</if>
+        <if test = "A_PROJECT_AMOUNT!=null">,#{A_PROJECT_AMOUNT}</if>
+        <if test = "A_PROJECT_OVERVIEW!=null">,#{A_PROJECT_OVERVIEW}</if>
+        <if test = "A_MUNICIPAL_APPROVAL!=null">,#{A_MUNICIPAL_APPROVAL}</if>
+        <if test = "A_APPROVAL_PERIOD!=null">,#{A_APPROVAL_PERIOD}</if>
+        <if test = "A_RES_DESC!=null">,#{A_RES_DESC}</if>
+        <if test = "A_PROPERTY_REDLINE!=null">,#{A_PROPERTY_REDLINE}</if>
+        <if test = "A_PROPERTY_DESC!=null">,#{A_PROPERTY_DESC}</if>
+        <if test = "A_CUST_ROOM!=null">,#{A_CUST_ROOM}</if>
+        <if test = "A_ACCESS_PROJECT_SCHEME!=null">,#{A_ACCESS_PROJECT_SCHEME}</if>
+        <if test = "A_RES_EXPLORER!=null">,#{A_RES_EXPLORER}</if>
+        <if test = "A_RES_EXPLOR_CONTACT!=null">,#{A_RES_EXPLOR_CONTACT}</if>
+        <if test = "A_RES_HAVE!=null">,#{A_RES_HAVE}</if>
+        <if test = "A_TOTAL_AMOUNT!=null">,#{A_TOTAL_AMOUNT}</if>
+        <if test = "A_LONGEST_PERIOD!=null">,#{A_LONGEST_PERIOD}</if>
+        <if test = "A_UNABLE_RELOVE!=null">,#{A_UNABLE_RELOVE}</if>
+        <if test = "Z_RES_PROVIDE_STAND!=null">,#{Z_RES_PROVIDE_STAND}</if>
+        <if test = "Z_BOARD_READY!=null">,#{Z_BOARD_READY}</if>
+        <if test = "Z_TRANS_READY!=null">,#{Z_TRANS_READY}</if>
+        <if test = "Z_OPTICAL_READY!=null">,#{Z_OPTICAL_READY}</if>
+        <if test = "Z_BOARD_PERIOD!=null">,#{Z_BOARD_PERIOD}</if>
+        <if test = "Z_BOARD_AMOUNT!=null">,#{Z_BOARD_AMOUNT}</if>
+        <if test = "Z_BOARD_TYPE!=null">,#{Z_BOARD_TYPE}</if>
+        <if test = "Z_BOARD_MODEL!=null">,#{Z_BOARD_MODEL}</if>
+        <if test = "Z_TRANS_PERIOD!=null">,#{Z_TRANS_PERIOD}</if>
+        <if test = "Z_TRANS_AMOUNT!=null">,#{Z_TRANS_AMOUNT}</if>
+        <if test = "Z_TRANS_TYPE!=null">,#{Z_TRANS_TYPE}</if>
+        <if test = "Z_OTHER_TYPE!=null">,#{Z_OTHER_TYPE}</if>
+        <if test = "Z_TRANS_MODEL!=null">,#{Z_TRANS_MODEL}</if>
+        <if test = "Z_OPTICAL_PERIOD!=null">,#{Z_OPTICAL_PERIOD}</if>
+        <if test = "Z_OPTICAL_AMOUNT!=null">,#{Z_OPTICAL_AMOUNT}</if>
+        <if test = "Z_CONSTRUCT_PERIOD_STAND!=null">,#{Z_CONSTRUCT_PERIOD_STAND}</if>
+        <if test = "Z_PROJECT_AMOUNT!=null">,#{Z_PROJECT_AMOUNT}</if>
+        <if test = "Z_PROJECT_OVERVIEW!=null">,#{Z_PROJECT_OVERVIEW}</if>
+        <if test = "Z_MUNICIPAL_APPROVAL!=null">,#{Z_MUNICIPAL_APPROVAL}</if>
+        <if test = "Z_APPROVAL_PERIOD!=null">,#{Z_APPROVAL_PERIOD}</if>
+        <if test = "Z_RES_DESC!=null">,#{Z_RES_DESC}</if>
+        <if test = "Z_PROPERTY_REDLINE!=null">,#{Z_PROPERTY_REDLINE}</if>
+        <if test = "Z_PROPERTY_DESC!=null">,#{Z_PROPERTY_DESC}</if>
+        <if test = "Z_CUST_ROOM!=null">,#{Z_CUST_ROOM}</if>
+        <if test = "Z_ACCESS_PROJECT_SCHEME!=null">,#{Z_ACCESS_PROJECT_SCHEME}</if>
+        <if test = "Z_RES_EXPLORER!=null">,#{Z_RES_EXPLORER}</if>
+        <if test = "Z_RES_EXPLOR_CONTACT!=null">,#{Z_RES_EXPLOR_CONTACT}</if>
+        <if test = "Z_RES_HAVE!=null">,#{Z_RES_HAVE}</if>
+        <if test = "Z_TOTAL_AMOUNT!=null">,#{Z_TOTAL_AMOUNT}</if>
+        <if test = "Z_LONGEST_PERIOD!=null">,#{Z_LONGEST_PERIOD}</if>
+        <if test = "Z_UNABLE_RELOVE!=null">,#{Z_UNABLE_RELOVE}</if>
+        <if test = "ACCESS_CIR_TYPE!=null">,#{ACCESS_CIR_TYPE}</if>
+        <if test = "OTHER_ACE_CIR_TYPE!=null">,#{OTHER_ACE_CIR_TYPE}</if>
+        <if test = "UPLINK_NODE_PORT!=null">,#{UPLINK_NODE_PORT}</if>
+        <if test = "COLLECT_RES!=null">,#{COLLECT_RES}</if>
+        <if test = "COLLECT_MONEY!=null">,#{COLLECT_MONEY}</if>
+        <if test = "COLLECT_DAY!=null">,#{COLLECT_DAY}</if>
+        <if test = "COLLECT_DESC!=null">,#{COLLECT_DESC}</if>
+        ,sysdate)
+    </insert>
+    <select id="queryInfoByTacheId"  resultType="map">
+        SELECT A_CONSTRUCT_SCHEME,A_ACCESS_ROOM,A_INVESTMENT_AMOUNT,A_CONSTRUCT_PERIOD,A_RES_SATISFY,Z_CONSTRUCT_SCHEME,Z_ACCESS_ROOM,Z_CONSTRUCT_PERIOD,Z_RES_SATISFY
+        ,L_CONSTRUCT_SCHEME,L_RES_SATISFY,
+       decode(tache_id,'510101066',nvl(Z_INVESTMENT_AMOUNT + L_SPECIAL_INVESTMENT_AMOUNT,L_SPECIAL_INVESTMENT_AMOUNT),Z_INVESTMENT_AMOUNT) Z_INVESTMENT_AMOUNT
+        ,L_CONSTRUCT_PERIOD,L_SPECIAL_INVESTMENT_AMOUNT
+        FROM GOM_BDW_CHECK_FEEDBACK GBCF WHERE WO_ID IN(
+        SELECT MAX(WO_ID) FROM GOM_BDW_CHECK_FEEDBACK WHERE SRV_ORD_ID=#{srvOrdId}  AND TACHE_ID=#{tacheId} )
+    </select>
+    <delete id="deleteInfoBytacheId" parameterType="java.lang.String">
+        DELETE FROM GOM_BDW_CHECK_FEEDBACK WHERE SRV_ORD_ID=#{srvOrdId} AND TACHE_ID= #{tacheId}
+    </delete>
+    <select id="queryInfoBySrvOrdId"  resultType="map">
+        SELECT
+        CASE WHEN SUM(Z_RES_SATISFY)>0 THEN 1 ELSE 0 END Z_RES_SATISFY,
+        /*CASE WHEN  SUM(Z_INVESTMENT_AMOUNT)>0 THEN SUM(Z_INVESTMENT_AMOUNT) ELSE 0 END Z_INVESTMENT_AMOUNT,*/
+        CASE WHEN  MAX(Z_CONSTRUCT_PERIOD)>0  THEN MAX(Z_CONSTRUCT_PERIOD)  ELSE 0 END Z_CONSTRUCT_PERIOD
+        FROM GOM_BDW_CHECK_FEEDBACK CK
+        left join gom_wo wo on CK.wo_id=wo.wo_id and wo.wo_state='290000004'
+        WHERE (CK.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID=#{srvOrdId})
+        or  CK.SRV_ORD_ID = #{srvOrdId})
+        and TACHE_ID in('510101061','510101062','510101063','510101064','500001150') AND CK.IS_EFFECT is null
+    </select>
+    <select id="queryInvestmentAmountBySrvOrdId"  resultType="map">
+       SELECT SUM(Z_INVESTMENT_AMOUNT) AS Z_INVESTMENT_AMOUNT FROM (
+       SELECT
+        CASE WHEN  Z_INVESTMENT_AMOUNT>0 THEN
+        Z_INVESTMENT_AMOUNT
+         ELSE 0
+         END Z_INVESTMENT_AMOUNT
+        FROM GOM_BDW_CHECK_FEEDBACK CK
+        WHERE (CK.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info
+          where SRV_ORD_ID=#{srvOrdId}) or  CK.SRV_ORD_ID = #{srvOrdId})
+          AND  TACHE_ID ='500001150' AND IS_EFFECT is null ORDER BY id DESC )
+    </select>
+
+    <select id="queryLocalInfoBySrvOrdId"  resultType="map">
+        SELECT
+        CASE WHEN SUM(Z_RES_SATISFY)IS NOT NULL THEN (CASE WHEN SUM(Z_RES_SATISFY)>0 THEN 1 ELSE 0 END) END L_RES_SATISFY,
+        SUM(Z_INVESTMENT_AMOUNT) L_INVESTMENT_AMOUNT,MAX(Z_CONSTRUCT_PERIOD) L_CONSTRUCT_PERIOD
+        FROM GOM_BDW_CHECK_FEEDBACK CK
+        WHERE CK.SRV_ORD_ID in (select RELATE_INFO_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID=#{srvOrdId})
+        AND TACHE_ID='500001150'
+    </select>
+    <select id="querySchmeBySrvOrdId"  resultType="map">
+        SELECT LISTAGG(NAME || ':' ||A,'。&#10;')  WITHIN GROUP( ORDER BY SRV_ORD_ID) RETA,
+        LISTAGG(NAME || ':' ||Z,'。&#13;')  WITHIN GROUP( ORDER BY SRV_ORD_ID) RETZ ,SRV_ORD_ID
+        FROM(
+            SELECT SRV_ORD_ID,LISTAGG(A_CONSTRUCT_SCHEME,';')  WITHIN GROUP( ORDER BY TACHE_ID) AS A ,
+            LISTAGG(Z_CONSTRUCT_SCHEME,';')  WITHIN GROUP( ORDER BY TACHE_ID) AS Z ,TACHE_ID,
+            CASE
+            WHEN TACHE_ID='510101061' THEN '数据'   WHEN TACHE_ID='510101062' THEN '传输'
+            WHEN TACHE_ID='510101063' THEN '交换'   WHEN TACHE_ID='510101064' THEN '其他'
+            END NAME
+            FROM GOM_BDW_CHECK_FEEDBACK
+            WHERE SRV_ORD_ID=#{srvOrdId}
+            GROUP BY TACHE_ID,SRV_ORD_ID)
+        GROUP BY SRV_ORD_ID
+    </select>
+    <select id="queryLocalSchmeBySrvOrdId" resultType="map">
+       SELECT  LISTAGG(Concat(Concat(ORG_NAME,':'),Z_CONSTRUCT_SCHEME) , '。&#10;') WITHIN GROUP( ORDER BY SRV_ORD_ID) AS RETL
+            FROM (SELECT * FROM (
+                    SELECT ck.*,RI.RELATE_INFO_ID AS RELATE_INFO_ID,DD.ORG_NAME AS ORG_NAME
+                    FROM GOM_BDW_CHECK_FEEDBACK CK
+                    LEFT JOIN gom_bdw_sec_local_relate_info RI ON RI.RELATE_INFO_ID = CK.SRV_ORD_ID
+                    LEFT JOIN GOM_ORDER_ATTR SS ON SS.ORDER_ID = RI.ORDER_ID
+                    LEFT JOIN GOM_ORG_S DD  ON SS.ATTR_VAL = DD.ORG_ID
+                    WHERE RI.SRV_ORD_ID=#{srvOrdId} AND TACHE_ID='500001150' AND SS.ATTR_ID = 'REGION_ID' AND CK.IS_EFFECT is null
+                    order by WO_ID desc
+            )T
+            )
+    </select>
+    <select id="qryCheckInfoHis" parameterType="string" resultType="map">
+        SELECT US.USER_REAL_NAME,UT.TACHE_NAME,WG.NAME WORK_GROUP_NAME,A.SRV_ORD_ID,A.WO_ID,A.A_CONSTRUCT_SCHEME,A.A_ACCESS_ROOM,A.A_INVESTMENT_AMOUNT,A.A_CONSTRUCT_PERIOD,A.A_RES_SATISFY,A.Z_CONSTRUCT_SCHEME,A.Z_ACCESS_ROOM,A.Z_INVESTMENT_AMOUNT,A.Z_CONSTRUCT_PERIOD,A.Z_RES_SATISFY,A.CREATE_DATE
+        FROM GOM_BDW_CHECK_FEEDBACK A
+        LEFT JOIN GOM_WO  WO ON A.WO_ID=WO.WO_ID
+        LEFT JOIN GOM_USER_S US ON  WO.DEAL_USER_ID = US.USER_ID
+        LEFT JOIN GOM_PS_2_WO_S WS ON WS.ID=  WO.PS_ID
+        LEFT JOIN UOS_TACHE UT ON UT.ID = WS.TACHE_ID
+        LEFT JOIN WORK_GROUP WG ON WO.DISP_OBJ_ID=WG.WORK_GROUP_ID AND WO.DISP_OBJ_TYE 	='260000002'
+        WHERE SRV_ORD_ID =#{srvOrdId} ORDER BY A.CREATE_DATE
+    </select>
+
+
+    <!--获取接入机房-->
+    <select id="queryAccessRoom"  resultType="map">
+     SELECt LISTAGG( A, ';') WITHIN GROUP(ORDER BY SRV_ORD_ID) as ROOMA,
+             LISTAGG( Z, ';') WITHIN GROUP(ORDER BY SRV_ORD_ID) as ROOMZ
+    FROM (
+    select SRV_ORD_ID,
+    case when A_ACCESS_ROOM is not null then
+           LISTAGG(name || ':' || A_ACCESS_ROOM, ';') WITHIN GROUP(ORDER BY TACHE_ID) end A,
+    case when Z_ACCESS_ROOM is not null then
+           LISTAGG(name || ':' || Z_ACCESS_ROOM, ';') WITHIN GROUP(ORDER BY TACHE_ID) end Z
+      from GOM_BDW_CHECK_FEEDBACK cf
+      LEFT JOIN gom_area_s a
+        ON a.ID = cf.areaid
+     where tache_id = '500001145'
+       and SRV_ORD_ID = #{srvOrdId}
+   group by SRV_ORD_ID,Z_ACCESS_ROOM,A_ACCESS_ROOM)
+
+
+    </select>
+
+    <select id="queryNum" resultType="int" parameterType="map">
+        SELECT count(ID) num FROM GOM_BDW_CHECK_FEEDBACK WHERE SRV_ORD_ID=#{srvOrdId} and TACHE_ID in(#{transport},#{exchange},#{data},#{other})
+    </select>
+
+    <select id="qryAreaName"  resultType="String">
+        SELECT NAME FROM GOM_AREA_S WHERE ID= #{areaId}
+    </select>
+
+    <select id="qryDepartment"  resultType="String">
+       select ORG_NAME from GOM_ORG_S where ORG_ID=(select ATTR_VAL from GOM_ORDER_ATTR WHERE ATTR_ID='REGION_ID' AND  ORDER_ID = (select ORDER_ID from gom_bdw_sec_local_relate_info where SRV_ORD_ID =#{0}))
+    </select>
+
+    <insert id="insertCheckInfoA" parameterType="map">
+        INSERT INTO GOM_BDW_CHECK_FEEDBACK (ID,SRV_ORD_ID,WO_ID,TACHE_ID,AREAID,AREAA,AREAZ
+        <if test = "A_CONSTRUCT_SCHEME!=null">,A_CONSTRUCT_SCHEME</if>
+        <if test = "A_ACCESS_ROOM!=null">,A_ACCESS_ROOM</if>
+        <if test = "A_INVESTMENT_AMOUNT!=null">,A_INVESTMENT_AMOUNT</if>
+        <if test = "A_CONSTRUCT_PERIOD!=null">,A_CONSTRUCT_PERIOD</if>
+        <if test = "A_RES_SATISFY!=null">,A_RES_SATISFY</if>
+        ,CREATE_DATE)
+        VALUES(SEQ_GOM_BDW_CHECK_FEEDBACK.nextval+1,#{srvOrdId},#{woId},#{tacheId},#{areaId},#{areaA},#{areaZ}
+        <if test = "A_CONSTRUCT_SCHEME!=null">,#{A_CONSTRUCT_SCHEME}</if>
+        <if test = "A_ACCESS_ROOM!=null">,#{A_ACCESS_ROOM}</if>
+        <if test = "A_INVESTMENT_AMOUNT!=null">,#{A_INVESTMENT_AMOUNT}</if>
+        <if test = "A_CONSTRUCT_PERIOD!=null">,#{A_CONSTRUCT_PERIOD}</if>
+        <if test = "A_RES_SATISFY!=null">,#{A_RES_SATISFY}</if>
+        ,sysdate)
+    </insert>
+    <insert id="insertCheckInfoZ" parameterType="map">
+        INSERT INTO GOM_BDW_CHECK_FEEDBACK (ID,SRV_ORD_ID,WO_ID,TACHE_ID,AREAID,AREAA,AREAZ
+        <if test = "Z_CONSTRUCT_SCHEME!=null">,Z_CONSTRUCT_SCHEME</if>
+        <if test = "Z_ACCESS_ROOM!=null">,Z_ACCESS_ROOM</if>
+        <if test = "Z_INVESTMENT_AMOUNT!=null">,Z_INVESTMENT_AMOUNT</if>
+        <if test = "Z_CONSTRUCT_PERIOD!=null">,Z_CONSTRUCT_PERIOD</if>
+        <if test = "Z_RES_SATISFY!=null">,Z_RES_SATISFY</if>
+        ,CREATE_DATE)
+        VALUES(SEQ_GOM_BDW_CHECK_FEEDBACK.nextval+1,#{srvOrdId},#{woId},#{tacheId},#{areaId},#{areaA},#{areaZ}
+        <if test = "Z_CONSTRUCT_SCHEME!=null">,#{Z_CONSTRUCT_SCHEME}</if>
+        <if test = "Z_ACCESS_ROOM!=null">,#{Z_ACCESS_ROOM}</if>
+        <if test = "Z_INVESTMENT_AMOUNT!=null">,#{Z_INVESTMENT_AMOUNT}</if>
+        <if test = "Z_CONSTRUCT_PERIOD!=null">,#{Z_CONSTRUCT_PERIOD}</if>
+        <if test = "Z_RES_SATISFY!=null">,#{Z_RES_SATISFY}</if>
+        ,sysdate)
+    </insert>
+
+    <select id="queryInfoByTacheIdTwo"  resultType="map">
+        SELECT A_RES_PROVIDE,A_RES_ACCESS,A_EQUIP_READY,Z_RES_PROVIDE,Z_RES_ACCESS,Z_EQUIP_READY
+        FROM GOM_BDW_CHECK_FEEDBACK GBCF WHERE WO_ID IN(
+        SELECT MAX(WO_ID) FROM GOM_BDW_CHECK_FEEDBACK WHERE SRV_ORD_ID=#{srvOrdId}  AND TACHE_ID=#{tacheId} )
+    </select>
+
+    <delete id="deleteInfoBySrvOrdId" parameterType="java.lang.String">
+        DELETE FROM GOM_BDW_CHECK_FEEDBACK WHERE SRV_ORD_ID=#{srvOrdId}
+    </delete>
+
+    <select id="qryLastNodeInfo"  resultType="map">
+
+
+          SELECT * FROM (
+    SELECT
+	ut.id,
+	ut.tache_name,
+	w.WO_STATE,
+	w.disp_obj_tye,
+	w.disp_obj_id,
+	w.WO_ID,
+	w.CREATE_DATE
+    FROM
+	gom_wo w
+	LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+	LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+    WHERE
+	order_ID = #{orderId}
+	AND WO_STATE = '290000004'
+    ORDER BY
+	w.WO_ID DESC
+    ) A WHERE rownum = 1
+
+    </select>
+
+    <select id="qryFinishNodeList"  resultType="map">
+    SELECT
+	ut.id,
+	ut.tache_name,
+	w.WO_STATE,
+	w.disp_obj_tye,
+	w.disp_obj_id,
+	w.WO_ID,
+	w.CREATE_DATE
+    FROM
+	gom_wo w
+	LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+	LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+    WHERE
+	order_ID = #{orderId}
+	AND WO_STATE = '290000004'
+    </select>
+
+    <select id="qryLastTotalNode"  resultType="map">
+
+
+    SELECT * FROM(
+       SELECT
+           ut.id,
+	ut.tache_name,
+	w.WO_STATE,
+	w.disp_obj_tye,
+	w.disp_obj_id,
+	w.WO_ID,
+	w.CREATE_DATE
+    FROM
+	gom_wo w
+	LEFT JOIN GOM_PS_2_WO_S ws ON ws.id = w.ps_id
+	LEFT JOIN UOS_TACHE ut ON ut.id = ws.tache_id
+     WHERE
+	order_ID = #{orderId}
+	AND WO_STATE = '290000004'
+     AND ut.ID ='510101060'
+     ORDER BY
+	w.WO_ID DESC
+	) WHERE  rownum = 1
+
+    </select>
+</mapper>

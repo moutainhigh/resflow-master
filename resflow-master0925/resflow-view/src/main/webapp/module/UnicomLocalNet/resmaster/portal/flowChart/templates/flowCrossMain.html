@@ -1,0 +1,127 @@
+<div class="modal-header">
+    <h4 class="modal-title">本地调度流程</h4>
+</div>
+<div class="modal-body" style="padding:0px;">
+<!-- 流程图s -->
+    <div class="fish-flowBox" >
+        <!-- 流程图展示 -->
+        <div class="panel panel-default" style="min-width: 1025px">
+            <div class="panel-heading">
+                <span class="panel-title">跨域电路新开、变更、拆机流程</span>
+            </div>
+
+            <div class="panel-body flow-chart-box">
+                <ul class="fish-prompt">
+                    <li class="fish-prompt-1">已完成</li>
+                    <li class="fish-prompt-2">处理中</li>
+                    <li class="fish-prompt-3">未完成</li>
+                </ul>
+                <ul class="fish-flowUl fish-ver clearfix">
+                    <li id="twodryFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">二干调度</p>
+                    </li>
+                    <li id="onedryFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">一干调度</p>
+                    </li>
+                    <li id="jikeFlowSub" style="display: none;" class="fish-finish">
+                        <span class="fish-flowIcon"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">集中集客</p>
+                    </li>
+                    <li id="CIRCUIT_DISPATCH" tacheCode="CIRCUIT_DISPATCH">
+                        <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-1.png" /></span>
+                        <p class="fish-flowName">电路调度</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li class="fish-Line-s1 fish-finish"><label style="top: 50%"></label></li>
+                    <li class="fish-flow1">
+                        <!-- 处理中加 fish-dispose\ 完成加 fish-finish -->
+                        <div class="relative" id="NEW_RES_ENTRY" tacheCode="NEW_RES_ENTRY">
+                            <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-2.png" /></span>
+                            <p class="fish-flowName">新建资源录入</p>
+                            <div class="fish-arrows"></div>
+                        </div>
+                        <!-- 单横线 -->
+                        <div class="fish-line-h"></div>
+                    </li>
+                    <li class="fish-Line-s1">
+                        <label style="top: 0"></label>
+                        <label style="left:0;top:50%"></label>
+                    </li>
+
+                    <li class="fish-Line-s2" style="margin-top: 75px !important;"></li>
+                    <li class="fish-flow2" style="margin-top: 54px !important;">
+                        <dl class="fish-flow-dl">
+                            <dd class="clearfix">
+                                <div class="relative" id="FIBER_RES_ALLOCATE" tacheCode="FIBER_RES_ALLOCATE">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-8.png" /></span>
+                                    <p class="fish-flowName">光线资源分配</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                                <div class="relative" id="OUTSIDE_CONSTRUCT" tacheCode="OUTSIDE_CONSTRUCT">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-12.png" /></span>
+                                    <p class="fish-flowName">外线施工</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+                            <dd class="clearfix">
+                                <div class="inline-block relative" id="RES_ALLOCATE" tacheCode="RES_ALLOCATE">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-7.png" /></span>
+                                    <p class="fish-flowName">资源分配</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                                <div class="inline-block relative" id="DATA_MAKE" tacheCode="DATA_MAKE">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-14.png" /></span>
+                                    <p class="fish-flowName">数据制作</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                                <div class="inline-block relative" id="RES_CONSTRUCT" tacheCode="RES_CONSTRUCT">
+                                    <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-13.png" /></span>
+                                    <p class="fish-flowName">资源施工</p>
+                                    <div class="fish-arrows"></div>
+                                </div>
+                            </dd>
+
+                        </dl>
+                    </li>
+                    <li class="fish-Line-s2" style="margin-top: 75px !important;">
+                        <label style="top: 0"></label>
+                        <label style="top: 100%"></label>
+                    </li>
+                    <li id="LOCAL_TEST" tacheCode="LOCAL_TEST">
+                        <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/icon-9.png" /></span>
+                        <p class="fish-flowName">本地测试</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                    <li class="fish-Line-s1"><label style="top: 50%"></label></li>
+                    <li class="fish-flow1">
+                        <!-- 处理中加 fish-dispose\ 完成加 fish-finish -->
+                        <div class="relative" id="CROSS_WHOLE_COURDER_TEST" tacheCode="CROSS_WHOLE_COURDER_TEST">
+                            <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73confirm.png"/></span>
+                            <p class="fish-flowName">跨域全程测试</p>
+                            <div class="fish-arrows"></div>
+                        </div>
+                        <!-- 单横线 -->
+                        <div class="fish-line-h"></div>
+                    </li>
+                    <li class="fish-Line-s1">
+                        <label style="top: 0"></label>
+                    </li>
+
+                    <li id="RENT" tacheCode="RENT">
+                        <span class="fish-flowIcon tachClick"><img src="module/UnicomLocalNet/resmaster/portal/flowChart/images/73tongzhi.png" /></span>
+                        <p class="fish-flowName">起租</p>
+                        <div class="fish-arrows"></div>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- 步骤s -->
+            <div class="panel-footer" id = crossMain>
+
+            </div>
+        </div>
+
+    </div>
+</div>

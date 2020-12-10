@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="0">
+    <title id="title">本地网调度系统</title>
+    <link rel="stylesheet" href="frm/fish-desktop/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="frm/fish-desktop/css/fish-desktop-compact.css">
+    <link rel="stylesheet" href="frm/fish-desktop/third-party/pagesidebar/pagesidebar.css">
+    <link rel="stylesheet" href="frm/fish-desktop/third-party/fileupload/fileupload.css">
+    <link  rel="stylesheet" href="module/UnicomLocalNet/resmaster/portal/homePage/BasicIconfont/iconfont.css">
+    <!--modify 20190319 zhangrui 修改原有css样式,注释一个，增加一个-->
+    <!--<link rel="stylesheet" href="module/component/css/ngc-desktop-default.css">-->
+    <link rel="stylesheet" href="module/flow/common/css/rest-ui.css">
+    <style type="text/css">
+        html, body {
+            margin: 0px;
+            height: 100%;
+            width: 100%;
+        }
+        #person-button:hover{
+            color: blue;
+        }
+        #group-button:hover{
+            color: blue;
+        }
+        #person-button{
+            width: 180px;
+            font-size: 14px;
+        }
+        #group-button{
+            width: 180px;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+
+<body onload="init()">
+    <div id="person" name="person" style="width: 100%">
+        <input type="button" id="person-button" name="person-button" value="个人权限申请"
+               title="点击切换个人产品权限申请页面" onclick="init()" >
+    </div>
+    <div id="group" name="group"  style="width: 100%;">
+        <input type="button" id="group-button" name="group-button" value="岗位权限申请"
+               title="点击切换岗位产品权限申请页面" onclick="groupShow()" >
+    </div>
+    <div id="main_index_content_1" name="main_index_content_1" style="width: 100%;">
+    </div>
+    <div id="main_index_content_2" name="main_index_content_2" style="width: 100%;">
+    </div>
+</body>
+
+<!--echarts图表p echarts3 引用顺序要在fish前面 -->
+<script src="module/component/BasicIconfont/iconfont.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="frm/fish-desktop/libs/ie-specific/html5shiv/html5shiv.min.js"></script>
+<script src="frm/fish-desktop/libs/ie-specific/respond/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript" src="frm/fish-desktop/js/fish-desktop-all.min.js"></script>
+<script type="text/javascript" src="frm/fish-desktop/third-party/pagesidebar/fish.pagesidebar.js"></script>
+<script type="text/javascript" src="frm/fish-desktop/third-party/fileupload/fish.fileupload.js"></script>
+<script type="text/javascript" src="frame/plugins/requiresJS.js" data-main="bussRoleApplyIndex_config.js"></script>
+<!--echarts图表 -->
+<script type="text/javascript">
+
+    /**
+     * 切换到岗位产品分配页面
+     */
+    function groupShow() {
+        document.getElementById("person").style.display = ""; //显示
+        document.getElementById("group").style.display = "none"; //隐藏
+        document.getElementById("main_index_content_1").style.display = "none"; //隐藏
+        document.getElementById("main_index_content_2").style.display = ""; //显示
+    }
+
+    /**
+     * 初始化时隐藏岗位分配页面，显示个人分配页面
+     */
+    function init() {
+        document.getElementById("person").style.display = "none"; //隐藏
+        document.getElementById("group").style.display = ""; //显示
+        document.getElementById("main_index_content_1").style.display = ""; //显示
+        document.getElementById("main_index_content_2").style.display = "none"; //隐藏
+    }
+
+</script>
+</html>

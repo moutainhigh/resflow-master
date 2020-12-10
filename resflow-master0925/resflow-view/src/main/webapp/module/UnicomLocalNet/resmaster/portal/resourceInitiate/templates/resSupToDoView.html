@@ -1,0 +1,60 @@
+<div id="isa-resSupToDo-mainPanel">
+    <div style="padding: 15px 15px 0px 15px">
+        <form class="form-horizontal" id="resSupToDo-Qryform">
+            <div class="resSupToDo-btn-row">
+                <div id="resSupToDo-searchCodeDiv">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">业务号码</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="serialNumber" id="serialNumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">电路编号</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="circuitCode" id="circuitCode">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label class="col-md-4 col-sm-4 control-label">产品类型</label>
+                                <div class="col-md-8 col-sm-8">
+                                    <input class="combobox form-control" name="productType" id="productType">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix" id="searchBtnDiv">
+                        <div style="float: right;margin-right: 30px" >
+                            <button id="queryOrder"  type="button" class="btn btn-danger">查询</button>
+                            <button id="cancel" type="reset" class="btn btn-default">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="orderDeal-tab" class="ui-tabs">
+        <ul class="ui-tabs-nav">
+            <li><a id="tabs-a-a-link" href="#tabs-a-a">待签收<span class="redge pull-right clearfix" id="waitSignFor">0</span></a></li>
+            <li><a id="tabs-a-b-link" href="#tabs-a-a">处理中<span class="redge pull-right clearfix" id="dealWith">0</span></a></li>
+            <li><a id="tabs-a-c-link" href="#tabs-a-a">已完成<span class="redge pull-right clearfix" id="completed">0</span></a></li>
+        </ul>
+        <div class="mgtb-10-15" style="margin-bottom: 0 !important;">
+            <button class="btn btn-default mgr-5" type="button" id="touchGet">签  收</button>
+            <button class="btn btn-default mgr-5" type="button" id="releaseTouchGet">释放签收</button>
+        </div>
+        <div id="tabs-a-a" style="padding: 6px 4px 0px 4px;">
+            <!-- 实际的内容页 -->
+            <div class="tab-content-model">
+                <div id="orderDeal-grid"></div>
+            </div>
+        </div>
+
+    </div>
+</div>

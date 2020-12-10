@@ -1,0 +1,106 @@
+.pdr-0{padding-right: 0 !important;}
+.mgr-0{margin-right: 0 !important;}
+
+.content-back,body{
+    background-color: #EEF0F4;
+}
+.panel-title {
+    color: #333;
+    vertical-align: middle;
+    position: relative;
+    padding-left: 10px;
+}
+.panel-title:before {
+    display: inline-block;
+    content: '';
+    width: 5px;
+    height:14px;
+    background-color: #eb4a4b;
+    border-radius: 5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.panel-body {
+    padding: 6px 10px;
+}
+.person-data,.orderSheet{
+    display: inline-block;
+    margin-bottom: 0 !important;
+    padding-left: 10px !important;
+}
+.person-data li{
+    display: inline-block;
+    float: left;
+    margin-right: 120px;
+    padding-left: 20px;
+}
+.person-data .person-icon1{
+    background: url("../images/icon-6.png") 0 0 no-repeat;
+}
+.person-data .person-icon2{
+    background: url("../images/icon-7.png") 0 0 no-repeat;
+}
+.person-data .person-icon3{
+    background: url("../images/icon-8.png") 0 0 no-repeat;
+}
+
+.orderSheet li{
+    display: inline-block;
+    min-width: 100px;
+    margin-top: 10px;
+}
+.orderSheet img{
+    display: inline-block;
+    float: left;
+    margin-right: 7px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    opacity: 0.8;
+
+}
+
+.orderSheet img:hover {
+    opacity: 1;
+}
+.orderSheet .orderInfo{
+    float: left;
+}
+.orderSheet .orderInfo p{
+    color: #666;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+.orderSheet .orderInfo span{
+    color: #707070;
+    font-size: 16px;
+    padding-left: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.orderSheet .orderInfo span:hover {
+    color: #cc2222;
+}
+
+
+a:link {
+    color: #0a7ddc;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #cc2222;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #0a7ddc;
+    text-decoration: none;
+}
+
+a:active {
+    color: #FFFFFF;
+    text-decoration: none;
+}

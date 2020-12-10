@@ -1,0 +1,232 @@
+<div class="modal-header">
+    <h4 class="modal-title">批量处理</h4>
+</div>
+<div class="modal-body">
+    <div id="batchDealDispatchInfo">
+        <div style="margin-left: 15px;margin-right: 15px;">
+            <form class="form-horizontal" id="batchDealDispatchInfo-form">
+                <div id="batchDealDispatchInfo-grid"></div>
+                <div style="padding: 10px;width:100%; margin-top: 10px;margin-bottom: 15px;" id="orgDiv">
+                    <div class="title_left">
+                        <span class="title_left_span">派单部门</span>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 col-sm-4 big-control-label" style="padding-right: 0;">是否派发本地网：</label>
+                        <div class="col-md-10 col-sm-8" id="toLocalNet">
+                            <label class="radio-inline">
+                                <input type="radio" class="resRadio" name="resRadio" id="resPass" value="是" checked="true">是</label>
+                            <label class="radio-inline">
+                                <input type="radio" class="resRadio" name="resRadio" id="resNoPass" value="否">否</label>
+                        </div>
+                        <div class="col-md-6 toLocal">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">主调局<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="masterRegionName" name="masterRegionName"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 toLocal">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">完成时间<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="masterComplateTime" name="masterComplateTime"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 toLocal">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">辅调局</label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="slaveRegionName" name="slaveRegionName"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 toLocal">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">完成时间</label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="slaveComplateTime" name="slaveComplateTime"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">数据制作<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <select id="netManageChild" name="netManageChild" class="ui-multiselect form-control" data-placeholder="请选择数据制作..." data-rule="required" multiple="">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">数据制作是否指定到人<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control"  id="isAssignPersonChild" name="isAssignPersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 dataMkName DATA_4NameChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">数据专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="DATA_4NameChild" name="DATA_4NameChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 dataMkName TRANS_3NameChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">传输专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="TRANS_3NameChild" name="TRANS_3NameChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 dataMkName EXCHANGE_5NameChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">交换专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="EXCHANGE_5NameChild" name="EXCHANGE_5NameChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 dataMkName IP_15NameChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">IP地址人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="IP_15NameChild" name="IP_15NameChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 dataMkName OTHER_11NameChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">其它专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="OTHER_11NameChild" name="OTHER_11NameChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">是否转资源分配</label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control"  id="resAllocateChild" name="resAllocateChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resourceSpecialty">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">资源分配<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <select id="resourceSpecialtyChild" name="resourceSpecialtyChild" class="ui-multiselect form-control" data-placeholder="请选择专业..." data-rule="required" multiple="">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resourceSpecialty">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">资源分配是否指定到人<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control"  id="isResAssChild" name="isResAssChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign TRANS_3PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">传输专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="TRANS_3PersonChild" name="TRANS_3PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign DATA_4PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">数据专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="DATA_4PersonChild" name="DATA_4PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign EXCHANGE_5PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">交换专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="EXCHANGE_5PersonChild" name="EXCHANGE_5PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign OPTICAL_2PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">光纤专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="OPTICAL_2PersonChild" name="OPTICAL_2PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign IP_15PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">IP地址人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="IP_15PersonChild" name="IP_15PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 resourceDiv resAssign OTHER_11PersonChild" style="display:none">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">其它专业人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="OTHER_11PersonChild" name="OTHER_11PersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">完工汇总是否指定到人<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control"  id="isComplatePersonChild" name="isComplatePersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 isComplatePerson">
+                            <div class="form-group">
+                                <label class="col-md-4 big-control-label">完工汇总人员选择<span style="color: red">*</span></label>
+                                <div class="col-md-8 input-group">
+                                    <input class="form-control" id="complatePersonChild" name="complatePersonChild"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <div id="subBtnDiv" style="float: right;margin-right: 50px;">
+        <button type="button" id="submitBtn" class="btn btn-danger">保存</button>
+        <button type="button" data-dismiss="modal" class="btn btn-default">关闭</button>
+    </div>
+</div>
